@@ -1,0 +1,9 @@
+- figure out config
+- test with cache
+- add ci tests
+- release
+- makefile
+- test with kubernetes
+- dockerhub example images
+- avx vs avx2 vs avx512 (cpu capability?)
+- record asciinema

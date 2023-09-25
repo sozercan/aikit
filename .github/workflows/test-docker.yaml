@@ -1,0 +1,40 @@
+name: docker-test
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+
+permissions: read-all
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: "1.21"
+
+      - name: create buildx builder
+        run: docker buildx create --use --name builder --bootstrap
+
+      - name: build aikit
+        run: docker buildx build . -t sozercan/aikit:latest
+
+      - name: build test model
+        run: docker buildx build . -t sozercan/testmodel:latest -f test/aikitfile.yaml
+
+      - name: run test model
+        run: docker run -d -p 8080:8080 sozercan/testmodel:latest
+
+      - name: run bats tests
+        run: make test-e2e-dependencies test-e2e

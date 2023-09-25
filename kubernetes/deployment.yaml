@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mistral
+  labels:
+    app: mistral
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: mistral
+  template:
+    metadata:
+      labels:
+        app: mistral
+    spec:
+      containers:
+      - name: mistral
+        image: sozercan/mistral:latest
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mistral
+spec:
+  selector:
+    app: mistral
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
