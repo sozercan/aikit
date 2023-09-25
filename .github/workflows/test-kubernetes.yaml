@@ -1,0 +1,60 @@
+# name: kubernetes-test
+
+# on:
+#   push:
+#     branches:
+#       - main
+#     paths-ignore:
+#       - '**.md'
+#   pull_request:
+#     branches:
+#       - main
+#     paths-ignore:
+#       - '**.md'
+
+# permissions: read-all
+
+# jobs:
+#   test:
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 240
+#     steps:
+#       - uses: actions/checkout@v4
+
+#       - name: cleanup disk space
+#         run: |
+#           df -H
+#           docker system prune -a -f
+#           sudo rm -rf /usr/share/dotnet
+#           sudo rm -rf /opt/ghc
+#           sudo rm -rf "/usr/local/share/boost"
+#           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+#           df -H
+
+#       - name: create buildx builder
+#         run: docker buildx create --use --name builder --bootstrap
+#       - uses: crazy-max/ghaction-github-runtime@v3
+
+#       - name: build aikit
+#         run: docker buildx build . -t sozercan/aikit:latest --load --cache-from=type=gha,scope=aikit --cache-to=type=gha,scope=aikit,mode=max
+
+#       - name: build test model
+#         run: docker buildx build . -t sozercan/testmodel:latest -f test/aikitfile.yaml --load --cache-from=type=gha,scope=testmodel --cache-to=type=gha,scope=testmodel,mode=max
+
+#       - name: install e2e dependencies
+#         run: make test-e2e-dependencies
+
+#       - name: create kind cluster
+#         run: kind create cluster --wait 5m
+
+#       - name: load test model image into kind cluster
+#         run: kind load docker-image sozercan/testmodel:latest
+
+#       - name: deploy test model
+#         run: |
+#           kubectl create deployment test-model-deployment --image=sozercan/testmodel:latest --replicas 1
+#           kubectl expose deployment test-model-deployment --port=8080 --target-port=8008 --name=test-model-service
+#           kubectl port-forward service/test-model-service 8080:8080 &
+
+#       - name: run bats test
+#         run: make test-e2e
