@@ -1,0 +1,20 @@
+#syntax=ghcr.io/sozercan/aikit:latest
+apiVersion: v1alpha1
+debug: true
+models:
+  - name: orca-2-13b
+    source: https://huggingface.co/TheBloke/Orca-2-13B-GGUF/resolve/main/orca-2-13b.Q4_K_M.gguf
+    sha256: d37ea225dbe22318a4784a458a1832e34193d46f01a31e0b62e3a841fb8ec9ce
+config: |
+  - name: orca-2-13b
+    backend: llama
+    parameters:
+      top_k: 80
+      temperature: 0.2
+      top_p: 0.7
+      model: orca-2-13b.Q4_K_M.gguf
+    context_size: 4096
+    gpu_layers: 43
+    f16: true
+    batch: 512
+    mmap: true

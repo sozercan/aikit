@@ -1,0 +1,38 @@
+name: update-models
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+ update-models:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push llama 2 models to GHCR
+        run: |
+          docker buildx create --use --name builder --bootstrap
+
+          # cpu avx
+          MODELS_PATH=models
+          docker buildx build . -t ghcr.io/sozercan/llama2:7b -f ${MODELS_PATH}/llama-2-7b-chat.yaml --push
+          docker buildx build . -t ghcr.io/sozercan/llama2:13b -f ${MODELS_PATH}/llama-2-13b-chat.yaml --push
+          docker buildx build . -t ghcr.io/sozercan/orca2:13b -f ${MODELS_PATH}/orca-2-13b.yaml --push
+
+          # cuda
+          CUDA_MODELS_PATH=models/cuda
+          docker buildx build . -t ghcr.io/sozercan/llama2:7b-cuda -f ${CUDA_MODELS_PATH}/llama-2-7b-chat.yaml --push
+          docker buildx build . -t ghcr.io/sozercan/llama2:13b-cuda -f ${CUDA_MODELS_PATH}/llama-2-13b-chat.yaml --push
+          docker buildx build . -t ghcr.io/sozercan/orca2:13b-cuda -f ${CUDA_MODELS_PATH}/orca-2-13b.yaml --push

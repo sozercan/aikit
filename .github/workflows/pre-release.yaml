@@ -1,0 +1,42 @@
+name: pre-release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+ release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: cleanup disk space
+        run: |
+          df -H
+          docker system prune -f -a --volumes
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          df -H
+
+      - name: Login to ghcr
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: create buildx builder
+        run: docker buildx create --use --name builder --bootstrap
+      - uses: crazy-max/ghaction-github-runtime@v3
+
+      - name: Push aikit:dev to GHCR
+        run: |
+          docker buildx build -t ghcr.io/sozercan/aikit:dev --push .

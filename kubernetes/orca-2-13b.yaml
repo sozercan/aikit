@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orca2
+  labels:
+    app: orca2
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: orca2
+  template:
+    metadata:
+      labels:
+        app: orca2
+    spec:
+      containers:
+      - name: orca2
+        image: ghcr.io/sozercan/orca2:13b
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orca2
+spec:
+  selector:
+    app: orca2
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
