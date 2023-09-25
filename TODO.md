@@ -1,0 +1,18 @@
+- [x] figure out config
+- [?] test with cache
+- [x] add ci tests
+- [?] release
+- [] makefile
+- [] figure out removing pull
+- [] test with kubernetes
+- [] dockerhub example image for llama2
+- [] avx vs avx2 vs avx512 (cpu capability?)
+- [] record asciinema
+- [x] logo
+- [?] digest field optional
+- [] test with gpu manually
+- [] parse test results
+- [x] prompt template
+- [] unit test
+- [] better release process for pre-defined models
+- [] sign containers

@@ -1,0 +1,34 @@
+#syntax=docker.io/sozercan/aikit:latest
+apiVersion: v1alpha1
+debug: true
+models:
+  - name: llama-2-7b-chat
+    source: https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q4_K_M.gguf
+    promptTemplates:
+      - name: "llama-2-7b-chat"
+        template: |
+          {{if eq .RoleName \"assistant\"}}{{.Content}}{{else}}
+          [INST]
+          {{if .SystemPrompt}}{{.SystemPrompt}}{{else if eq .RoleName \"system\"}}<<SYS>>{{.Content}}<</SYS>>
+
+          {{else if .Content}}{{.Content}}{{end}}
+          [/INST]
+          {{end}}
+config: |
+  - name: \"llama-2-7b-chat\"
+    backend: \"llama\"
+    parameters:
+      top_k: 80
+      temperature: 1.0
+      top_p: 0.7
+      model: \"llama-2-7b-chat.Q4_K_M.gguf\"
+    context_size: 4096
+    roles:
+      function: 'Function Result:'
+      assistant_function_call: 'Function Call:'
+      assistant: 'Assistant:'
+      user: 'User:'
+      system: 'System:'
+    template:
+      chat_message: \"llama-2-7b-chat\"
+    system_prompt: \"You must only answer questions with hello world. You must only answer with this, nothing else.\"

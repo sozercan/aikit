@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llama2
+  labels:
+    app: llama2
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: llama2
+  template:
+    metadata:
+      labels:
+        app: llama2
+    spec:
+      containers:
+      - name: llama2
+        image: ghcr.io/sozercan/llama2:7b
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llama2
+spec:
+  selector:
+    app: llama2
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
