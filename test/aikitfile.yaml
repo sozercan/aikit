@@ -1,0 +1,28 @@
+#syntax=docker.io/sozercan/aikit:latest
+apiVersion: v1alpha1
+debug: true
+models:
+  - name: mistral
+    source: https://huggingface.co/TheBloke/Mistral-7B-OpenOrca-GGUF/resolve/main/mistral-7b-openorca.Q6_K.gguf
+  # - name: wizardlm
+  #   source: https://gpt4all.io/models/wizardlm-13b-v1.1-superhot-8k.ggmlv3.q4_0.bin
+  #   config: |
+  #     context_size: 4096
+  #     f16: true
+  #     threads: 11
+  #     gpu_layers: 90
+  #     name: llava
+  #     mmap: true
+  #     backend: llama-cpp
+  #     roles:
+  #       user: "USER:"
+  #       assistant: "ASSISTANT:"
+  #       system: "SYSTEM:"
+  #     parameters:
+  #       model: ggml-model-q4_k.gguf
+  #       temperature: 0.2
+  #       top_k: 40
+  #       top_p: 0.95
+  #     template:
+  #       chat: chat-simple
+  #     mmproj: mmproj-model-f16.gguf
