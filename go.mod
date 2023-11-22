@@ -4,8 +4,8 @@ go 1.21
 
 require (
 	github.com/containerd/containerd v1.7.2
-	github.com/docker/docker v24.0.0-rc.2.0.20230706181717-98d3da79ef9c+incompatible
-	github.com/moby/buildkit v0.12.0
+	github.com/docker/docker v24.0.0-rc.2.0.20230718135204-8e51b8b59cb8+incompatible
+	github.com/moby/buildkit v0.12.3
 	github.com/opencontainers/image-spec v1.1.0-rc3
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.0
