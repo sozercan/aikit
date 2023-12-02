@@ -1,6 +1,7 @@
 #syntax=ghcr.io/sozercan/aikit:latest
 apiVersion: v1alpha1
 debug: true
+runtime: cuda
 models:
   - name: orca-2-13b
     source: https://huggingface.co/TheBloke/Orca-2-13B-GGUF/resolve/main/orca-2-13b.Q4_K_M.gguf
