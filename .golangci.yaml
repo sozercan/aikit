@@ -2,9 +2,9 @@ run:
   timeout: 5m
 
 linters-settings:
-  # gocritic:
-  #   enabled-tags:
-  #   - performance
+  gocritic:
+    enabled-tags:
+    - performance
   lll:
     line-length: 200
 
