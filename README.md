@@ -6,14 +6,14 @@
 
 AIKit is a quick, easy, and local or cloud-agnostic way to get started to host and deploy large language models (LLMs) for inference. No GPU, internet access or additional tools are needed to get started except for [Docker](https://docs.docker.com/desktop/install/linux-install/)!
 
-AIKit uses [LocalAI](https://localai.io/) under-the-hood to run inference. LocalAI provides a drop-in replacement REST API that is OpenAI API compatible, so you can use any OpenAI API compatible client, such as [Kubectl AI](https://github.com/sozercan/kubectl-ai), to send requests to open-source LLMs powered by AIKit!
+AIKit uses [LocalAI](https://localai.io/) under-the-hood to run inference. LocalAI provides a drop-in replacement REST API that is OpenAI API compatible, so you can use any OpenAI API compatible client, such as [Kubectl AI](https://github.com/sozercan/kubectl-ai), [Chatbot-UI](https://github.com/sozercan/chatbot-ui) and many more, to send requests to open-source LLMs powered by AIKit!
 
 > [!NOTE]
 > At this time, AIKit is tested with LocalAI `llama` backend. Other backends may work but are not tested. Please open an issue if you'd like to see support for other backends.
 
 ## Features
 
-- 🐳 No GPU, internet access or additional tools needed except for [Docker](https://docs.docker.com/desktop/install/linux-install/)!
+- 🐳 No GPU, Internet access or additional tools needed except for [Docker](https://docs.docker.com/desktop/install/linux-install/)!
 - 🤏 Minimal image size, resulting in less vulnerabilities and smaller attack surface with a custom [distroless](https://github.com/GoogleContainerTools/distroless)-based image
 - 🚀 Easy to use declarative configuration
 - ✨ OpenAI API compatible to use with any OpenAI API compatible client
@@ -141,7 +141,7 @@ curl http://localhost:8080/v1/chat/completions -H "Content-Type: application/jso
 ```
 
 > [!TIP]
-> For an example Kubernetes deployment and service YAML, see [kubernetes folder](./kubernetes/).
+> For an example Kubernetes deployment and service YAML, see [kubernetes folder](./kubernetes/). Please note that these are examples, you may need to customize them (such as properly configured resource requests and limits) based on your needs.
 
 ## GPU Acceleration Support
 

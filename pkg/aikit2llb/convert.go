@@ -6,6 +6,7 @@ import (
 	"path"
 
 	"github.com/moby/buildkit/client/llb"
+	"github.com/opencontainers/go-digest"
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/sozercan/aikit/pkg/aikit/config"
 	"github.com/sozercan/aikit/pkg/utils"
@@ -15,26 +16,23 @@ const (
 	debianSlim     = "docker.io/library/debian:12-slim"
 	distrolessBase = "gcr.io/distroless/cc-debian12:latest"
 	localAIVersion = "v1.40.0"
-	retryCount     = 5
 	cudaVersion    = "12-3"
 )
 
 func Aikit2LLB(c *config.Config) (llb.State, *specs.Image) {
 	var merge llb.State
 	s := llb.Image(debianSlim)
-	s = curl(s)
+	s, merge = copyModels(s, c)
+	s, merge = addLocalAI(c, s, merge)
 	if c.Runtime == utils.RuntimeNVIDIA {
-		s, merge = installCuda(s)
-	} else {
-		merge = llb.Image(distrolessBase)
+		s = installCuda(s, merge)
 	}
-	s, merge = copyModels(s, merge, c)
-	s = addLocalAI(c, s, merge)
 	imageCfg := NewImageConfig(c)
 	return s, imageCfg
 }
 
-func copyModels(s llb.State, merge llb.State, c *config.Config) (llb.State, llb.State) {
+func copyModels(s llb.State, c *config.Config) (llb.State, llb.State) {
+	db := llb.Image(distrolessBase)
 	initState := s
 
 	// create config file if defined
@@ -43,12 +41,24 @@ func copyModels(s llb.State, merge llb.State, c *config.Config) (llb.State, llb.
 	}
 
 	for _, model := range c.Models {
-		s = s.Run(llb.Shlexf("curl --retry %d --create-dirs -sSLO --output-dir /models %s", retryCount, model.Source)).Root()
-		// verify sha256 checksum if defined
+		var opts []llb.HTTPOption
+		opts = append(opts, llb.Filename(fileNameFromURL(model.Source)))
 		if model.SHA256 != "" {
-			path := fmt.Sprintf("/models/%s", fileNameFromURL(model.Source))
-			s = s.Run(shf("echo \"%s  %s\" | sha256sum -c -", model.SHA256, path)).Root()
+			digest := digest.NewDigestFromEncoded(digest.SHA256, model.SHA256)
+			opts = append(opts, llb.Checksum(digest))
 		}
+
+		m := llb.HTTP(model.Source, opts...)
+
+		var copyOpts []llb.CopyOption
+		copyOpts = append(copyOpts, &llb.CopyInfo{
+			CreateDestPath: true,
+		})
+		s = s.File(
+			llb.Copy(m, fileNameFromURL(model.Source), "/models/"+fileNameFromURL(model.Source), copyOpts...),
+			llb.WithCustomName("Copying "+fileNameFromURL(model.Source)+" to /models"), //nolint: goconst
+		)
+
 		// create prompt templates if defined
 		for _, pt := range model.PromptTemplates {
 			if pt.Name != "" && pt.Template != "" {
@@ -57,7 +67,7 @@ func copyModels(s llb.State, merge llb.State, c *config.Config) (llb.State, llb.
 		}
 	}
 	diff := llb.Diff(initState, s)
-	merge = llb.Merge([]llb.State{merge, diff})
+	merge := llb.Merge([]llb.State{db, diff})
 	return s, merge
 }
 
@@ -69,29 +79,29 @@ func fileNameFromURL(urlString string) string {
 	return path.Base(parsedURL.Path)
 }
 
-func curl(s llb.State) llb.State {
-	i := s.Run(llb.Shlex("apt-get update"), llb.IgnoreCache).Root()
-	return i.Run(llb.Shlex("apt-get install curl -y")).Root()
-}
-
-func installCuda(s llb.State) (llb.State, llb.State) {
+func installCuda(s llb.State, merge llb.State) llb.State {
 	initState := s
 
-	s = s.Run(shf("curl -O https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/cuda-keyring_1.1-1_all.deb && dpkg -i cuda-keyring_1.1-1_all.deb && rm cuda-keyring_1.1-1_all.deb")).Root()
-	s = s.Run(llb.Shlex("apt-get update"), llb.IgnoreCache).Root()
-	s = s.Run(shf("apt-get install -y libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean", cudaVersion)).Root()
+	cudaKeyringURL := "https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/cuda-keyring_1.1-1_all.deb"
+	cudaKeyring := llb.HTTP(cudaKeyringURL)
+	s = s.File(
+		llb.Copy(cudaKeyring, fileNameFromURL(cudaKeyringURL), "/"),
+		llb.WithCustomName("Copying "+fileNameFromURL(cudaKeyringURL)), //nolint: goconst
+	)
+	s = s.Run(shf("dpkg -i cuda-keyring_1.1-1_all.deb && rm cuda-keyring_1.1-1_all.deb")).Root()
+	s = s.Run(shf("apt-get update && apt-get install -y ca-certificates && apt-get update && apt-get install -y libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean", cudaVersion), llb.IgnoreCache).Root()
 
 	diff := llb.Diff(initState, s)
-	merge := llb.Merge([]llb.State{llb.Image(distrolessBase), diff})
-	return s, merge
+	merge = llb.Merge([]llb.State{merge, diff})
+	return merge
 }
 
-func addLocalAI(c *config.Config, s llb.State, merge llb.State) llb.State {
+func addLocalAI(c *config.Config, s llb.State, merge llb.State) (llb.State, llb.State) {
 	initState := s
 	var localAIURL string
 	switch c.Runtime {
 	case utils.RuntimeNVIDIA:
-		localAIURL = fmt.Sprintf("https://sertacstorage.blob.core.windows.net/localai/%s/local-ai", localAIVersion)
+		localAIURL = fmt.Sprintf("https://sertaccdn.azureedge.net/localai/%s/local-ai", localAIVersion)
 	case utils.RuntimeCPUAVX2:
 		localAIURL = fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%s/local-ai-avx2-Linux-x86_64", localAIVersion)
 	case utils.RuntimeCPUAVX512:
@@ -100,10 +110,17 @@ func addLocalAI(c *config.Config, s llb.State, merge llb.State) llb.State {
 		localAIURL = fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%s/local-ai-avx-Linux-x86_64", localAIVersion)
 	}
 
-	s = s.Run(llb.Shlexf("curl -Lo /usr/bin/local-ai %s", localAIURL)).Root()
-	s = s.Run(llb.Shlex("chmod +x /usr/bin/local-ai")).Root()
+	var opts []llb.HTTPOption
+	opts = append(opts, llb.Filename("local-ai"))
+	opts = append(opts, llb.Chmod(0o755))
+	localAI := llb.HTTP(localAIURL, opts...)
+	s = s.File(
+		llb.Copy(localAI, "local-ai", "/usr/bin"),
+		llb.WithCustomName("Copying "+fileNameFromURL(localAIURL)+" to /usr/bin"), //nolint: goconst
+	)
+
 	diff := llb.Diff(initState, s)
-	return llb.Merge([]llb.State{merge, diff})
+	return s, llb.Merge([]llb.State{merge, diff})
 }
 
 func shf(cmd string, v ...interface{}) llb.RunOption {
