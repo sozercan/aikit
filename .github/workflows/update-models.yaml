@@ -6,13 +6,31 @@ on:
 permissions:
   contents: write
   packages: write
+  id-token: write
 
 jobs:
  update-models:
+    strategy:
+      fail-fast: false
+      matrix:
+        model:
+         - llama-2-7b-chat
+         - llama-2-13b-chat
+         - orca-2-13b
+         - llama-2-7b-chat-cuda
+         - llama-2-13b-chat-cuda
+         - orca-2-13b-cuda
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - uses: crazy-max/ghaction-github-runtime@v3
 
       - name: Login to GHCR
         uses: docker/login-action@v3
@@ -21,18 +39,30 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push llama 2 models to GHCR
+      - name: parse matrix
         run: |
-          docker buildx create --use --name builder --bootstrap
+          echo "MODEL_NAME=$(echo ${{ matrix.model }} | cut -d'-' -f1-2 | sed 's/-//g')" >> $GITHUB_ENV
+          echo "MODEL_SIZE=$(echo ${{ matrix.model }} | rev | cut -d'-' -f2 | rev)" >> $GITHUB_ENV
+          echo "MODEL_RUNTIME=-$(echo ${{ matrix.model }} | rev | cut -d'-' -f1 | rev)" >> $GITHUB_ENV
 
-          # cpu avx
-          MODELS_PATH=models
-          docker buildx build . -t ghcr.io/sozercan/llama2:7b -f ${MODELS_PATH}/llama-2-7b-chat.yaml --push
-          docker buildx build . -t ghcr.io/sozercan/llama2:13b -f ${MODELS_PATH}/llama-2-13b-chat.yaml --push
-          docker buildx build . -t ghcr.io/sozercan/orca2:13b -f ${MODELS_PATH}/orca-2-13b.yaml --push
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ghcr.io/sozercan/${{ env.MODEL_NAME }}:${{ env.MODEL_SIZE }}${{ env.MODEL_RUNTIME }}
+          file: models/${{ matrix.model }}.yaml
+          cache-from: type=gha,scope=${{ env.MODEL_NAME }}:${{ env.MODEL_SIZE }}
+          cache-to: type=gha,scope=${{ env.MODEL_NAME }}:${{ env.MODEL_SIZE }},mode=max
 
-          # cuda
-          CUDA_MODELS_PATH=models/cuda
-          docker buildx build . -t ghcr.io/sozercan/llama2:7b-cuda -f ${CUDA_MODELS_PATH}/llama-2-7b-chat.yaml --push
-          docker buildx build . -t ghcr.io/sozercan/llama2:13b-cuda -f ${CUDA_MODELS_PATH}/llama-2-13b-chat.yaml --push
-          docker buildx build . -t ghcr.io/sozercan/orca2:13b-cuda -f ${CUDA_MODELS_PATH}/orca-2-13b.yaml --push
+      - name: Sign the images with GitHub OIDC Token
+        env:
+          DIGEST: ${{ steps.build-and-push.outputs.digest }}
+        run: cosign sign --yes "ghcr.io/sozercan/${{ env.MODEL_NAME }}:${{ env.MODEL_SIZE }}${{ env.MODEL_RUNTIME }}@${DIGEST}"
+
+      - name: verify image signature
+        env:
+          DIGEST: ${{ steps.build-and-push.outputs.digest }}
+        run: |
+          cosign verify ghcr.io/sozercan/${{ env.MODEL_NAME }}:${{ env.MODEL_SIZE }}${{ env.MODEL_RUNTIME }}@${DIGEST} \
+            --certificate-identity https://github.com/sozercan/aikit/.github/workflows/update-models.yaml@refs/heads/main \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com | jq

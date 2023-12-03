@@ -8,6 +8,7 @@ on:
 permissions:
   contents: write
   packages: write
+  id-token: write
 
 jobs:
  release:
@@ -15,10 +16,23 @@ jobs:
     timeout-minutes: 360
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Login to ghcr
+      - name: cleanup disk space
+        run: |
+          docker system prune -f -a --volumes
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - uses: crazy-max/ghaction-github-runtime@v3
+
+      - name: Login to GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -29,10 +43,18 @@ jobs:
         run: |
           echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
-      - name: Push aikit:latest to GHCR
-        run: |
-          docker buildx build . -t ghcr.io/sozercan/aikit:${TAG} -t ghcr.io/sozercan/aikit:latest --push --cache-from=type=gha,scope=aikit --cache-to=type=gha,scope=aikit,mode=max
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        id: build-and-push
+        with:
+          push: true
+          tags: |
+            ghcr.io/sozercan/aikit:${TAG}
+            ghcr.io/sozercan/aikit:latest
+          cache-from: type=gha,scope=aikit
+          cache-to: type=gha,scope=aikit,mode=max
 
-      # - name: release llama 2 image
-      #   run: |
-      #     docker buildx build -t ghcr.io/sozercan/llama2:7b -t ghcr.io/sozercan/llama2:7b-chat -t ghcr.io/sozercan/llama2:chat -t ghcr.io/sozercan/llama2:latest -f models/llama-2-chat-7b.yaml --push --cache-from=type=gha,scope=llama-2-7b-chat --cache-to=type=gha,scope=llama-2-7b-chat,mode=max
+      - name: Sign the images with GitHub OIDC Token
+        env:
+          DIGEST: ${{ steps.build-and-push.outputs.digest }}
+        run: cosign sign --yes "ghcr.io/sozercan/aikit@${DIGEST}"
