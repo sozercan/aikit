@@ -22,7 +22,7 @@ const (
 func Aikit2LLB(c *config.Config) (llb.State, *specs.Image) {
 	var merge llb.State
 	s := llb.Image(debianSlim)
-	s, merge = copyModels(s, c)
+	s, merge = copyModels(c, s)
 	s, merge = addLocalAI(c, s, merge)
 	if c.Runtime == utils.RuntimeNVIDIA {
 		s = installCuda(s, merge)
@@ -31,9 +31,9 @@ func Aikit2LLB(c *config.Config) (llb.State, *specs.Image) {
 	return s, imageCfg
 }
 
-func copyModels(s llb.State, c *config.Config) (llb.State, llb.State) {
+func copyModels(c *config.Config, s llb.State) (llb.State, llb.State) {
 	db := llb.Image(distrolessBase)
-	initState := s
+	savedState := s
 
 	// create config file if defined
 	if c.Config != "" {
@@ -66,7 +66,7 @@ func copyModels(s llb.State, c *config.Config) (llb.State, llb.State) {
 			}
 		}
 	}
-	diff := llb.Diff(initState, s)
+	diff := llb.Diff(savedState, s)
 	merge := llb.Merge([]llb.State{db, diff})
 	return s, merge
 }
@@ -80,8 +80,6 @@ func fileNameFromURL(urlString string) string {
 }
 
 func installCuda(s llb.State, merge llb.State) llb.State {
-	initState := s
-
 	cudaKeyringURL := "https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/cuda-keyring_1.1-1_all.deb"
 	cudaKeyring := llb.HTTP(cudaKeyringURL)
 	s = s.File(
@@ -89,15 +87,16 @@ func installCuda(s llb.State, merge llb.State) llb.State {
 		llb.WithCustomName("Copying "+fileNameFromURL(cudaKeyringURL)), //nolint: goconst
 	)
 	s = s.Run(shf("dpkg -i cuda-keyring_1.1-1_all.deb && rm cuda-keyring_1.1-1_all.deb")).Root()
+	savedState := s
 	s = s.Run(shf("apt-get update && apt-get install -y ca-certificates && apt-get update && apt-get install -y libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean", cudaVersion), llb.IgnoreCache).Root()
 
-	diff := llb.Diff(initState, s)
+	diff := llb.Diff(savedState, s)
 	merge = llb.Merge([]llb.State{merge, diff})
 	return merge
 }
 
 func addLocalAI(c *config.Config, s llb.State, merge llb.State) (llb.State, llb.State) {
-	initState := s
+	savedState := s
 	var localAIURL string
 	switch c.Runtime {
 	case utils.RuntimeNVIDIA:
@@ -119,7 +118,7 @@ func addLocalAI(c *config.Config, s llb.State, merge llb.State) (llb.State, llb.
 		llb.WithCustomName("Copying "+fileNameFromURL(localAIURL)+" to /usr/bin"), //nolint: goconst
 	)
 
-	diff := llb.Diff(initState, s)
+	diff := llb.Diff(savedState, s)
 	return s, llb.Merge([]llb.State{merge, diff})
 }
 
