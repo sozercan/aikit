@@ -22,22 +22,22 @@ const (
 func Aikit2LLB(c *config.Config) (llb.State, *specs.Image) {
 	var merge llb.State
 	s := llb.Image(debianSlim)
-	s, merge = copyModels(c, &s)
-	s, merge = addLocalAI(c, &s, &merge)
+	s, merge = copyModels(c, s)
+	s, merge = addLocalAI(c, s, merge)
 	if c.Runtime == utils.RuntimeNVIDIA {
-		s = installCuda(&s, &merge)
+		s = installCuda(s, merge)
 	}
 	imageCfg := NewImageConfig(c)
 	return s, imageCfg
 }
 
-func copyModels(c *config.Config, s *llb.State) (llb.State, llb.State) {
+func copyModels(c *config.Config, s llb.State) (llb.State, llb.State) {
 	db := llb.Image(distrolessBase)
-	initState := s
+	savedState := s
 
 	// create config file if defined
 	if c.Config != "" {
-		*s = s.Run(shf("echo \"%s\" >> /config.yaml", c.Config)).Root()
+		s = s.Run(shf("echo \"%s\" >> /config.yaml", c.Config)).Root()
 	}
 
 	for _, model := range c.Models {
@@ -54,7 +54,7 @@ func copyModels(c *config.Config, s *llb.State) (llb.State, llb.State) {
 		copyOpts = append(copyOpts, &llb.CopyInfo{
 			CreateDestPath: true,
 		})
-		*s = s.File(
+		s = s.File(
 			llb.Copy(m, fileNameFromURL(model.Source), "/models/"+fileNameFromURL(model.Source), copyOpts...),
 			llb.WithCustomName("Copying "+fileNameFromURL(model.Source)+" to /models"), //nolint: goconst
 		)
@@ -62,13 +62,13 @@ func copyModels(c *config.Config, s *llb.State) (llb.State, llb.State) {
 		// create prompt templates if defined
 		for _, pt := range model.PromptTemplates {
 			if pt.Name != "" && pt.Template != "" {
-				*s = s.Run(shf("echo \"%s\" >> /models/%s.tmpl", pt.Template, pt.Name)).Root()
+				s = s.Run(shf("echo \"%s\" >> /models/%s.tmpl", pt.Template, pt.Name)).Root()
 			}
 		}
 	}
-	diff := llb.Diff(*initState, *s)
+	diff := llb.Diff(savedState, s)
 	merge := llb.Merge([]llb.State{db, diff})
-	return *s, merge
+	return s, merge
 }
 
 func fileNameFromURL(urlString string) string {
@@ -79,25 +79,24 @@ func fileNameFromURL(urlString string) string {
 	return path.Base(parsedURL.Path)
 }
 
-func installCuda(s *llb.State, merge *llb.State) llb.State {
-	initState := s
-
+func installCuda(s llb.State, merge llb.State) llb.State {
 	cudaKeyringURL := "https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/cuda-keyring_1.1-1_all.deb"
 	cudaKeyring := llb.HTTP(cudaKeyringURL)
-	*s = s.File(
+	s = s.File(
 		llb.Copy(cudaKeyring, fileNameFromURL(cudaKeyringURL), "/"),
 		llb.WithCustomName("Copying "+fileNameFromURL(cudaKeyringURL)), //nolint: goconst
 	)
-	*s = s.Run(shf("dpkg -i cuda-keyring_1.1-1_all.deb && rm cuda-keyring_1.1-1_all.deb")).Root()
-	*s = s.Run(shf("apt-get update && apt-get install -y ca-certificates && apt-get update && apt-get install -y libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean", cudaVersion), llb.IgnoreCache).Root()
+	s = s.Run(shf("dpkg -i cuda-keyring_1.1-1_all.deb && rm cuda-keyring_1.1-1_all.deb")).Root()
+	savedState := s
+	s = s.Run(shf("apt-get update && apt-get install -y ca-certificates && apt-get update && apt-get install -y libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean", cudaVersion), llb.IgnoreCache).Root()
 
-	diff := llb.Diff(*initState, *s)
-	*merge = llb.Merge([]llb.State{*merge, diff})
-	return *merge
+	diff := llb.Diff(savedState, s)
+	merge = llb.Merge([]llb.State{merge, diff})
+	return merge
 }
 
-func addLocalAI(c *config.Config, s *llb.State, merge *llb.State) (llb.State, llb.State) {
-	initState := s
+func addLocalAI(c *config.Config, s llb.State, merge llb.State) (llb.State, llb.State) {
+	savedState := s
 	var localAIURL string
 	switch c.Runtime {
 	case utils.RuntimeNVIDIA:
@@ -111,15 +110,16 @@ func addLocalAI(c *config.Config, s *llb.State, merge *llb.State) (llb.State, ll
 	}
 
 	var opts []llb.HTTPOption
-	opts = append(opts, llb.Filename("local-ai"), llb.Chmod(0o755))
+	opts = append(opts, llb.Filename("local-ai"))
+	opts = append(opts, llb.Chmod(0o755))
 	localAI := llb.HTTP(localAIURL, opts...)
-	*s = s.File(
+	s = s.File(
 		llb.Copy(localAI, "local-ai", "/usr/bin"),
 		llb.WithCustomName("Copying "+fileNameFromURL(localAIURL)+" to /usr/bin"), //nolint: goconst
 	)
 
-	diff := llb.Diff(*initState, *s)
-	return *s, llb.Merge([]llb.State{*merge, diff})
+	diff := llb.Diff(savedState, s)
+	return s, llb.Merge([]llb.State{merge, diff})
 }
 
 func shf(cmd string, v ...interface{}) llb.RunOption {

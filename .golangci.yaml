@@ -2,12 +2,8 @@ run:
   timeout: 5m
 
 linters-settings:
-  gocritic:
-    enabled-tags:
-    - performance
   lll:
     line-length: 200
-
   misspell:
     locale: US
   staticcheck:
