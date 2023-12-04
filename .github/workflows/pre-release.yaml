@@ -12,7 +12,7 @@ permissions:
   id-token: write
 
 jobs:
- release:
+  pre-release:
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
@@ -57,6 +57,7 @@ jobs:
         env:
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
         run: |
-          cosign verify ghcr.io/sozercan/${{ env.MODEL_NAME }}:${{ env.MODEL_SIZE }}${{ env.MODEL_RUNTIME }}@${DIGEST} \
-            --certificate-identity https://github.com/sozercan/aikit/.github/workflows/pre-release.yaml@refs/heads/main \
+          # refs/heads/main
+          cosign verify ghcr.io/sozercan/aikit@${DIGEST} \
+            --certificate-identity https://github.com/sozercan/aikit/.github/workflows/pre-release.yaml@refs/pull/14/merge \
             --certificate-oidc-issuer https://token.actions.githubusercontent.com | jq
