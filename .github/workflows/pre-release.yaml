@@ -1,8 +1,7 @@
 name: pre-release
 
 on:
-  # push:
-  pull_request:
+  push:
     branches:
       - main
 
@@ -57,7 +56,6 @@ jobs:
         env:
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
         run: |
-          # refs/heads/main
           cosign verify ghcr.io/sozercan/aikit@${DIGEST} \
-            --certificate-identity https://github.com/sozercan/aikit/.github/workflows/pre-release.yaml@refs/pull/14/merge \
-            --certificate-oidc-issuer https://token.actions.githubusercontent.com | jq
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+            --certificate-identity https://github.com/sozercan/aikit/.github/workflows/pre-release.yaml@refs/heads/main

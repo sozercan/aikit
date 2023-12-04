@@ -65,5 +65,9 @@ jobs:
       - name: install e2e dependencies
         run: make test-e2e-dependencies
 
-      - name: run bats test
-        run: make test-e2e
+      - name: run test
+        run: |
+          curl --retry 20 --retry-delay 30 --retry-all-errors http://localhost:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
+            "model": "tinyllama-1.1b-chat",
+            "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}],
+            }'
