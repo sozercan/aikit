@@ -67,7 +67,7 @@ jobs:
 
       - name: run test
         run: |
-          curl http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{"model": "tinyllama-1.1b-chat", "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]}'
+          curl http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{"model": "llama-2-7b-chat", "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]}'
 
       - name: save logs
         if: always()
