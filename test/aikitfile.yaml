@@ -14,3 +14,4 @@ config: |
       top_p: 0.7
       model: tinyllama-1.1b-chat-v0.3.Q4_K_M.gguf
     context_size: 1000
+    mmap: false

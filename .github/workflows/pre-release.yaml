@@ -51,3 +51,11 @@ jobs:
         env:
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
         run: cosign sign --yes "ghcr.io/sozercan/aikit@${DIGEST}"
+
+      - name: Verify image signature
+        env:
+          DIGEST: ${{ steps.build-and-push.outputs.digest }}
+        run: |
+          cosign verify ghcr.io/sozercan/${{ env.MODEL_NAME }}:${{ env.MODEL_SIZE }}${{ env.MODEL_RUNTIME }}@${DIGEST} \
+            --certificate-identity https://github.com/sozercan/aikit/.github/workflows/pre-release.yaml@refs/heads/main \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com | jq

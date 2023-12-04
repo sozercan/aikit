@@ -47,6 +47,7 @@ jobs:
 
       - name: Build and push
         uses: docker/build-push-action@v5
+        id: build-and-push
         with:
           push: true
           tags: ghcr.io/sozercan/${{ env.MODEL_NAME }}:${{ env.MODEL_SIZE }}${{ env.MODEL_RUNTIME }}
@@ -59,7 +60,7 @@ jobs:
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
         run: cosign sign --yes "ghcr.io/sozercan/${{ env.MODEL_NAME }}:${{ env.MODEL_SIZE }}${{ env.MODEL_RUNTIME }}@${DIGEST}"
 
-      - name: verify image signature
+      - name: Verify image signature
         env:
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
         run: |
