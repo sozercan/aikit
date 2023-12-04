@@ -52,8 +52,8 @@ jobs:
           push: true
           tags: ghcr.io/sozercan/${{ env.MODEL_NAME }}:${{ env.MODEL_SIZE }}${{ env.MODEL_RUNTIME }}
           file: models/${{ matrix.model }}.yaml
-          cache-from: type=gha,scope=${{ env.MODEL_NAME }}:${{ env.MODEL_SIZE }}
-          cache-to: type=gha,scope=${{ env.MODEL_NAME }}:${{ env.MODEL_SIZE }},mode=max
+          cache-from: type=gha,scope=${{ env.MODEL_NAME }}-${{ env.MODEL_SIZE }}
+          cache-to: type=gha,scope=${{ env.MODEL_NAME }}-${{ env.MODEL_SIZE }},mode=max
 
       - name: Sign the images with GitHub OIDC Token
         env:
@@ -65,5 +65,5 @@ jobs:
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
         run: |
           cosign verify ghcr.io/sozercan/${{ env.MODEL_NAME }}:${{ env.MODEL_SIZE }}${{ env.MODEL_RUNTIME }}@${DIGEST} \
-            --certificate-identity https://github.com/sozercan/aikit/.github/workflows/update-models.yaml@refs/heads/main \
-            --certificate-oidc-issuer https://token.actions.githubusercontent.com | jq
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+            --certificate-identity https://github.com/sozercan/aikit/.github/workflows/update-models.yaml@refs/heads/main
