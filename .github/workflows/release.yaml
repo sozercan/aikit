@@ -39,9 +39,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get tag
-        run: |
-          echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+      - id: docker_meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/sozercan/aikit
+          tags: type=sha,format=long
 
       - name: Build and push
         uses: docker/build-push-action@v5
@@ -49,7 +51,7 @@ jobs:
         with:
           push: true
           tags: |
-            ghcr.io/sozercan/aikit:${TAG}
+            ${{ steps.docker_meta.outputs.tags }}
             ghcr.io/sozercan/aikit:latest
           cache-from: type=gha,scope=aikit
           cache-to: type=gha,scope=aikit,mode=max
