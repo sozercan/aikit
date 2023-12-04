@@ -1,12 +1,11 @@
-#syntax=ghcr.io/sozercan/aikit:latest
+#syntax=aikit:test
 apiVersion: v1alpha1
 debug: true
 runtime: cuda
 models:
   - name: llama-2-7b-chat
     source: https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q4_K_M.gguf
-  - name: mistral-7b-instruct
-    source: https://huggingface.co/TheBloke/Mistral-7B-OpenOrca-GGUF/resolve/main/mistral-7b-openorca.Q6_K.gguf
+    sha256: "08a5566d61d7cb6b420c3e4387a39e0078e1f2fe5f055f3a03887385304d4bfa"
 config: |
   - name: llama-2-7b-chat
     backend: llama
@@ -16,24 +15,6 @@ config: |
       top_p: 0.7
       model: llama-2-7b-chat.Q4_K_M.gguf
     context_size: 4096
-    gpu_layers: 35
-    f16: true
-    batch: 512
-    mmap: true
-  - name: mistral-7b-instruct
-    context_size: 4096
-    threads: 4
-    parameters:
-      model: mistral-7b-openorca.Q6_K.gguf
-      temperature: 0.2
-      top_k: 40
-      top_p: 0.95
-    template:
-      chat_message: chatml
-      chat: chatml-block
-      completion: completion
-    stopwords:
-    - <|im_end|>
     gpu_layers: 35
     f16: true
     batch: 512
