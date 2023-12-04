@@ -41,29 +41,40 @@ jobs:
 
       - name: parse matrix
         run: |
-          echo "MODEL_NAME=$(echo ${{ matrix.model }} | cut -d'-' -f1-2 | sed 's/-//g')" >> $GITHUB_ENV
-          echo "MODEL_SIZE=$(echo ${{ matrix.model }} | rev | cut -d'-' -f2 | rev)" >> $GITHUB_ENV
-          echo "MODEL_RUNTIME=-$(echo ${{ matrix.model }} | rev | cut -d'-' -f1 | rev)" >> $GITHUB_ENV
+          echo "MODEL_NAME=$(echo $input | sed -E 's/([a-z]+)-([0-9]+)-.*/\1\2/')" >> $GITHUB_ENV
+          echo "MODEL_SIZE=$(echo $input | sed -E 's/[a-z]+-[0-9]+-([0-9]+b).*/\1/')" >> $GITHUB_ENV
+          echo "MODEL_TYPE=$(echo $input | sed -E 's/.*-([a-z]+)(-cuda)?$/\1/' | grep -Eo 'chat|orca|llama')" >> $GITHUB_ENV
+          echo "MODEL_RUNTIME=$(echo $input | sed -E 's/.*-(cuda)?$/\1/' | grep -Eo 'cuda')" >> $GITHUB_ENV
 
       - name: Build and push
-        uses: docker/build-push-action@v5
-        id: build-and-push
-        with:
-          push: true
-          tags: ghcr.io/sozercan/${{ env.MODEL_NAME }}:${{ env.MODEL_SIZE }}${{ env.MODEL_RUNTIME }}
-          file: models/${{ matrix.model }}.yaml
-          cache-from: type=gha,scope=${{ env.MODEL_NAME }}-${{ env.MODEL_SIZE }}
-          cache-to: type=gha,scope=${{ env.MODEL_NAME }}-${{ env.MODEL_SIZE }},mode=max
-
-      - name: Sign the images with GitHub OIDC Token
-        env:
-          DIGEST: ${{ steps.build-and-push.outputs.digest }}
-        run: cosign sign --yes "ghcr.io/sozercan/${{ env.MODEL_NAME }}:${{ env.MODEL_SIZE }}${{ env.MODEL_RUNTIME }}@${DIGEST}"
-
-      - name: Verify image signature
-        env:
-          DIGEST: ${{ steps.build-and-push.outputs.digest }}
         run: |
-          cosign verify ghcr.io/sozercan/${{ env.MODEL_NAME }}:${{ env.MODEL_SIZE }}${{ env.MODEL_RUNTIME }}@${DIGEST} \
-            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-            --certificate-identity https://github.com/sozercan/aikit/.github/workflows/update-models.yaml@refs/heads/main
+          docker buildx build . -t ghcr.io/sozercan/${{ env.MODEL_NAME }}:${{ env.MODEL_SIZE }}${{ env.MODEL_RUNTIME }} \
+            -f models/${{ matrix.model }}.yaml \
+            --load --progress plain \
+            --cache-from=type=gha,scope=${{ env.MODEL_NAME }}-${{ env.MODEL_SIZE }} \
+            --cache-to=type=gha,scope=${{ env.MODEL_NAME }}-${{ env.MODEL_SIZE }},mode=max
+      # todo add push
+
+      # - name: Build and push
+      #   uses: docker/build-push-action@v5
+      #   id: build-and-push
+      #   with:
+      #     load: true
+      #     # push: true
+      #     tags: ghcr.io/sozercan/${{ env.MODEL_NAME }}:${{ env.MODEL_SIZE }}${{ env.MODEL_RUNTIME }}
+      #     file: models/${{ matrix.model }}.yaml
+      #     cache-from: type=gha,scope=${{ env.MODEL_NAME }}-${{ env.MODEL_SIZE }}
+      #     cache-to: type=gha,scope=${{ env.MODEL_NAME }}-${{ env.MODEL_SIZE }},mode=max
+
+      # - name: Sign the images with GitHub OIDC Token
+      #   env:
+      #     DIGEST: ${{ steps.build-and-push.outputs.digest }}
+      #   run: cosign sign --yes "ghcr.io/sozercan/${{ env.MODEL_NAME }}:${{ env.MODEL_SIZE }}${{ env.MODEL_RUNTIME }}@${DIGEST}"
+
+      # - name: Verify image signature
+      #   env:
+      #     DIGEST: ${{ steps.build-and-push.outputs.digest }}
+      #   run: |
+      #     cosign verify ghcr.io/sozercan/${{ env.MODEL_NAME }}:${{ env.MODEL_SIZE }}${{ env.MODEL_RUNTIME }}@${DIGEST} \
+      #       --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+      #       --certificate-identity https://github.com/sozercan/aikit/.github/workflows/update-models.yaml@refs/heads/main
