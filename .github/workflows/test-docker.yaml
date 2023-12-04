@@ -60,14 +60,23 @@ jobs:
         run: docker images
 
       - name: run test model
-        run: docker run -d -p 8080:8080 testmodel:test
+        run: docker run --name testmodel -d -p 8080:8080 testmodel:test
 
       - name: install e2e dependencies
         run: make test-e2e-dependencies
 
       - name: run test
         run: |
-          curl --retry 20 --retry-delay 30 --retry-all-errors http://localhost:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
-            "model": "tinyllama-1.1b-chat",
-            "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}],
-            }'
+          curl --retry 20 --retry-delay 30 --retry-all-errors http://localhost:8080/v1/chat/completions -H "Content-Type: application/json" -d '{"model": "tinyllama-1.1b-chat", "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]}'
+
+      - name: save logs
+        if: always()
+        run: |
+          docker logs testmodel > docker.log
+
+      - name: publish logs
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-logs
+          path: docker.log

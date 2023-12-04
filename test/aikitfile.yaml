@@ -9,9 +9,9 @@ config: |
   - name: tinyllama-1.1b-chat
     backend: llama
     parameters:
-      top_k: 80
-      temperature: 0.2
-      top_p: 0.7
+      top_k: 40
+      temperature: 0
+      top_p: 0.1
       model: tinyllama-1.1b-chat-v0.3.Q4_K_M.gguf
     context_size: 1000
     mmap: false
