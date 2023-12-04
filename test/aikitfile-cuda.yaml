@@ -3,38 +3,19 @@ apiVersion: v1alpha1
 debug: true
 runtime: cuda
 models:
-  - name: llama-2-7b-chat
-    source: https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q4_K_M.gguf
-  - name: mistral-7b-instruct
-    source: https://huggingface.co/TheBloke/Mistral-7B-OpenOrca-GGUF/resolve/main/mistral-7b-openorca.Q6_K.gguf
+  - name: tinyllama-1.1b-chat
+    source: https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v0.3-GGUF/resolve/main/tinyllama-1.1b-chat-v0.3.Q4_K_M.gguf
+    sha256: "2d3bd82534bb6c6e0f4be1761b29b25bdcd65855a022513cb65f24ad3b25e41f"
 config: |
-  - name: llama-2-7b-chat
+  - name: tinyllama-1.1b-chat
     backend: llama
     parameters:
       top_k: 80
       temperature: 0.2
       top_p: 0.7
-      model: llama-2-7b-chat.Q4_K_M.gguf
-    context_size: 4096
-    gpu_layers: 35
-    f16: true
-    batch: 512
-    mmap: true
-  - name: mistral-7b-instruct
-    context_size: 4096
-    threads: 4
-    parameters:
-      model: mistral-7b-openorca.Q6_K.gguf
-      temperature: 0.2
-      top_k: 40
-      top_p: 0.95
-    template:
-      chat_message: chatml
-      chat: chatml-block
-      completion: completion
-    stopwords:
-    - <|im_end|>
-    gpu_layers: 35
+      model: tinyllama-1.1b-chat-v0.3.Q4_K_M.gguf
+    context_size: 1000
+    gpu_layers: 10
     f16: true
     batch: 512
     mmap: true

@@ -2,15 +2,15 @@
 apiVersion: v1alpha1
 debug: true
 models:
-  - name: llama-2-7b-chat
-    source: https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q4_K_M.gguf
-    sha256: "08a5566d61d7cb6b420c3e4387a39e0078e1f2fe5f055f3a03887385304d4bfa"
+  - name: tinyllama-1.1b-chat
+    source: https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v0.3-GGUF/resolve/main/tinyllama-1.1b-chat-v0.3.Q4_K_M.gguf
+    sha256: "2d3bd82534bb6c6e0f4be1761b29b25bdcd65855a022513cb65f24ad3b25e41f"
 config: |
-  - name: llama-2-7b-chat
+  - name: tinyllama-1.1b-chat
     backend: llama
     parameters:
       top_k: 80
       temperature: 0.2
       top_p: 0.7
-      model: llama-2-7b-chat.Q4_K_M.gguf
-    context_size: 4096
+      model: tinyllama-1.1b-chat-v0.3.Q4_K_M.gguf
+    context_size: 1000
