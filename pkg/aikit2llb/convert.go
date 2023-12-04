@@ -25,10 +25,10 @@ func Aikit2LLB(c *config.Config) (llb.State, *specs.Image) {
 	s, merge = copyModels(c, s)
 	s, merge = addLocalAI(c, s, merge)
 	if c.Runtime == utils.RuntimeNVIDIA {
-		s = installCuda(s, merge)
+		merge = installCuda(s, merge)
 	}
 	imageCfg := NewImageConfig(c)
-	return s, imageCfg
+	return merge, imageCfg
 }
 
 func copyModels(c *config.Config, s llb.State) (llb.State, llb.State) {
@@ -87,8 +87,9 @@ func installCuda(s llb.State, merge llb.State) llb.State {
 		llb.WithCustomName("Copying "+fileNameFromURL(cudaKeyringURL)), //nolint: goconst
 	)
 	s = s.Run(shf("dpkg -i cuda-keyring_1.1-1_all.deb && rm cuda-keyring_1.1-1_all.deb")).Root()
+	s = s.Run(shf("apt-get update && apt-get install -y ca-certificates && apt-get update"), llb.IgnoreCache).Root()
 	savedState := s
-	s = s.Run(shf("apt-get update && apt-get install -y ca-certificates && apt-get update && apt-get install -y libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean", cudaVersion), llb.IgnoreCache).Root()
+	s = s.Run(shf("apt-get install -y libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean", cudaVersion)).Root()
 
 	diff := llb.Diff(savedState, s)
 	merge = llb.Merge([]llb.State{merge, diff})
