@@ -41,18 +41,18 @@ jobs:
 
       - name: parse matrix
         run: |
-          echo "MODEL_NAME=$(echo $input | sed -E 's/([a-z]+)-([0-9]+)-.*/\1\2/')" >> $GITHUB_ENV
-          echo "MODEL_SIZE=$(echo $input | sed -E 's/[a-z]+-[0-9]+-([0-9]+b).*/\1/')" >> $GITHUB_ENV
-          echo "MODEL_TYPE=$(echo $input | sed -E 's/.*-([a-z]+)(-cuda)?$/\1/' | grep -Eo 'chat|orca|llama')" >> $GITHUB_ENV
-          echo "MODEL_RUNTIME=-$(echo $input | sed -E 's/.*-(cuda)?$/\1/' | grep -Eo 'cuda')" >> $GITHUB_ENV
+          echo "MODEL_NAME=$(echo ${{ matrix.model }} | sed -E 's/([a-z]+)-([0-9]+)-.*/\1\2/')" >> $GITHUB_ENV
+          echo "MODEL_SIZE=$(echo ${{ matrix.model }} | sed -E 's/[a-z]+-[0-9]+-([0-9]+b).*/\1/')" >> $GITHUB_ENV
+          echo "MODEL_TYPE=$(echo ${{ matrix.model }} | sed -E 's/.*-([a-z]+)(-cuda)?$/\1/' | grep -Eo 'chat|orca|llama')" >> $GITHUB_ENV
+          echo "MODEL_RUNTIME=-$(echo ${{ matrix.model }} | sed -E 's/.*-(cuda)?$/\1/' | grep -Eo 'cuda')" >> $GITHUB_ENV
 
       - name: Build and push
         run: |
           docker buildx build . -t ghcr.io/sozercan/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} \
             -f models/${{ matrix.model }}.yaml \
             --load --progress plain \
-            --cache-from=type=gha,scope=${{ env.MODEL_NAME }}-${{ env.MODEL_SIZE }} \
-            --cache-to=type=gha,scope=${{ env.MODEL_NAME }}-${{ env.MODEL_SIZE }},mode=max
+            --cache-from=type=gha,scope=${MODEL_NAME}-${MODEL_SIZE} \
+            --cache-to=type=gha,scope=${MODEL_NAME}-${MODEL_SIZE},mode=max
       # todo add push
 
       # - name: Build and push
