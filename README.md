@@ -20,6 +20,7 @@ AIKit uses [LocalAI](https://localai.io/) under-the-hood to run inference. Local
 - 🚢 Kubernetes deployment ready
 - 📦 Supports multiple models with a single image
 - 🖥️ Supports GPU-accelerated inferencing with NVIDIA GPUs
+- 🔐 Signed images for `aikit` and pre-made models
 
 ## Demos
 
