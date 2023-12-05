@@ -63,28 +63,13 @@ jobs:
             --push --progress plain \
             --cache-from=type=gha,scope=${MODEL_NAME}-${MODEL_SIZE} \
             --cache-to=type=gha,scope=${MODEL_NAME}-${MODEL_SIZE},mode=max
-      # todo add push
+          echo "DIGEST=$(cosign triangulate ghcr.io/sozercan/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} --type digest) >> $GITHUB_ENV
 
-      # - name: Build and push
-      #   uses: docker/build-push-action@v5
-      #   id: build-and-push
-      #   with:
-      #     load: true
-      #     # push: true
-      #     tags: ghcr.io/sozercan/${{ env.MODEL_NAME }}:${{ env.MODEL_SIZE }}${{ env.MODEL_RUNTIME }}
-      #     file: models/${{ matrix.model }}.yaml
-      #     cache-from: type=gha,scope=${{ env.MODEL_NAME }}-${{ env.MODEL_SIZE }}
-      #     cache-to: type=gha,scope=${{ env.MODEL_NAME }}-${{ env.MODEL_SIZE }},mode=max
+      - name: Sign the images with GitHub OIDC Token
+        run: cosign sign --yes ${DIGEST}
 
-      # - name: Sign the images with GitHub OIDC Token
-      #   env:
-      #     DIGEST: ${{ steps.build-and-push.outputs.digest }}
-      #   run: cosign sign --yes "ghcr.io/sozercan/${{ env.MODEL_NAME }}:${{ env.MODEL_SIZE }}${{ env.MODEL_RUNTIME }}@${DIGEST}"
-
-      # - name: Verify image signature
-      #   env:
-      #     DIGEST: ${{ steps.build-and-push.outputs.digest }}
-      #   run: |
-      #     cosign verify ghcr.io/sozercan/${{ env.MODEL_NAME }}:${{ env.MODEL_SIZE }}${{ env.MODEL_RUNTIME }}@${DIGEST} \
-      #       --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-      #       --certificate-identity https://github.com/sozercan/aikit/.github/workflows/update-models.yaml@refs/heads/main
+      - name: Verify image signature
+        run: |
+          cosign verify ${DIGEST} \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+            --certificate-identity https://github.com/sozercan/aikit/.github/workflows/update-models.yaml@refs/heads/main
