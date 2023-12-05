@@ -15,7 +15,7 @@ import (
 const (
 	debianSlim     = "docker.io/library/debian:12-slim"
 	distrolessBase = "gcr.io/distroless/cc-debian12:latest"
-	localAIVersion = "v1.40.0"
+	localAIVersion = "v2.0.0"
 	cudaVersion    = "12-3"
 )
 
@@ -101,7 +101,7 @@ func addLocalAI(c *config.Config, s llb.State, merge llb.State) (llb.State, llb.
 	var localAIURL string
 	switch c.Runtime {
 	case utils.RuntimeNVIDIA:
-		localAIURL = fmt.Sprintf("https://sertaccdn.azureedge.net/localai/%s/local-ai", localAIVersion)
+		localAIURL = fmt.Sprintf("https://sertaccdn.azureedge.net/localai/%s/cuda12/local-ai", localAIVersion)
 	case utils.RuntimeCPUAVX2:
 		localAIURL = fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%s/local-ai-avx2-Linux-x86_64", localAIVersion)
 	case utils.RuntimeCPUAVX512:
