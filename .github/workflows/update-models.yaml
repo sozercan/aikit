@@ -48,6 +48,16 @@ jobs:
 
       - name: Build and push
         run: |
+          if [ "${MODEL_RUNTIME}" == "-" ]; then
+            export MODEL_RUNTIME=""
+            echo "MODEL_RUNTIME=''" >> $GITHUB_ENV
+          fi
+
+          echo MODEL_NAME ${MODEL_NAME}
+          echo MODEL_SIZE ${MODEL_SIZE}
+          echo MODEL_TYPE ${MODEL_TYPE}
+          echo MODEL_RUNTIME ${MODEL_RUNTIME}
+
           docker buildx build . -t ghcr.io/sozercan/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} \
             -f models/${{ matrix.model }}.yaml \
             --load --progress plain \
