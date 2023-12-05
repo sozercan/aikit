@@ -53,12 +53,12 @@ jobs:
             echo "MODEL_RUNTIME=''" >> $GITHUB_ENV
           fi
 
-          docker buildx build . -t ghcr.io/sozercan/test/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} \
+          docker buildx build . -t ghcr.io/sozercan/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} \
             -f models/${{ matrix.model }}.yaml \
             --push --progress plain \
             --cache-from=type=gha,scope=${MODEL_NAME}-${MODEL_SIZE} \
             --cache-to=type=gha,scope=${MODEL_NAME}-${MODEL_SIZE},mode=max
-          echo "DIGEST=$(cosign triangulate ghcr.io/sozercan/test/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} --type digest)" >> $GITHUB_ENV
+          echo "DIGEST=$(cosign triangulate ghcr.io/sozercan/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} --type digest)" >> $GITHUB_ENV
 
       - name: Sign the images with GitHub OIDC Token
         run: cosign sign --yes ${DIGEST}
