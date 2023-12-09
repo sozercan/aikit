@@ -1,0 +1,54 @@
+name: extract-binary
+
+on:
+  workflow_dispatch:
+
+permissions:
+  # contents: write
+  packages: write
+
+jobs:
+  extract-binary:
+    # strategy:
+    #   fail-fast: true
+    #   matrix:
+    #     build-type:
+    #       - cublas-cuda12
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - name: cleanup disk space
+        run: |
+          docker system prune -f -a --volumes
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+      - name: install oras
+        env:
+          ORAS_VERSION: 1.1.0
+        run: |
+          curl -sL "https://github.com/oras-project/oras/releases/download/v${ORAS_VERSION}/oras_${ORAS_VERSION}_linux_amd64.tar.gz
+          tar -zxvf oras_${ORAS_VERSION}_linux_amd64.tar.gz -C /usr/local/bin/ oras
+
+      - name: install crane
+        env:
+          CRANE_VERSION: 0.17.0
+        run: |
+          curl -sL "https://github.com/google/go-containerregistry/releases/download/v${CRANE_VERSION}/go-containerregistry_Linux_x86_64.tar.gz" > go-containerregistry.tar.gz
+          tar -zxvf go-containerregistry.tar.gz -C /usr/local/bin/ crane
+
+      - name: extract local-ai gpu binary
+        run: |
+          crane export quay.io/go-skynet/local-ai:v2.0.0-cublas-cuda12 - | tar -Oxf - build/local-ai > local-ai
+
+      - name: Login to GHCR
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: create and push oci artifact
+        run: |
+          oras push ghcr.io/sozercan/test/local-ai:v2.0.0-cublas-cuda12 local-ai:application/octet-stream
