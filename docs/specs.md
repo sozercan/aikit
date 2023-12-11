@@ -5,7 +5,8 @@
 ```yaml
 apiVersion: # required. only v1alpha1 is supported at the moment
 debug: # optional. if set to true, will print debug logs
-runtime: # optional. defaults to avx. can be avx, avx2, avx512, cuda
+runtime: # optional. defaults to avx. can be "avx", "avx2", "avx512", "cuda"
+backends: # optional. list of additional backends. can be "stablediffusion"
 models: # required. list of models to build
   - name: # required. name of the model
     source: # required. source of the model. must be a url
@@ -23,6 +24,8 @@ Example:
 apiVersion: v1alpha1
 debug: true
 runtime: cuda
+backends:
+  - stablediffusion
 models:
   - name: llama-2-7b-chat
     source: https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q4_K_M.gguf

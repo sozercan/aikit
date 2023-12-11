@@ -5,6 +5,7 @@ KIND_VERSION ?= 0.20.0
 KUBERNETES_VERSION ?= 1.28.0
 TAG ?= test
 OUTPUT_TYPE ?= type=docker
+TEST_FILE ?= test/aikitfile.yaml
 PULL ?=
 NO_CACHE ?=
 
@@ -18,7 +19,7 @@ build-aikit:
 
 .PHONY: build-test-model
 build-test-model:
-	docker buildx build . -t ${REGISTRY}/testmodel:${TAG} -f test/aikitfile.yaml --output=${OUTPUT_TYPE}
+	docker buildx build . -t ${REGISTRY}/testmodel:${TAG} -f ${TEST_FILE} --output=${OUTPUT_TYPE}
 
 .PHONY: run-test-model
 run-test-model:
