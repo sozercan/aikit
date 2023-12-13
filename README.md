@@ -17,7 +17,7 @@ AIKit uses [LocalAI](https://localai.io/) under-the-hood to run inference. Local
 - 🤏 Minimal image size, resulting in less vulnerabilities and smaller attack surface with a custom [distroless](https://github.com/GoogleContainerTools/distroless)-based image
 - 🚀 [Easy to use declarative configuration](./docs/specs.md)
 - ✨ OpenAI API compatible to use with any OpenAI API compatible client
-- 🖼️ [Multi-modal model support](#vision-with-llava)
+- 🖼️ [Multi-modal model support](./docs/demo.md#vision-with-llava)
 - 🚢 Kubernetes deployment ready
 - 📦 Supports multiple models with a single image
 - 🖥️ [Supports GPU-accelerated inferencing with NVIDIA GPUs](#nvidia)
@@ -41,6 +41,8 @@ Output should be similar to:
 ```json
 {"created":1701236489,"object":"chat.completion","id":"dd1ff40b-31a7-4418-9e32-42151ab6875a","model":"llama-2-7b-chat","choices":[{"index":0,"finish_reason":"stop","message":{"role":"assistant","content":"\nKubernetes is a container orchestration system that automates the deployment, scaling, and management of containerized applications in a microservices architecture."}}],"usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0}}
 ```
+
+That's it! 🎉 API is OpenAI compatible so this is a drop-in replacement for any OpenAI API compatible client.
 
 ## Demos
 
