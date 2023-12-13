@@ -51,8 +51,7 @@ jobs:
       - name: extract artifacts from local-ai container
         run: |
           crane export quay.io/go-skynet/local-ai:v2.0.0-cublas-cuda12 > export.tar
-          tar -xvf export.tar
-          ls -al .
+          tar -xvf export.tar build
 
       - name: Login to GHCR
         uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
