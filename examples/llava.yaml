@@ -1,0 +1,34 @@
+#syntax=ghcr.io/sozercan/aikit:latest
+apiVersion: v1alpha1
+debug: true
+models:
+  - name: ggml-model-q4_k.gguf
+    source:  https://huggingface.co/mys/ggml_bakllava-1/resolve/main/ggml-model-q4_k.gguf
+    sha256: 5be58c339d8762e72d482a3e071a58d2df07df4a7aaabf8869415ae2b0f088d6
+    promptTemplates:
+      - name: chat-simple
+        template: |
+          A chat between a curious human and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the human's questions.
+          {{.Input}}
+          ASSISTANT:
+  - name: mmproj-model-f16.gguf
+    source: https://huggingface.co/mys/ggml_bakllava-1/resolve/main/mmproj-model-f16.gguf
+    sha256: 2e467eba710002839e0966d5e329942bb836eabd4e787bc713b07eff1d8ea13b
+config: |
+  - name: llava
+    backend: llama-cpp
+    context_size: 4096
+    threads: 4
+    mmap: true
+    mmproj: mmproj-model-f16.gguf
+    roles:
+      user: \"USER:\"
+      assistant: \"ASSISTANT:\"
+      system: \"SYSTEM:\"
+    parameters:
+      model: ggml-model-q4_k.gguf
+      temperature: 0.2
+      top_k: 40
+      top_p: 0.95
+    template:
+      chat: chat-simple
