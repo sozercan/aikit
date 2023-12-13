@@ -9,7 +9,7 @@ AIKit is a quick, easy, and local or cloud-agnostic way to get started to host a
 AIKit uses [LocalAI](https://localai.io/) under-the-hood to run inference. LocalAI provides a drop-in replacement REST API that is OpenAI API compatible, so you can use any OpenAI API compatible client, such as [Kubectl AI](https://github.com/sozercan/kubectl-ai), [Chatbot-UI](https://github.com/sozercan/chatbot-ui) and many more, to send requests to open-source LLMs powered by AIKit!
 
 > [!NOTE]
-> At this time, AIKit is tested with LocalAI `llama` backend. Other backends may work but are not tested. Please open an issue if you'd like to see support for other backends.
+> At this time, AIKit is tested with LocalAI `llama` and `stablediffusion` backends. Other backends may work but are not tested. Please open an issue if you'd like to see support for other backends.
 
 ## Features
 
