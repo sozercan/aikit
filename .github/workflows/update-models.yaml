@@ -61,6 +61,7 @@ jobs:
           docker buildx build . -t ghcr.io/sozercan/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} \
             -f models/${{ matrix.model }}.yaml \
             --push --progress plain \
+            --sbom=true --provenance=true \
             --cache-from=type=gha,scope=${MODEL_NAME}-${MODEL_SIZE} \
             --cache-to=type=gha,scope=${MODEL_NAME}-${MODEL_SIZE},mode=max
           echo "DIGEST=$(cosign triangulate ghcr.io/sozercan/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} --type digest)" >> $GITHUB_ENV
