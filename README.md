@@ -17,8 +17,9 @@ AIKit uses [LocalAI](https://localai.io/) under-the-hood to run inference. Local
 - 🤏 Minimal image size, resulting in less vulnerabilities and smaller attack surface with a custom [distroless](https://github.com/GoogleContainerTools/distroless)-based image
 - 🚀 [Easy to use declarative configuration](./docs/specs.md)
 - ✨ OpenAI API compatible to use with any OpenAI API compatible client
-- 🖼️ [Multi-modal model support](#vision-with-llava)
-- 🚢 Kubernetes deployment ready
+- 📸 [Multi-modal model support](#vision-with-llava)
+- 🖼️ Image generation support with Stable Diffusion
+- 🚢 [Kubernetes deployment ready](#kubernetes-deployment)
 - 📦 Supports multiple models with a single image
 - 🖥️ [Supports GPU-accelerated inferencing with NVIDIA GPUs](#nvidia)
 - 🔐 [Signed images for `aikit` and pre-made models](./docs/cosign.md)
@@ -27,15 +28,15 @@ AIKit uses [LocalAI](https://localai.io/) under-the-hood to run inference. Local
 
 ### Building an image with a Llama 2 model
 
-[<img src="https://asciinema.org/a/J9bitkONKPvedSfU1RkrmVEhD.svg" width="500">](https://asciinema.org/a/J9bitkONKPvedSfU1RkrmVEhD)
+[<img src="https://asciinema.org/a/J9bitkONKPvedSfU1RkrmVEhD.svg" width="400">](https://asciinema.org/a/J9bitkONKPvedSfU1RkrmVEhD)
 
 ### Inference
 
-[<img src="https://asciinema.org/a/DYh5bCQMNPSis1whhsfPeMOoM.svg" width="500">](https://asciinema.org/a/DYh5bCQMNPSis1whhsfPeMOoM)
+[<img src="https://asciinema.org/a/DYh5bCQMNPSis1whhsfPeMOoM.svg" width="400">](https://asciinema.org/a/DYh5bCQMNPSis1whhsfPeMOoM)
 
 ### Vision with LLaVA
 
-[<img src="https://asciinema.org/a/626553.svg" width="500">](https://asciinema.org/a/626553)
+[<img src="https://asciinema.org/a/626553.svg" width="400">](https://asciinema.org/a/626553)
 
 > see [llava.yaml](./examples//llava.yaml) for the configuration used in the demo
 

@@ -22,31 +22,39 @@ const (
 
 func Aikit2LLB(c *config.Config) (llb.State, *specs.Image) {
 	var merge llb.State
-	s := llb.Image(debianSlim)
-	s, merge = copyModels(c, s)
-	s, merge = addLocalAI(c, s, merge)
+	state := llb.Image(debianSlim)
+	base := getBaseImage(c)
+
+	state, merge = copyModels(c, base, state)
+	state, merge = addLocalAI(c, state, merge)
+
+	// install cuda if runtime is nvidia
 	if c.Runtime == utils.RuntimeNVIDIA {
-		merge = installCuda(s, merge)
+		merge = installCuda(state, merge)
 	}
+
+	// install opencv and friends if stable diffusion backend is being used
 	for b := range c.Backends {
 		if strings.Contains(c.Backends[b], "stablediffusion") {
-			merge = installOpenCV(s, merge)
+			merge = installOpenCV(state, merge)
 		}
 	}
+
 	imageCfg := NewImageConfig(c)
 	return merge, imageCfg
 }
 
-func copyModels(c *config.Config, s llb.State) (llb.State, llb.State) {
-	var base llb.State
+func getBaseImage(c *config.Config) llb.State {
 	for b := range c.Backends {
 		if strings.Contains(c.Backends[b], "stablediffusion") {
-			// due to too many dependencies, we are using debian slim as base for stable diffusion
-			base = llb.Image(debianSlim)
-		} else {
-			base = llb.Image(distrolessBase)
+			// due to too many dependencies, using debian slim as base for stable diffusion
+			return llb.Image(debianSlim)
 		}
 	}
+	return llb.Image(distrolessBase)
+}
+
+func copyModels(c *config.Config, base llb.State, s llb.State) (llb.State, llb.State) {
 	savedState := s
 
 	// create config file if defined
@@ -162,7 +170,7 @@ func addLocalAI(c *config.Config, s llb.State, merge llb.State) (llb.State, llb.
 	opts = append(opts, llb.Chmod(0o755))
 	localAI := llb.HTTP(localAIURL, opts...)
 	s = s.File(
-		llb.Copy(localAI, "local-ai", "/usr/bin"),
+		llb.Copy(localAI, "local-ai", "/usr/bin/local-ai"),
 		llb.WithCustomName("Copying "+fileNameFromURL(localAIURL)+" to /usr/bin"), //nolint: goconst
 	)
 
