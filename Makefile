@@ -5,7 +5,7 @@ KIND_VERSION ?= 0.20.0
 KUBERNETES_VERSION ?= 1.28.0
 TAG ?= test
 OUTPUT_TYPE ?= type=docker
-TEST_FILE ?= test/aikitfile.yaml
+TEST_FILE ?= test/aikitfile-llama.yaml
 PULL ?=
 NO_CACHE ?=
 
