@@ -62,7 +62,7 @@ jobs:
       - name: build test model
         run: |
           docker buildx build . -t testmodel:test \
-            -f test/aikitfile.yaml \
+            -f test/aikitfile-${{ matrix.backend }}.yaml \
             --load --progress plain \
             --cache-from=type=gha,scope=testmodel \
             --cache-to=type=gha,scope=testmodel,mode=max
@@ -79,12 +79,15 @@ jobs:
       - name: run llama test
         if: matrix.backend == 'llama'
         run: |
-          curl http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{"model": "llama-2-7b-chat", "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]}'
+          curl http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
+            "model": "llama-2-7b-chat",
+            "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
+          }'
 
       - name: run stablediffusion test
         if: matrix.backend == 'stablediffusion'
         run: |
-          curl http://localhost:8080/v1/images/generations -H "Content-Type: application/json" -d '{
+          curl http://127.0.0.1:8080/v1/images/generations -H "Content-Type: application/json" -d '{
             "prompt": "A cute baby llama",
             "size": "256x256"
           }'
