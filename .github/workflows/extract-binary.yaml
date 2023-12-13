@@ -53,6 +53,6 @@ jobs:
 
       - name: create and push oci artifact
         run: |
-          oras push ghcr.io/sozercan/test/local-ai:v2.0.0-cublas-cuda12-core \
+          oras push ghcr.io/sozercan/test/local-ai:v2.0.0-cublas-cuda12 \
             build/local-ai:application/octet-stream \
             build/backend-assets/:application/octet-stream
