@@ -60,6 +60,8 @@ jobs:
             ghcr.io/sozercan/aikit:latest
           cache-from: type=gha,scope=aikit
           cache-to: type=gha,scope=aikit,mode=max
+          sbom: true
+          provenance: true
 
       - name: Sign the images with GitHub OIDC Token
         env:
