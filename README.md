@@ -46,7 +46,7 @@ That's it! 🎉 API is OpenAI compatible so this is a drop-in replacement for an
 
 ## Demos
 
-See [demos](./docs/demos.md) for demos and examples.
+See [demos](./docs/demo.md) for demos and examples.
 
 ## Pre-made Models
 
