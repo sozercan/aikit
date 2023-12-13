@@ -72,9 +72,10 @@ jobs:
 
       - name: run test
         run: |
-          curl http://localhost:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
-            "model": "llava",
-            "messages": [{"role": "user", "content": [{"type":"text", "text": "What is in the image?"}, {"type": "image_url", "image_url": {"url": "https://discovery.sndimg.com/content/dam/images/discovery/fullset/2021/12/1/GettyImages-1280574445.jpg.rend.hgtvcom.966.644.suffix/1638387352203.jpeg" }}], "temperature": 0.9}]}'
+          curl http://localhost:8080/v1/images/generations -H "Content-Type: application/json" -d '{
+            "prompt": "A cute baby sea otter",
+            "size": "256x256"
+          }'
 
       - name: save logs
         if: always()
