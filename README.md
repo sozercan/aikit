@@ -15,13 +15,13 @@ AIKit uses [LocalAI](https://localai.io/) under-the-hood to run inference. Local
 
 - 🐳 No GPU, Internet access or additional tools needed except for [Docker](https://docs.docker.com/desktop/install/linux-install/)!
 - 🤏 Minimal image size, resulting in less vulnerabilities and smaller attack surface with a custom [distroless](https://github.com/GoogleContainerTools/distroless)-based image
-- 🚀 Easy to use declarative configuration
+- 🚀 [Easy to use declarative configuration](./docs/specs.md)
 - ✨ OpenAI API compatible to use with any OpenAI API compatible client
 - 🖼️ [Multi-modal model support](#vision-with-llava)
 - 🚢 Kubernetes deployment ready
 - 📦 Supports multiple models with a single image
-- 🖥️ Supports GPU-accelerated inferencing with NVIDIA GPUs
-- 🔐 Signed images for `aikit` and pre-made models
+- 🖥️ [Supports GPU-accelerated inferencing with NVIDIA GPUs](#nvidia)
+- 🔐 [Signed images for `aikit` and pre-made models](./docs/cosign.md)
 
 ## Demos
 
