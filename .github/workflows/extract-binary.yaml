@@ -17,13 +17,21 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 240
     steps:
+      - uses: easimon/maximize-build-space@master
+        with:
+          remove-dotnet: 'true'
+          remove-docker-images: 'true'
+          remove-codeql: 'true'
+          remove-haskell: 'true'
+          remove-android: 'true'
+
       - name: cleanup disk space
         run: |
-          docker system prune -f -a --volumes
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf "/usr/local/share/boost"
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          # docker system prune -f -a --volumes
+          # sudo rm -rf /usr/share/dotnet
+          # sudo rm -rf /opt/ghc
+          # sudo rm -rf "/usr/local/share/boost"
+          # sudo rm -rf "$AGENT_TOOLSDIRECTORY"
           df -H
 
       - name: install oras
@@ -41,7 +49,6 @@ jobs:
           tar -zxvf go-containerregistry_Linux_x86_64.tar.gz -C /usr/local/bin/ crane
 
       - name: extract artifacts from local-ai container
-        working-directory: /tmp
         run: |
           crane export quay.io/go-skynet/local-ai:v2.0.0-cublas-cuda12 > export.tar
           tar -xvf export.tar
@@ -55,7 +62,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: create and push oci artifact
-        working-directory: /tmp
         run: |
           oras push ghcr.io/sozercan/test/local-ai:v2.0.0-cublas-cuda12 \
             build/local-ai:application/octet-stream \
