@@ -18,6 +18,12 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      matrix:
+        backend:
+          - llama
+          - stablediffusion
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@eb238b55efaa70779f274895e782ed17c84f2895 # v2.6.1
@@ -70,9 +76,18 @@ jobs:
       - name: install e2e dependencies
         run: make test-e2e-dependencies
 
-      - name: run test
+      - name: run llama test
+        if: matrix.backend == 'llama'
         run: |
           curl http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{"model": "llama-2-7b-chat", "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]}'
+
+      - name: run stablediffusion test
+        if: matrix.backend == 'stablediffusion'
+        run: |
+          curl http://localhost:8080/v1/images/generations -H "Content-Type: application/json" -d '{
+            "prompt": "A cute baby llama",
+            "size": "256x256"
+          }'
 
       - name: save logs
         if: always()
