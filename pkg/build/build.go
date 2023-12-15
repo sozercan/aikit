@@ -128,6 +128,10 @@ func validateConfig(c *config.Config) error {
 		return errors.New("no models defined")
 	}
 
+	if slices.Contains(c.Backends, utils.BackendStableDiffusion) && slices.Contains(c.Backends, utils.BackendExllama) {
+		return errors.New("cannot specify both stablediffusion and exllama at this time")
+	}
+
 	runtimes := []string{"", utils.RuntimeNVIDIA, utils.RuntimeCPUAVX, utils.RuntimeCPUAVX2, utils.RuntimeCPUAVX512}
 	if !slices.Contains(runtimes, c.Runtime) {
 		return errors.Errorf("runtime %s is not supported", c.Runtime)

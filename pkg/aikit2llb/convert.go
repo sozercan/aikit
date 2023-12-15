@@ -14,9 +14,12 @@ import (
 )
 
 const (
-	debianSlim     = "docker.io/library/debian:12-slim"
-	distrolessBase = "gcr.io/distroless/cc-debian12:latest"
+	debianSlim           = "docker.io/library/debian:12-slim"
+	distrolessBase       = "gcr.io/distroless/cc-debian12:latest"
+	distrolessPythonBase = "gcr.io/distroless/python3-debian12:latest"
+
 	localAIVersion = "v2.0.0"
+	localAIRepo    = "https://github.com/mudler/LocalAI"
 	cudaVersion    = "12-3"
 )
 
@@ -35,7 +38,10 @@ func Aikit2LLB(c *config.Config) (llb.State, *specs.Image) {
 
 	// install opencv and friends if stable diffusion backend is being used
 	for b := range c.Backends {
-		if strings.Contains(c.Backends[b], "stablediffusion") {
+		switch c.Backends[b] {
+		case utils.BackendExllama:
+			merge = installExllama(state, merge)
+		case utils.BackendStableDiffusion:
 			merge = installOpenCV(state, merge)
 		}
 	}
@@ -46,8 +52,10 @@ func Aikit2LLB(c *config.Config) (llb.State, *specs.Image) {
 
 func getBaseImage(c *config.Config) llb.State {
 	for b := range c.Backends {
-		if strings.Contains(c.Backends[b], "stablediffusion") {
-			// due to too many dependencies, using debian slim as base for stable diffusion
+		switch c.Backends[b] {
+		case utils.BackendExllama:
+			return llb.Image(distrolessPythonBase)
+		case utils.BackendStableDiffusion:
 			return llb.Image(debianSlim)
 		}
 	}
@@ -55,6 +63,11 @@ func getBaseImage(c *config.Config) llb.State {
 }
 
 func copyModels(c *config.Config, base llb.State, s llb.State) (llb.State, llb.State) {
+	for b := range c.Backends {
+		if c.Backends[b] == utils.BackendExllama {
+			s = s.Run(shf("apt-get update && apt-get install -y git git-lfs && apt-get clean"), llb.IgnoreCache).Root()
+		}
+	}
 	savedState := s
 
 	// create config file if defined
@@ -63,6 +76,8 @@ func copyModels(c *config.Config, base llb.State, s llb.State) (llb.State, llb.S
 	}
 
 	for _, model := range c.Models {
+		// clone the huggingface repo from a branch if defined
+
 		var opts []llb.HTTPOption
 		opts = append(opts, llb.Filename(fileNameFromURL(model.Source)))
 		if model.SHA256 != "" {
@@ -122,8 +137,7 @@ func installCuda(s llb.State, merge llb.State) llb.State {
 	s = s.Run(shf("apt-get install -y libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean", cudaVersion)).Root()
 
 	diff := llb.Diff(savedState, s)
-	merge = llb.Merge([]llb.State{merge, diff})
-	return merge
+	return llb.Merge([]llb.State{merge, diff})
 }
 
 func installOpenCV(s llb.State, merge llb.State) llb.State {
@@ -149,6 +163,26 @@ func installOpenCV(s llb.State, merge llb.State) llb.State {
 		llb.WithCustomName("Copying stable diffusion backend"), //nolint: goconst
 	)
 	return merge
+}
+
+func installExllama(s llb.State, merge llb.State) llb.State {
+	// install git
+	s = s.Run(shf("apt-get update && apt-get install -y git python3-pip && apt-get clean"), llb.IgnoreCache).Root()
+
+	savedState := s
+
+	// clone localai exllama backend only and remove non-python files
+	s = s.Run(shf("git clone --filter=blob:none --no-checkout %s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone backend/python/exllama && git sparse-checkout set backend/python/exllama && git checkout %s && rm -rf .git && find . -type f ! -name '*.py' -delete", localAIRepo, localAIVersion)).Root()
+
+	// clone exllama to localai exllama backend path
+	s = s.Run(shf("git clone https://github.com/turboderp/exllama /tmp/localai/backend/python/exllama && cd /tmp/localai/backend/python/exllama && rm -rf .git && find . -type f ! -name '*.py' -delete")).Root()
+	// clone exllama
+
+	// pip install
+	// COPY --from=build-env /usr/local/lib/python3.5/site-packages /usr/local/lib/python3.5/site-packages
+
+	diff := llb.Diff(savedState, s)
+	return llb.Merge([]llb.State{merge, diff})
 }
 
 func addLocalAI(c *config.Config, s llb.State, merge llb.State) (llb.State, llb.State) {

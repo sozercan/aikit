@@ -1,0 +1,17 @@
+#syntax=aikit:test
+apiVersion: v1alpha1
+debug: true
+models:
+  - name: llama-2-7b-chat
+    source: https://huggingface.co/TheBloke/Llama-2-7B-Chat-GPTQ/tree/gptq-4bit-64g-actorder_True
+config: |
+  - name: llama-2-7b-chat
+    backend: exllama
+    context_size: 4096
+    f16: true
+    gpu_layers: 35
+    batch: 512
+    mmap: true
+    parameters:
+      model: "Llama-2-7B-Chat-GPTQ"
+      temperature: 0.2
