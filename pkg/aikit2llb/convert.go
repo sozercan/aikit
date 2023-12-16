@@ -16,7 +16,7 @@ import (
 const (
 	debianSlim           = "docker.io/library/debian:12-slim"
 	distrolessBase       = "gcr.io/distroless/cc-debian12:latest"
-	distrolessPythonBase = "gcr.io/distroless/python3-debian12:latest"
+	distrolessPythonBase = "gcr.io/distroless/python3-debian12:debug"
 
 	localAIVersion = "v2.0.0"
 	localAIRepo    = "https://github.com/mudler/LocalAI"
@@ -63,11 +63,6 @@ func getBaseImage(c *config.Config) llb.State {
 }
 
 func copyModels(c *config.Config, base llb.State, s llb.State) (llb.State, llb.State) {
-	for b := range c.Backends {
-		if c.Backends[b] == utils.BackendExllama {
-			s = s.Run(shf("apt-get update && apt-get install -y git git-lfs && apt-get clean"), llb.IgnoreCache).Root()
-		}
-	}
 	savedState := s
 
 	// create config file if defined
@@ -76,8 +71,6 @@ func copyModels(c *config.Config, base llb.State, s llb.State) (llb.State, llb.S
 	}
 
 	for _, model := range c.Models {
-		// clone the huggingface repo from a branch if defined
-
 		var opts []llb.HTTPOption
 		opts = append(opts, llb.Filename(fileNameFromURL(model.Source)))
 		if model.SHA256 != "" {
@@ -167,16 +160,17 @@ func installOpenCV(s llb.State, merge llb.State) llb.State {
 
 func installExllama(s llb.State, merge llb.State) llb.State {
 	// install git
-	s = s.Run(shf("apt-get update && apt-get install -y git python3-pip && apt-get clean"), llb.IgnoreCache).Root()
-
+	s = s.Run(shf("apt-get update && apt-get install --no-install-recommends -y git ca-certificates python3-grpcio && apt-get clean"), llb.IgnoreCache).Root()
+	// python3-pip
 	savedState := s
 
 	// clone localai exllama backend only and remove non-python files
-	s = s.Run(shf("git clone --filter=blob:none --no-checkout %s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone backend/python/exllama && git sparse-checkout set backend/python/exllama && git checkout %s && rm -rf .git && find . -type f ! -name '*.py' -delete", localAIRepo, localAIVersion)).Root()
+	s = s.Run(shf("git clone --filter=blob:none --no-checkout %s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python/exllama && git checkout && rm -rf .git", localAIRepo)).Root()
+	// TODO: add localAIVersion to git checkout
+	//  && find . -type f ! -name '*.py' -delete
 
 	// clone exllama to localai exllama backend path
-	s = s.Run(shf("git clone https://github.com/turboderp/exllama /tmp/localai/backend/python/exllama && cd /tmp/localai/backend/python/exllama && rm -rf .git && find . -type f ! -name '*.py' -delete")).Root()
-	// clone exllama
+	s = s.Run(shf("git clone https://github.com/turboderp/exllama /tmp/exllama && mv /tmp/exllama/*.py /tmp/localai/backend/python/exllama && rm -rf /tmp/exllama && cd /tmp/localai/backend/python/exllama && rm -rf .git")).Root()
 
 	// pip install
 	// COPY --from=build-env /usr/local/lib/python3.5/site-packages /usr/local/lib/python3.5/site-packages

@@ -19,7 +19,7 @@ build-aikit:
 
 .PHONY: build-test-model
 build-test-model:
-	docker buildx build . -t ${REGISTRY}/testmodel:${TAG} -f ${TEST_FILE} --output=${OUTPUT_TYPE}
+	docker buildx build . -t ${REGISTRY}/testmodel:${TAG} -f ${TEST_FILE} --output=${OUTPUT_TYPE} --progress plain
 
 .PHONY: run-test-model
 run-test-model:

@@ -1,9 +1,19 @@
-#syntax=aikit:test
+#syntax=ghcr.io/sozercan/aikit:test
 apiVersion: v1alpha1
 debug: true
+backends:
+  - exllama
 models:
-  - name: llama-2-7b-chat
-    source: https://huggingface.co/TheBloke/Llama-2-7B-Chat-GPTQ/tree/gptq-4bit-64g-actorder_True
+    # source: https://huggingface.co/TheBloke/Llama-2-7B-Chat-GPTQ/tree/gptq-4bit-64g-actorder_True
+    # source: https://huggingface.co/TheBloke/Llama-2-7B-Chat-GPTQ/tree/main
+    # source: https://huggingface.co/TheBloke/Llama-2-7B-Chat-GPTQ
+    # source: https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q4_K_M.gguf
+  - name: Llama-2-7B-Chat-GPTQ/model.safetensors
+    source: https://huggingface.co/TheBloke/Llama-2-7B-Chat-GPTQ/resolve/main/model.safetensors
+  - name: Llama-2-7B-Chat-GPTQ/tokenizer.model
+    source: https://huggingface.co/TheBloke/Llama-2-7B-Chat-GPTQ/resolve/main/tokenizer.model
+  - name: Llama-2-7B-Chat-GPTQ/config.json
+    source: https://huggingface.co/TheBloke/Llama-2-7B-Chat-GPTQ/resolve/main/config.json
 config: |
   - name: llama-2-7b-chat
     backend: exllama
