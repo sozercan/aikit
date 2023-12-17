@@ -132,6 +132,10 @@ func validateConfig(c *config.Config) error {
 		return errors.New("cannot specify both stablediffusion and exllama at this time")
 	}
 
+	if slices.Contains(c.Backends, utils.BackendExllama) && c.Runtime != utils.RuntimeNVIDIA {
+		return errors.New("exllama only supports nvidia runtime")
+	}
+
 	runtimes := []string{"", utils.RuntimeNVIDIA, utils.RuntimeCPUAVX, utils.RuntimeCPUAVX2, utils.RuntimeCPUAVX512}
 	if !slices.Contains(runtimes, c.Runtime) {
 		return errors.Errorf("runtime %s is not supported", c.Runtime)

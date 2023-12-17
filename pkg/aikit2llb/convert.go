@@ -129,6 +129,9 @@ func installCuda(s llb.State, merge llb.State) llb.State {
 	savedState := s
 	s = s.Run(shf("apt-get install -y libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean", cudaVersion)).Root()
 
+	// need bookworm non-free
+	// nvidia-cudnn
+
 	diff := llb.Diff(savedState, s)
 	return llb.Merge([]llb.State{merge, diff})
 }
@@ -159,10 +162,13 @@ func installOpenCV(s llb.State, merge llb.State) llb.State {
 }
 
 func installExllama(s llb.State, merge llb.State) llb.State {
-	// install git
-	s = s.Run(shf("apt-get update && apt-get install --no-install-recommends -y git ca-certificates python3-grpcio && apt-get clean"), llb.IgnoreCache).Root()
-	// python3-pip
+	// add sid repo for libcufft11
+	s = s.Run(shf("echo 'deb http://deb.debian.org/debian sid contrib non-free non-free-firmware' | tee -a /etc/apt/sources.list")).Root()
+	// install git, pip3
+	s = s.Run(shf("apt-get update && apt-get install --no-install-recommends -y git ca-certificates python3-pip && apt-get clean"), llb.IgnoreCache).Root()
+
 	savedState := s
+	s = s.Run(shf("apt-get install -y libcufft11 libcurand10 libnvtoolsext1 && pip3 install torch grpcio protobuf --no-dependencies --break-system-packages")).Root()
 
 	// clone localai exllama backend only and remove non-python files
 	s = s.Run(shf("git clone --filter=blob:none --no-checkout %s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python/exllama && git checkout && rm -rf .git", localAIRepo)).Root()
@@ -172,7 +178,10 @@ func installExllama(s llb.State, merge llb.State) llb.State {
 	// clone exllama to localai exllama backend path
 	s = s.Run(shf("git clone https://github.com/turboderp/exllama /tmp/exllama && mv /tmp/exllama/*.py /tmp/localai/backend/python/exllama && rm -rf /tmp/exllama && cd /tmp/localai/backend/python/exllama && rm -rf .git")).Root()
 
-	// pip install
+	s = s.Run(shf("sed -i 's|#!/usr/bin/env python3|#!/usr/bin/python3|g' /tmp/localai/backend/python/exllama/exllama.py")).Root()
+
+	// pip install torch grpcio protobuf
+	//libcufft
 	// COPY --from=build-env /usr/local/lib/python3.5/site-packages /usr/local/lib/python3.5/site-packages
 
 	diff := llb.Diff(savedState, s)
