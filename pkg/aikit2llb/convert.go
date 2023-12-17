@@ -15,7 +15,7 @@ import (
 const (
 	debianSlim     = "docker.io/library/debian:12-slim"
 	distrolessBase = "gcr.io/distroless/cc-debian12:latest"
-	localAIVersion = "v2.0.0"
+	localAIVersion = "v2.1.0"
 	cudaVersion    = "12-3"
 )
 
