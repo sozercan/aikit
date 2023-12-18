@@ -100,12 +100,12 @@ jobs:
         if: matrix.backend == 'stablediffusion'
         run: docker cp testmodel:/tmp/generated/images /tmp
 
-      - name: publish logs
+      - name: publish test artifacts
         if: always()
         uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
         with:
-          name: docker-logs
+          name: test-${{ matrix.backend }}
           path: |
             /tmp/*.log
-            /tmp/*.png
+            /tmp/images/*.png
 
