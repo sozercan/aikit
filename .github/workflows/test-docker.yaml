@@ -94,12 +94,18 @@ jobs:
 
       - name: save logs
         if: always()
-        run: |
-          docker logs testmodel > docker.log
+        run: docker logs testmodel > /tmp/docker-${{ matrix.backend }}.log
+
+      - name: save generated image
+        if: matrix.backend == 'stablediffusion'
+        run: docker cp testmodel:/tmp/generated/images /tmp
 
       - name: publish logs
         if: always()
         uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
         with:
           name: docker-logs
-          path: docker.log
+          path: |
+            /tmp/*.log
+            /tmp/*.png
+
