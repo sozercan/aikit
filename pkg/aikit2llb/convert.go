@@ -18,7 +18,7 @@ const (
 	distrolessBase       = "gcr.io/distroless/cc-debian12:latest"
 	distrolessPythonBase = "gcr.io/distroless/python3-debian12:debug"
 
-	localAIVersion = "v2.0.0"
+	localAIVersion = "v2.1.0"
 	localAIRepo    = "https://github.com/mudler/LocalAI"
 	cudaVersion    = "12-3"
 )
@@ -136,31 +136,6 @@ func installCuda(s llb.State, merge llb.State) llb.State {
 	return llb.Merge([]llb.State{merge, diff})
 }
 
-func installOpenCV(s llb.State, merge llb.State) llb.State {
-	savedState := s
-	// adding debian 11 (bullseye) repo due to opencv 4.5 requirement
-	s = s.Run(shf("echo 'deb http://deb.debian.org/debian bullseye main' | tee -a /etc/apt/sources.list")).Root()
-	// pinning libdap packages to bullseye version due to symbol error
-	s = s.Run(shf("apt-get update && mkdir -p /tmp/generated/images && apt-get install -y libopencv-imgcodecs4.5 libgomp1 libdap27=3.20.7-6 libdapclient6v5=3.20.7-6 && apt-get clean"), llb.IgnoreCache).Root()
-	diff := llb.Diff(savedState, s)
-	merge = llb.Merge([]llb.State{merge, diff})
-
-	sdURL := fmt.Sprintf("https://sertaccdn.azureedge.net/localai/%s/stablediffusion", localAIVersion)
-	var opts []llb.HTTPOption
-	opts = append(opts, llb.Filename("stablediffusion"))
-	opts = append(opts, llb.Chmod(0o755))
-	var copyOpts []llb.CopyOption
-	copyOpts = append(copyOpts, &llb.CopyInfo{
-		CreateDestPath: true,
-	})
-	sd := llb.HTTP(sdURL, opts...)
-	merge = merge.File(
-		llb.Copy(sd, "stablediffusion", "/tmp/localai/backend_data/backend-assets/grpc/stablediffusion", copyOpts...),
-		llb.WithCustomName("Copying stable diffusion backend"), //nolint: goconst
-	)
-	return merge
-}
-
 func installExllama(s llb.State, merge llb.State) llb.State {
 	// add sid repo for libcufft11
 	s = s.Run(shf("echo 'deb http://deb.debian.org/debian sid contrib non-free non-free-firmware' | tee -a /etc/apt/sources.list")).Root()
@@ -186,6 +161,31 @@ func installExllama(s llb.State, merge llb.State) llb.State {
 
 	diff := llb.Diff(savedState, s)
 	return llb.Merge([]llb.State{merge, diff})
+}
+
+func installOpenCV(s llb.State, merge llb.State) llb.State {
+	savedState := s
+	// adding debian 11 (bullseye) repo due to opencv 4.5 requirement
+	s = s.Run(shf("echo 'deb http://deb.debian.org/debian bullseye main' | tee -a /etc/apt/sources.list")).Root()
+	// pinning libdap packages to bullseye version due to symbol error
+	s = s.Run(shf("apt-get update && mkdir -p /tmp/generated/images && apt-get install -y libopencv-imgcodecs4.5 libgomp1 libdap27=3.20.7-6 libdapclient6v5=3.20.7-6 && apt-get clean"), llb.IgnoreCache).Root()
+	diff := llb.Diff(savedState, s)
+	merge = llb.Merge([]llb.State{merge, diff})
+
+	sdURL := fmt.Sprintf("https://sertaccdn.azureedge.net/localai/%s/stablediffusion", localAIVersion)
+	var opts []llb.HTTPOption
+	opts = append(opts, llb.Filename("stablediffusion"))
+	opts = append(opts, llb.Chmod(0o755))
+	var copyOpts []llb.CopyOption
+	copyOpts = append(copyOpts, &llb.CopyInfo{
+		CreateDestPath: true,
+	})
+	sd := llb.HTTP(sdURL, opts...)
+	merge = merge.File(
+		llb.Copy(sd, "stablediffusion", "/tmp/localai/backend_data/backend-assets/grpc/stablediffusion", copyOpts...),
+		llb.WithCustomName("Copying stable diffusion backend"), //nolint: goconst
+	)
+	return merge
 }
 
 func addLocalAI(c *config.Config, s llb.State, merge llb.State) (llb.State, llb.State) {

@@ -6,7 +6,7 @@
 apiVersion: # required. only v1alpha1 is supported at the moment
 debug: # optional. if set to true, will print debug logs
 runtime: # optional. defaults to avx. can be "avx", "avx2", "avx512", "cuda"
-backends: # optional. list of additional backends. can be "stablediffusion, "exllama"
+backends: # optional. list of additional backends. can be "stablediffusion or "exllama".
 models: # required. list of models to build
   - name: # required. name of the model
     source: # required. source of the model. must be a url
