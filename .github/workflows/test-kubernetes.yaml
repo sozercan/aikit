@@ -58,7 +58,7 @@ jobs:
       - name: build test model
         run: |
           docker buildx build . -t testmodel:test \
-            -f test/aikitfile.yaml \
+            -f test/aikitfile-llama.yaml \
             --load --progress plain \
             --cache-from=type=gha,scope=testmodel \
             --cache-to=type=gha,scope=testmodel,mode=max

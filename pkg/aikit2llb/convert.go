@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"path"
+	"strings"
 
 	"github.com/moby/buildkit/client/llb"
 	"github.com/opencontainers/go-digest"
@@ -21,18 +22,39 @@ const (
 
 func Aikit2LLB(c *config.Config) (llb.State, *specs.Image) {
 	var merge llb.State
-	s := llb.Image(debianSlim)
-	s, merge = copyModels(c, s)
-	s, merge = addLocalAI(c, s, merge)
+	state := llb.Image(debianSlim)
+	base := getBaseImage(c)
+
+	state, merge = copyModels(c, base, state)
+	state, merge = addLocalAI(c, state, merge)
+
+	// install cuda if runtime is nvidia
 	if c.Runtime == utils.RuntimeNVIDIA {
-		merge = installCuda(s, merge)
+		merge = installCuda(state, merge)
 	}
+
+	// install opencv and friends if stable diffusion backend is being used
+	for b := range c.Backends {
+		if strings.Contains(c.Backends[b], "stablediffusion") {
+			merge = installOpenCV(state, merge)
+		}
+	}
+
 	imageCfg := NewImageConfig(c)
 	return merge, imageCfg
 }
 
-func copyModels(c *config.Config, s llb.State) (llb.State, llb.State) {
-	db := llb.Image(distrolessBase)
+func getBaseImage(c *config.Config) llb.State {
+	for b := range c.Backends {
+		if strings.Contains(c.Backends[b], "stablediffusion") {
+			// due to too many dependencies, using debian slim as base for stable diffusion
+			return llb.Image(debianSlim)
+		}
+	}
+	return llb.Image(distrolessBase)
+}
+
+func copyModels(c *config.Config, base llb.State, s llb.State) (llb.State, llb.State) {
 	savedState := s
 
 	// create config file if defined
@@ -50,13 +72,20 @@ func copyModels(c *config.Config, s llb.State) (llb.State, llb.State) {
 
 		m := llb.HTTP(model.Source, opts...)
 
+		var modelPath string
+		if strings.Contains(model.Name, "/") {
+			modelPath = "/models/" + path.Dir(model.Name) + "/" + fileNameFromURL(model.Source)
+		} else {
+			modelPath = "/models/" + fileNameFromURL(model.Source)
+		}
+
 		var copyOpts []llb.CopyOption
 		copyOpts = append(copyOpts, &llb.CopyInfo{
 			CreateDestPath: true,
 		})
 		s = s.File(
-			llb.Copy(m, fileNameFromURL(model.Source), "/models/"+fileNameFromURL(model.Source), copyOpts...),
-			llb.WithCustomName("Copying "+fileNameFromURL(model.Source)+" to /models"), //nolint: goconst
+			llb.Copy(m, fileNameFromURL(model.Source), modelPath, copyOpts...),
+			llb.WithCustomName("Copying "+fileNameFromURL(model.Source)+" to "+modelPath), //nolint: goconst
 		)
 
 		// create prompt templates if defined
@@ -67,7 +96,7 @@ func copyModels(c *config.Config, s llb.State) (llb.State, llb.State) {
 		}
 	}
 	diff := llb.Diff(savedState, s)
-	merge := llb.Merge([]llb.State{db, diff})
+	merge := llb.Merge([]llb.State{base, diff})
 	return s, merge
 }
 
@@ -87,12 +116,38 @@ func installCuda(s llb.State, merge llb.State) llb.State {
 		llb.WithCustomName("Copying "+fileNameFromURL(cudaKeyringURL)), //nolint: goconst
 	)
 	s = s.Run(shf("dpkg -i cuda-keyring_1.1-1_all.deb && rm cuda-keyring_1.1-1_all.deb")).Root()
+	// running apt-get update twice due to nvidia repo
 	s = s.Run(shf("apt-get update && apt-get install -y ca-certificates && apt-get update"), llb.IgnoreCache).Root()
 	savedState := s
 	s = s.Run(shf("apt-get install -y libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean", cudaVersion)).Root()
 
 	diff := llb.Diff(savedState, s)
 	merge = llb.Merge([]llb.State{merge, diff})
+	return merge
+}
+
+func installOpenCV(s llb.State, merge llb.State) llb.State {
+	savedState := s
+	// adding debian 11 (bullseye) repo due to opencv 4.5 requirement
+	s = s.Run(shf("echo 'deb http://deb.debian.org/debian bullseye main' | tee -a /etc/apt/sources.list")).Root()
+	// pinning libdap packages to bullseye version due to symbol error
+	s = s.Run(shf("apt-get update && mkdir -p /tmp/generated/images && apt-get install -y libopencv-imgcodecs4.5 libgomp1 libdap27=3.20.7-6 libdapclient6v5=3.20.7-6 && apt-get clean"), llb.IgnoreCache).Root()
+	diff := llb.Diff(savedState, s)
+	merge = llb.Merge([]llb.State{merge, diff})
+
+	sdURL := fmt.Sprintf("https://sertaccdn.azureedge.net/localai/%s/stablediffusion", localAIVersion)
+	var opts []llb.HTTPOption
+	opts = append(opts, llb.Filename("stablediffusion"))
+	opts = append(opts, llb.Chmod(0o755))
+	var copyOpts []llb.CopyOption
+	copyOpts = append(copyOpts, &llb.CopyInfo{
+		CreateDestPath: true,
+	})
+	sd := llb.HTTP(sdURL, opts...)
+	merge = merge.File(
+		llb.Copy(sd, "stablediffusion", "/tmp/localai/backend_data/backend-assets/grpc/stablediffusion", copyOpts...),
+		llb.WithCustomName("Copying stable diffusion backend"), //nolint: goconst
+	)
 	return merge
 }
 
@@ -115,7 +170,7 @@ func addLocalAI(c *config.Config, s llb.State, merge llb.State) (llb.State, llb.
 	opts = append(opts, llb.Chmod(0o755))
 	localAI := llb.HTTP(localAIURL, opts...)
 	s = s.File(
-		llb.Copy(localAI, "local-ai", "/usr/bin"),
+		llb.Copy(localAI, "local-ai", "/usr/bin/local-ai"),
 		llb.WithCustomName("Copying "+fileNameFromURL(localAIURL)+" to /usr/bin"), //nolint: goconst
 	)
 

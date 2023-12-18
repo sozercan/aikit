@@ -9,7 +9,7 @@ AIKit is a quick, easy, and local or cloud-agnostic way to get started to host a
 AIKit uses [LocalAI](https://localai.io/) under-the-hood to run inference. LocalAI provides a drop-in replacement REST API that is OpenAI API compatible, so you can use any OpenAI API compatible client, such as [Kubectl AI](https://github.com/sozercan/kubectl-ai), [Chatbot-UI](https://github.com/sozercan/chatbot-ui) and many more, to send requests to open-source LLMs powered by AIKit!
 
 > [!NOTE]
-> At this time, AIKit is tested with LocalAI `llama` backend. Other backends may work but are not tested. Please open an issue if you'd like to see support for other backends.
+> At this time, AIKit is tested with LocalAI `llama` and `stablediffusion` backends. Other backends may work but are not tested. Please open an issue if you'd like to see support for other backends.
 
 ## Features
 
@@ -17,8 +17,9 @@ AIKit uses [LocalAI](https://localai.io/) under-the-hood to run inference. Local
 - 🤏 Minimal image size, resulting in less vulnerabilities and smaller attack surface with a custom [distroless](https://github.com/GoogleContainerTools/distroless)-based image
 - 🚀 [Easy to use declarative configuration](./docs/specs.md)
 - ✨ OpenAI API compatible to use with any OpenAI API compatible client
-- 🖼️ [Multi-modal model support](./docs/demo.md#vision-with-llava)
-- 🚢 Kubernetes deployment ready
+- 📸 [Multi-modal model support](./docs/demo.md#vision-with-llava)
+- 🖼️ Image generation support with Stable Diffusion
+- 🚢 [Kubernetes deployment ready](#kubernetes-deployment)
 - 📦 Supports multiple models with a single image
 - 🖥️ [Supports GPU-accelerated inferencing with NVIDIA GPUs](#nvidia)
 - 🔐 [Signed images for `aikit` and pre-made models](./docs/cosign.md)

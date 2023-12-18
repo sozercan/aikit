@@ -18,6 +18,12 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      matrix:
+        backend:
+          - llama
+          - stablediffusion
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@eb238b55efaa70779f274895e782ed17c84f2895 # v2.6.1
@@ -56,7 +62,7 @@ jobs:
       - name: build test model
         run: |
           docker buildx build . -t testmodel:test \
-            -f test/aikitfile.yaml \
+            -f test/aikitfile-${{ matrix.backend }}.yaml \
             --load --progress plain \
             --cache-from=type=gha,scope=testmodel \
             --cache-to=type=gha,scope=testmodel,mode=max
@@ -70,18 +76,36 @@ jobs:
       - name: install e2e dependencies
         run: make test-e2e-dependencies
 
-      - name: run test
+      - name: run llama test
+        if: matrix.backend == 'llama'
         run: |
-          curl http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{"model": "llama-2-7b-chat", "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]}'
+          curl http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
+            "model": "llama-2-7b-chat",
+            "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
+          }'
+
+      - name: run stablediffusion test
+        if: matrix.backend == 'stablediffusion'
+        run: |
+          curl http://127.0.0.1:8080/v1/images/generations -H "Content-Type: application/json" -d '{
+            "prompt": "A cute baby llama",
+            "size": "256x256"
+          }'
 
       - name: save logs
         if: always()
-        run: |
-          docker logs testmodel > docker.log
+        run: docker logs testmodel > /tmp/docker-${{ matrix.backend }}.log
 
-      - name: publish logs
+      - name: save generated image
+        if: matrix.backend == 'stablediffusion'
+        run: docker cp testmodel:/tmp/generated/images /tmp
+
+      - name: publish test artifacts
         if: always()
         uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
         with:
-          name: docker-logs
-          path: docker.log
+          name: test-${{ matrix.backend }}
+          path: |
+            /tmp/*.log
+            /tmp/images/*.png
+

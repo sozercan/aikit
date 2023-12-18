@@ -14,11 +14,12 @@ func NewFromBytes(b []byte) (*Config, error) {
 }
 
 type Config struct {
-	APIVersion string  `yaml:"apiVersion"`
-	Debug      bool    `yaml:"debug,omitempty"`
-	Runtime    string  `yaml:"runtime,omitempty"`
-	Models     []Model `yaml:"models"`
-	Config     string  `yaml:"config,omitempty"`
+	APIVersion string   `yaml:"apiVersion"`
+	Debug      bool     `yaml:"debug,omitempty"`
+	Runtime    string   `yaml:"runtime,omitempty"`
+	Backends   []string `yaml:"backends,omitempty"`
+	Models     []Model  `yaml:"models"`
+	Config     string   `yaml:"config,omitempty"`
 }
 
 type Model struct {
