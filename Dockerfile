@@ -1,4 +1,4 @@
-FROM golang:1.21-bullseye@sha256:ca78a56712ab89487123b3af2b30052824653730e7ff25271d2f3037153bc0df as builder
+FROM golang:1.21-bullseye@sha256:cfb0768fb3e3845e95f46f7150630d6eb0930ec10aa9b8ceb16e6f8f581d2d57 as builder
 COPY . /go/src/github.com/sozercan/aikit
 WORKDIR /go/src/github.com/sozercan/aikit
 RUN CGO_ENABLED=0 go build -o /aikit --ldflags '-extldflags "-static"' ./cmd/frontend
