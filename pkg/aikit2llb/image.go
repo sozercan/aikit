@@ -50,6 +50,7 @@ func emptyImage(c *config.Config) *specs.Image {
 			exllamaEnv := []string{
 				"EXTERNAL_GRPC_BACKENDS=exllama:/tmp/localai/backend/python/exllama/exllama.py",
 				"PYTHONPATH=/usr/local/cuda/lib64",
+				"CUDA_HOME=/usr/local/cuda",
 			}
 			img.Config.Env = append(img.Config.Env, exllamaEnv...)
 		}

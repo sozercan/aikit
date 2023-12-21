@@ -32,9 +32,9 @@ func Aikit2LLB(c *config.Config) (llb.State, *specs.Image) {
 	state, merge = addLocalAI(c, state, merge)
 
 	// install cuda if runtime is nvidia
-	if c.Runtime == utils.RuntimeNVIDIA {
-		merge = installCuda(state, merge)
-	}
+	// if c.Runtime == utils.RuntimeNVIDIA {
+	// 	merge = installCuda(state, merge)
+	// }
 
 	// install opencv and friends if stable diffusion backend is being used
 	for b := range c.Backends {
@@ -137,27 +137,46 @@ func installCuda(s llb.State, merge llb.State) llb.State {
 }
 
 func installExllama(s llb.State, merge llb.State) llb.State {
-	// add sid repo for libcufft11
-	s = s.Run(shf("echo 'deb http://deb.debian.org/debian sid contrib non-free non-free-firmware' | tee -a /etc/apt/sources.list")).Root()
 	// install git, pip3
 	s = s.Run(shf("apt-get update && apt-get install --no-install-recommends -y git ca-certificates python3-pip && apt-get clean"), llb.IgnoreCache).Root()
 
+	// add nvidia repos required for torch
+	cudaKeyringURLs := []string{
+		"https://developer.download.nvidia.com/compute/cuda/repos/debian11/x86_64/cuda-keyring_1.1-1_all.deb",
+		"https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb",
+	}
+	for _, cudaKeyringURL := range cudaKeyringURLs {
+		cudaKeyring := llb.HTTP(cudaKeyringURL)
+		s = s.File(
+			llb.Copy(cudaKeyring, fileNameFromURL(cudaKeyringURL), "/"),
+			llb.WithCustomName("Copying "+fileNameFromURL(cudaKeyringURL)), //nolint: goconst
+		)
+		s = s.Run(shf("dpkg -i cuda-keyring_1.1-1_all.deb && rm cuda-keyring_1.1-1_all.deb")).Root()
+	}
+	// running apt-get update twice due to nvidia repo
+	s = s.Run(shf("apt-get update && apt-get install -y ca-certificates && apt-get update"), llb.IgnoreCache).Root()
+	// removing setuptools since it's installed as system package
+	s = s.Run(shf("rm -rf /usr/lib/python3/dist-packages/setuptools*")).Root()
+
 	savedState := s
-	s = s.Run(shf("apt-get install -y libcufft11 libcurand10 libnvtoolsext1 && pip3 install torch grpcio protobuf --no-dependencies --break-system-packages")).Root()
+	s = s.Run(shf("apt-get install -y gnu-which g++ libcudnn8 libnccl2 libcusparse-%[1]s libcufft-%[1]s libcurand-%[1]s cuda-nvtx-%[1]s cuda-cupti-%[1]s libnvjitlink-%[1]s && apt-get clean", cudaVersion)).Root()
+	s = s.Run(shf("mv /usr/bin/which.gnu /usr/bin/which")).Root()
+
+	// install minimum pip dependencies
+	// we don't need dependencies of torch since it'll install nvidia libraries
+	// we are installing as distro packages since these will copied to distroless image
+	s = s.Run(shf("pip3 install torch grpcio protobuf typing-extensions sympy mpmath sentencepiece setuptools numpy ninja --no-dependencies --break-system-packages")).Root()
 
 	// clone localai exllama backend only and remove non-python files
-	s = s.Run(shf("git clone --filter=blob:none --no-checkout %s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python/exllama && git checkout && rm -rf .git", localAIRepo)).Root()
-	// TODO: add localAIVersion to git checkout
-	//  && find . -type f ! -name '*.py' -delete
+	s = s.Run(shf("git clone --filter=blob:none --no-checkout %[1]s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python/exllama && git checkout %[2]s && rm -rf .git", localAIRepo, localAIVersion)).Root()
 
 	// clone exllama to localai exllama backend path
-	s = s.Run(shf("git clone https://github.com/turboderp/exllama /tmp/exllama && mv /tmp/exllama/*.py /tmp/localai/backend/python/exllama && rm -rf /tmp/exllama && cd /tmp/localai/backend/python/exllama && rm -rf .git")).Root()
+	s = s.Run(shf("git clone https://github.com/turboderp/exllama /tmp/exllama && mv /tmp/exllama/* /tmp/localai/backend/python/exllama && rm -rf /tmp/exllama && cd /tmp/localai/backend/python/exllama && rm -rf .git")).Root()
+	//  && find . -type f ! -name '*.py' -delete
+	// TODO: remove non-python files
 
+	// substitute due to env binary not being available in distroless python
 	s = s.Run(shf("sed -i 's|#!/usr/bin/env python3|#!/usr/bin/python3|g' /tmp/localai/backend/python/exllama/exllama.py")).Root()
-
-	// pip install torch grpcio protobuf
-	//libcufft
-	// COPY --from=build-env /usr/local/lib/python3.5/site-packages /usr/local/lib/python3.5/site-packages
 
 	diff := llb.Diff(savedState, s)
 	return llb.Merge([]llb.State{merge, diff})
