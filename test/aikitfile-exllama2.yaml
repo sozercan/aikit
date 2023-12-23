@@ -3,7 +3,7 @@ apiVersion: v1alpha1
 debug: true
 runtime: cuda
 backends:
-  - exllama
+  - exllama2
 models:
   - name: Llama-2-7B-Chat-GPTQ/model.safetensors
     source: https://huggingface.co/TheBloke/Llama-2-7B-Chat-GPTQ/resolve/main/model.safetensors
@@ -13,7 +13,7 @@ models:
     source: https://huggingface.co/TheBloke/Llama-2-7B-Chat-GPTQ/resolve/main/config.json
 config: |
   - name: llama-2-7b-chat
-    backend: exllama
+    backend: exllama2
     context_size: 4096
     parameters:
       model: "Llama-2-7B-Chat-GPTQ"

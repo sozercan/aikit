@@ -14,9 +14,8 @@ import (
 )
 
 const (
-	debianSlim           = "docker.io/library/debian:12-slim"
-	distrolessBase       = "gcr.io/distroless/cc-debian12:latest"
-	distrolessPythonBase = "gcr.io/distroless/python3-debian12:debug"
+	debianSlim     = "docker.io/library/debian:12-slim"
+	distrolessBase = "gcr.io/distroless/cc-debian12:latest"
 
 	localAIVersion = "v2.1.0"
 	localAIRepo    = "https://github.com/mudler/LocalAI"
@@ -40,7 +39,8 @@ func Aikit2LLB(c *config.Config) (llb.State, *specs.Image) {
 	for b := range c.Backends {
 		switch c.Backends[b] {
 		case utils.BackendExllama:
-			merge = installExllama(state, merge)
+		case utils.BackendExllamaV2:
+			merge = installExllama(c, state, merge)
 		case utils.BackendStableDiffusion:
 			merge = installOpenCV(state, merge)
 		}
@@ -54,7 +54,7 @@ func getBaseImage(c *config.Config) llb.State {
 	for b := range c.Backends {
 		switch c.Backends[b] {
 		case utils.BackendExllama:
-			// return llb.Image(distrolessPythonBase)
+		case utils.BackendExllamaV2:
 			return llb.Image(debianSlim)
 		case utils.BackendStableDiffusion:
 			return llb.Image(debianSlim)
@@ -124,16 +124,22 @@ func installCuda(c *config.Config, s llb.State, merge llb.State) llb.State {
 		llb.Copy(cudaKeyring, fileNameFromURL(cudaKeyringURL), "/"),
 		llb.WithCustomName("Copying "+fileNameFromURL(cudaKeyringURL)), //nolint: goconst
 	)
-	s = s.Run(shf("dpkg -i cuda-keyring_1.1-1_all.deb && rm cuda-keyring_1.1-1_all.deb")).Root()
+	s = s.Run(sh("dpkg -i cuda-keyring_1.1-1_all.deb && rm cuda-keyring_1.1-1_all.deb")).Root()
 	// running apt-get update twice due to nvidia repo
-	s = s.Run(shf("apt-get update && apt-get install -y ca-certificates && apt-get update"), llb.IgnoreCache).Root()
+	s = s.Run(sh("apt-get update && apt-get install -y ca-certificates && apt-get update"), llb.IgnoreCache).Root()
 	savedState := s
 	s = s.Run(shf("apt-get install -y --no-install-recommends libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean", cudaVersion)).Root()
 
-	// installing dev libraries used for exllama
+	// installing dev dependencies used for exllama
 	for b := range c.Backends {
-		if c.Backends[b] == utils.BackendExllama {
-			s = s.Run(shf("apt-get install -y --no-install-recommends cuda-cudart-dev-%[1]s cuda-crt-%[1]s libcusparse-dev-%[1]s libcublas-dev-%[1]s libcusolver-dev-%[1]s cuda-nvcc-%[1]s && apt-get clean", cudaVersion)).Root()
+		if c.Backends[b] == utils.BackendExllama || c.Backends[b] == utils.BackendExllamaV2 {
+			var exllama2Dep string
+			if c.Backends[b] == utils.BackendExllamaV2 {
+				exllama2Dep = fmt.Sprintf("libcurand-dev-%[1]s", cudaVersion)
+			}
+			exllamaDeps := fmt.Sprintf("apt-get install -y --no-install-recommends cuda-cudart-dev-%[1]s cuda-crt-%[1]s libcusparse-dev-%[1]s libcublas-dev-%[1]s libcusolver-dev-%[1]s cuda-nvcc-%[1]s %[2]s && apt-get clean", cudaVersion, exllama2Dep)
+
+			s = s.Run(sh(exllamaDeps)).Root()
 		}
 	}
 
@@ -141,15 +147,29 @@ func installCuda(c *config.Config, s llb.State, merge llb.State) llb.State {
 	return llb.Merge([]llb.State{merge, diff})
 }
 
-func installExllama(s llb.State, merge llb.State) llb.State {
+func installExllama(c *config.Config, s llb.State, merge llb.State) llb.State {
+	backend := "exllama"
+	exllamaRepo := "https://github.com/turboderp/exllama"
+	for b := range c.Backends {
+		if c.Backends[b] == utils.BackendExllamaV2 {
+			exllamaRepo = "https://github.com/turboderp/exllamav2"
+			backend = "exllama2"
+		}
+	}
+
 	savedState := s
-	s = s.Run(shf("apt-get update && apt-get install --no-install-recommends -y git ca-certificates python3-pip python3-dev g++ && apt-get clean"), llb.IgnoreCache).Root()
+	s = s.Run(sh("apt-get update && apt-get install --no-install-recommends -y git ca-certificates python3-pip python3-dev g++ && apt-get clean"), llb.IgnoreCache).Root()
 
-	// clone localai exllama backend only and remove non-python files
-	s = s.Run(shf("git clone --filter=blob:none --no-checkout %[1]s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python/exllama && git checkout %[2]s && rm -rf .git", localAIRepo, localAIVersion)).Root()
+	// clone localai exllama backend only
+	s = s.Run(shf("git clone --filter=blob:none --no-checkout %[1]s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python/%[2]s && git checkout %[3]s && rm -rf .git", localAIRepo, backend, localAIVersion)).Root()
 
-	// clone exllama to localai exllama backend path
-	s = s.Run(shf("git clone https://github.com/turboderp/exllama /tmp/exllama && mv /tmp/exllama/* /tmp/localai/backend/python/exllama && rm -rf /tmp/exllama && cd /tmp/localai/backend/python/exllama && rm -rf .git && pip3 install grpcio protobuf typing-extensions sympy mpmath setuptools numpy --break-system-packages && pip3 install -r /tmp/localai/backend/python/exllama/requirements.txt --break-system-packages")).Root()
+	// workaround until https://github.com/mudler/LocalAI/pull/1484 is merged
+	if backend == "exllama2" {
+		s = s.Run(sh("sed -i 's/self.seed/None/g' /tmp/localai/backend/python/exllama2/exllama2_backend.py && sed -i 's/bytes(t/bytes(output/g' /tmp/localai/backend/python/exllama2/exllama2_backend.py")).Root()
+	}
+
+	// clone exllama to localai exllama backend path and install python dependencies
+	s = s.Run(shf("git clone %[1]s /tmp/%[2]s && mv /tmp/%[2]s/* /tmp/localai/backend/python/%[2]s && rm -rf /tmp/%[2]s && cd /tmp/localai/backend/python/%[2]s && rm -rf .git && pip3 install grpcio protobuf typing-extensions sympy mpmath setuptools numpy --break-system-packages && pip3 install -r /tmp/localai/backend/python/%[2]s/requirements.txt --break-system-packages", exllamaRepo, backend)).Root()
 
 	diff := llb.Diff(savedState, s)
 	return llb.Merge([]llb.State{merge, diff})
@@ -158,9 +178,10 @@ func installExllama(s llb.State, merge llb.State) llb.State {
 func installOpenCV(s llb.State, merge llb.State) llb.State {
 	savedState := s
 	// adding debian 11 (bullseye) repo due to opencv 4.5 requirement
-	s = s.Run(shf("echo 'deb http://deb.debian.org/debian bullseye main' | tee -a /etc/apt/sources.list")).Root()
+	s = s.Run(sh("echo 'deb http://deb.debian.org/debian bullseye main' | tee -a /etc/apt/sources.list")).Root()
 	// pinning libdap packages to bullseye version due to symbol error
-	s = s.Run(shf("apt-get update && mkdir -p /tmp/generated/images && apt-get install -y libopencv-imgcodecs4.5 libgomp1 libdap27=3.20.7-6 libdapclient6v5=3.20.7-6 && apt-get clean"), llb.IgnoreCache).Root()
+	libdapVersion := "3.20.7-6"
+	s = s.Run(shf("apt-get update && mkdir -p /tmp/generated/images && apt-get install -y libopencv-imgcodecs4.5 libgomp1 libdap27=%[1]s libdapclient6v5=%[1]s && apt-get clean", libdapVersion), llb.IgnoreCache).Root()
 	diff := llb.Diff(savedState, s)
 	merge = llb.Merge([]llb.State{merge, diff})
 
@@ -209,4 +230,8 @@ func addLocalAI(c *config.Config, s llb.State, merge llb.State) (llb.State, llb.
 
 func shf(cmd string, v ...interface{}) llb.RunOption {
 	return llb.Args([]string{"/bin/sh", "-c", fmt.Sprintf(cmd, v...)})
+}
+
+func sh(cmd string) llb.RunOption {
+	return llb.Args([]string{"/bin/sh", "-c", cmd})
 }

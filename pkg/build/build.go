@@ -128,11 +128,15 @@ func validateConfig(c *config.Config) error {
 		return errors.New("no models defined")
 	}
 
-	if slices.Contains(c.Backends, utils.BackendStableDiffusion) && slices.Contains(c.Backends, utils.BackendExllama) {
+	if slices.Contains(c.Backends, utils.BackendStableDiffusion) && (slices.Contains(c.Backends, utils.BackendExllama) || slices.Contains(c.Backends, utils.BackendExllamaV2)) {
 		return errors.New("cannot specify both stablediffusion and exllama at this time")
 	}
 
-	if slices.Contains(c.Backends, utils.BackendExllama) && c.Runtime != utils.RuntimeNVIDIA {
+	if slices.Contains(c.Backends, utils.BackendExllama) && slices.Contains(c.Backends, utils.BackendExllamaV2) {
+		return errors.New("cannot specify both exllama and exllamav2 at this time")
+	}
+
+	if (slices.Contains(c.Backends, utils.BackendExllama) || slices.Contains(c.Backends, utils.BackendExllamaV2)) && c.Runtime != utils.RuntimeNVIDIA {
 		return errors.New("exllama only supports nvidia runtime")
 	}
 

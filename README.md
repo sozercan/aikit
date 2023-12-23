@@ -8,9 +8,6 @@ AIKit is a quick, easy, and local or cloud-agnostic way to get started to host a
 
 AIKit uses [LocalAI](https://localai.io/) under-the-hood to run inference. LocalAI provides a drop-in replacement REST API that is OpenAI API compatible, so you can use any OpenAI API compatible client, such as [Kubectl AI](https://github.com/sozercan/kubectl-ai), [Chatbot-UI](https://github.com/sozercan/chatbot-ui) and many more, to send requests to open-source LLMs powered by AIKit!
 
-> [!NOTE]
-> At this time, AIKit is tested with LocalAI `llama` and `stablediffusion` backends. Other backends may work but are not tested. Please open an issue if you'd like to see support for other backends.
-
 ## Features
 
 - 🐳 No GPU, Internet access or additional tools needed except for [Docker](https://docs.docker.com/desktop/install/linux-install/)!
@@ -19,6 +16,7 @@ AIKit uses [LocalAI](https://localai.io/) under-the-hood to run inference. Local
 - ✨ OpenAI API compatible to use with any OpenAI API compatible client
 - 📸 [Multi-modal model support](./docs/demo.md#vision-with-llava)
 - 🖼️ Image generation support with Stable Diffusion
+- 🦙 Support for GGUF (`llama`), GPTQ (`exllama` or `exllama2`), and GGML (`llama-ggml`) formats
 - 🚢 [Kubernetes deployment ready](#kubernetes-deployment)
 - 📦 Supports multiple models with a single image
 - 🖥️ [Supports GPU-accelerated inferencing with NVIDIA GPUs](#nvidia)

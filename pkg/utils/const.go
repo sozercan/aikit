@@ -7,7 +7,8 @@ const (
 	RuntimeCPUAVX512 = "avx512"
 
 	BackendStableDiffusion = "stablediffusion"
-	BackendExllama = "exllama"
+	BackendExllama         = "exllama"
+	BackendExllamaV2       = "exllama2"
 
 	APIv1alpha1 = "v1alpha1"
 )
