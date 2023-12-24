@@ -129,7 +129,7 @@ func validateConfig(c *config.Config) error {
 	}
 
 	if slices.Contains(c.Backends, utils.BackendStableDiffusion) && (slices.Contains(c.Backends, utils.BackendExllama) || slices.Contains(c.Backends, utils.BackendExllamaV2)) {
-		return errors.New("cannot specify both stablediffusion and exllama at this time")
+		return errors.New("cannot specify both stablediffusion with exllama or exllama2 at this time")
 	}
 
 	if slices.Contains(c.Backends, utils.BackendExllama) && slices.Contains(c.Backends, utils.BackendExllamaV2) {
@@ -137,7 +137,7 @@ func validateConfig(c *config.Config) error {
 	}
 
 	if (slices.Contains(c.Backends, utils.BackendExllama) || slices.Contains(c.Backends, utils.BackendExllamaV2)) && c.Runtime != utils.RuntimeNVIDIA {
-		return errors.New("exllama only supports nvidia runtime")
+		return errors.New("exllama only supports nvidia cuda runtime. please add 'runtime: cuda' to your aikitfile.yaml")
 	}
 
 	runtimes := []string{"", utils.RuntimeNVIDIA, utils.RuntimeCPUAVX, utils.RuntimeCPUAVX2, utils.RuntimeCPUAVX512}
