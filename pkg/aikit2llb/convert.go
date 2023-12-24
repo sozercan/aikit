@@ -150,10 +150,12 @@ func installCuda(c *config.Config, s llb.State, merge llb.State) llb.State {
 func installExllama(c *config.Config, s llb.State, merge llb.State) llb.State {
 	backend := "exllama"
 	exllamaRepo := "https://github.com/turboderp/exllama"
+	exllamaTag := "master"
 	for b := range c.Backends {
 		if c.Backends[b] == utils.BackendExllamaV2 {
 			exllamaRepo = "https://github.com/turboderp/exllamav2"
 			backend = "exllama2"
+			exllamaTag = "v0.0.11"
 		}
 	}
 
@@ -164,12 +166,12 @@ func installExllama(c *config.Config, s llb.State, merge llb.State) llb.State {
 	s = s.Run(shf("git clone --filter=blob:none --no-checkout %[1]s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python/%[2]s && git checkout %[3]s && rm -rf .git", localAIRepo, backend, localAIVersion)).Root()
 
 	// workaround until https://github.com/mudler/LocalAI/pull/1484 is merged
-	if backend == "exllama2" {
+	if backend == utils.BackendExllamaV2 {
 		s = s.Run(sh("sed -i 's/self.seed/None/g' /tmp/localai/backend/python/exllama2/exllama2_backend.py && sed -i 's/bytes(t/bytes(output/g' /tmp/localai/backend/python/exllama2/exllama2_backend.py")).Root()
 	}
 
 	// clone exllama to localai exllama backend path and install python dependencies
-	s = s.Run(shf("git clone %[1]s /tmp/%[2]s && mv /tmp/%[2]s/* /tmp/localai/backend/python/%[2]s && rm -rf /tmp/%[2]s && cd /tmp/localai/backend/python/%[2]s && rm -rf .git && pip3 install grpcio protobuf typing-extensions sympy mpmath setuptools numpy --break-system-packages && pip3 install -r /tmp/localai/backend/python/%[2]s/requirements.txt --break-system-packages", exllamaRepo, backend)).Root()
+	s = s.Run(shf("git clone --depth 1 %[1]s --branch %[2]s /tmp/%[3]s && mv /tmp/%[3]s/* /tmp/localai/backend/python/%[3]s && rm -rf /tmp/%[3]s && cd /tmp/localai/backend/python/%[3]s && rm -rf .git && pip3 install grpcio protobuf typing-extensions sympy mpmath setuptools numpy --break-system-packages && pip3 install -r /tmp/localai/backend/python/%[3]s/requirements.txt --break-system-packages", exllamaRepo, exllamaTag, backend)).Root()
 
 	diff := llb.Diff(savedState, s)
 	return llb.Merge([]llb.State{merge, diff})

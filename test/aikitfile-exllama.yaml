@@ -1,4 +1,4 @@
-#syntax=ghcr.io/sozercan/aikit:test
+#syntax=aikit:test
 apiVersion: v1alpha1
 debug: true
 runtime: cuda
