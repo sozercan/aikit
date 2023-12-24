@@ -16,7 +16,7 @@ AIKit uses [LocalAI](https://localai.io/) under-the-hood to run inference. Local
 - ✨ OpenAI API compatible to use with any OpenAI API compatible client
 - 📸 [Multi-modal model support](./docs/demo.md#vision-with-llava)
 - 🖼️ Image generation support with Stable Diffusion
-- 🦙 Support for GGUF (`llama`), GPTQ (`exllama` or `exllama2`), and GGML (`llama-ggml`) formats
+- 🦙 Support for GGUF (`llama`), GPTQ (`exllama` or `exllama2`), EXL2 (`exllama2`), and GGML (`llama-ggml`) formats
 - 🚢 [Kubernetes deployment ready](#kubernetes-deployment)
 - 📦 Supports multiple models with a single image
 - 🖥️ [Supports GPU-accelerated inferencing with NVIDIA GPUs](#nvidia)
