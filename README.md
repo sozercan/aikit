@@ -8,9 +8,6 @@ AIKit is a quick, easy, and local or cloud-agnostic way to get started to host a
 
 AIKit uses [LocalAI](https://localai.io/) under-the-hood to run inference. LocalAI provides a drop-in replacement REST API that is OpenAI API compatible, so you can use any OpenAI API compatible client, such as [Kubectl AI](https://github.com/sozercan/kubectl-ai), [Chatbot-UI](https://github.com/sozercan/chatbot-ui) and many more, to send requests to open-source LLMs powered by AIKit!
 
-> [!NOTE]
-> At this time, AIKit is tested with LocalAI `llama` and `stablediffusion` backends. Other backends may work but are not tested. Please open an issue if you'd like to see support for other backends.
-
 ## Features
 
 - 🐳 No GPU, Internet access or additional tools needed except for [Docker](https://docs.docker.com/desktop/install/linux-install/)!
@@ -19,6 +16,7 @@ AIKit uses [LocalAI](https://localai.io/) under-the-hood to run inference. Local
 - ✨ OpenAI API compatible to use with any OpenAI API compatible client
 - 📸 [Multi-modal model support](./docs/demo.md#vision-with-llava)
 - 🖼️ Image generation support with Stable Diffusion
+- 🦙 Support for GGUF ([`llama`](https://github.com/ggerganov/llama.cpp)), GPTQ ([`exllama`](https://github.com/turboderp/exllama) or [`exllama2`](https://github.com/turboderp/exllamav2)), EXL2 ([`exllama2`](https://github.com/turboderp/exllamav2)), and GGML ([`llama-ggml`](https://github.com/ggerganov/llama.cpp)) formats
 - 🚢 [Kubernetes deployment ready](#kubernetes-deployment)
 - 📦 Supports multiple models with a single image
 - 🖥️ [Supports GPU-accelerated inferencing with NVIDIA GPUs](#nvidia)
@@ -30,7 +28,9 @@ You can get started with AIKit quickly on your local machine without a GPU!
 
 ```bash
 docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama2:7b
+```
 
+```bash
 curl http://localhost:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
     "model": "llama-2-7b-chat",
     "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
@@ -39,9 +39,7 @@ curl http://localhost:8080/v1/chat/completions -H "Content-Type: application/jso
 
 Output should be similar to:
 
-```json
-{"created":1701236489,"object":"chat.completion","id":"dd1ff40b-31a7-4418-9e32-42151ab6875a","model":"llama-2-7b-chat","choices":[{"index":0,"finish_reason":"stop","message":{"role":"assistant","content":"\nKubernetes is a container orchestration system that automates the deployment, scaling, and management of containerized applications in a microservices architecture."}}],"usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0}}
-```
+`{"created":1701236489,"object":"chat.completion","id":"dd1ff40b-31a7-4418-9e32-42151ab6875a","model":"llama-2-7b-chat","choices":[{"index":0,"finish_reason":"stop","message":{"role":"assistant","content":"\nKubernetes is a container orchestration system that automates the deployment, scaling, and management of containerized applications in a microservices architecture."}}],"usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0}}`
 
 That's it! 🎉 API is OpenAI compatible so this is a drop-in replacement for any OpenAI API compatible client.
 
@@ -176,6 +174,11 @@ To get started with GPU-accelerated inferencing, make sure to set the following 
 
 ```yaml
 runtime: cuda         # use NVIDIA CUDA runtime
+```
+
+For `llama` backend, set the following in your `config`:
+
+```yaml
 f16: true             # use float16 precision
 gpu_layers: 35        # number of layers to offload to GPU
 low_vram: true        # for devices with low VRAM
@@ -183,6 +186,9 @@ low_vram: true        # for devices with low VRAM
 
 > [!TIP]
 > Make sure to customize these values based on your model and GPU specs.
+
+> [!NOTE]
+> For `exllama` and `exllama2` backends, GPU acceleration is enabled by default and cannot be disabled.
 
 After building the model, you can run it with [`--gpus all`](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/docker-specialized.html#gpu-enumeration) flag to enable GPU support:
 

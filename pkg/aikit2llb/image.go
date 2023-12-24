@@ -30,6 +30,10 @@ func emptyImage(c *config.Config) *specs.Image {
 	img.RootFS.Type = "layers"
 	img.Config.WorkingDir = "/"
 
+	img.Config.Env = []string{
+		"PATH=" + system.DefaultPathEnv("linux"),
+	}
+
 	cudaEnv := []string{
 		"PATH=" + system.DefaultPathEnv("linux") + ":/usr/local/cuda/bin",
 		"NVIDIA_REQUIRE_CUDA=cuda>=12.0",
@@ -37,12 +41,17 @@ func emptyImage(c *config.Config) *specs.Image {
 		"NVIDIA_VISIBLE_DEVICES=all",
 		"LD_LIBRARY_PATH=/usr/local/cuda/lib64",
 	}
-
 	if c.Runtime == utils.RuntimeNVIDIA {
-		img.Config.Env = cudaEnv
-	} else {
-		img.Config.Env = []string{
-			"PATH=" + system.DefaultPathEnv("linux"),
+		img.Config.Env = append(img.Config.Env, cudaEnv...)
+	}
+
+	for b := range c.Backends {
+		if c.Backends[b] == utils.BackendExllama || c.Backends[b] == utils.BackendExllamaV2 {
+			exllamaEnv := []string{
+				"EXTERNAL_GRPC_BACKENDS=exllama:/tmp/localai/backend/python/exllama/exllama.py,exllama2:/tmp/localai/backend/python/exllama2/exllama2_backend.py",
+				"CUDA_HOME=/usr/local/cuda",
+			}
+			img.Config.Env = append(img.Config.Env, exllamaEnv...)
 		}
 	}
 
