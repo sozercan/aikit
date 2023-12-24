@@ -16,7 +16,7 @@ AIKit uses [LocalAI](https://localai.io/) under-the-hood to run inference. Local
 - ✨ OpenAI API compatible to use with any OpenAI API compatible client
 - 📸 [Multi-modal model support](./docs/demo.md#vision-with-llava)
 - 🖼️ Image generation support with Stable Diffusion
-- 🦙 Support for GGUF (`llama`), GPTQ (`exllama` or `exllama2`), EXL2 (`exllama2`), and GGML (`llama-ggml`) formats
+- 🦙 Support for GGUF ([`llama`](https://github.com/ggerganov/llama.cpp)), GPTQ ([`exllama`](https://github.com/turboderp/exllama) or [`exllama2`](https://github.com/turboderp/exllamav2)), EXL2 ([`exllama2`](https://github.com/turboderp/exllamav2)), and GGML ([`llama-ggml`](https://github.com/ggerganov/llama.cpp)) formats
 - 🚢 [Kubernetes deployment ready](#kubernetes-deployment)
 - 📦 Supports multiple models with a single image
 - 🖥️ [Supports GPU-accelerated inferencing with NVIDIA GPUs](#nvidia)
@@ -174,6 +174,11 @@ To get started with GPU-accelerated inferencing, make sure to set the following 
 
 ```yaml
 runtime: cuda         # use NVIDIA CUDA runtime
+```
+
+For `llama` backend, set the following in your `config`:
+
+```yaml
 f16: true             # use float16 precision
 gpu_layers: 35        # number of layers to offload to GPU
 low_vram: true        # for devices with low VRAM
@@ -181,6 +186,9 @@ low_vram: true        # for devices with low VRAM
 
 > [!TIP]
 > Make sure to customize these values based on your model and GPU specs.
+
+> [!NOTE]
+> For `exllama` and `exllama2` backends, GPU acceleration is enabled by default and cannot be disabled.
 
 After building the model, you can run it with [`--gpus all`](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/docker-specialized.html#gpu-enumeration) flag to enable GPU support:
 
