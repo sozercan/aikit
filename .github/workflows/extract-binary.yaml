@@ -2,6 +2,10 @@ name: extract-binary
 
 on:
   workflow_dispatch:
+    inputs:
+      localai_version:
+        description: 'Version of local-ai container to extract artifacts from'
+        required: true
 
 permissions:
   packages: write
@@ -10,8 +14,6 @@ jobs:
   extract-binary:
     runs-on: ubuntu-latest
     timeout-minutes: 240
-    env:
-      LOCAL_AI_VERSION: v2.1.0
     steps:
       - uses: easimon/maximize-build-space@master
         with:
@@ -37,7 +39,7 @@ jobs:
 
       - name: extract artifacts from local-ai container
         run: |
-          crane export quay.io/go-skynet/local-ai:${LOCAL_AI_VERSION}-cublas-cuda12-core > export.tar
+          crane export quay.io/go-skynet/local-ai:${{ github.event.inputs.localai_version }}-cublas-cuda12-core > export.tar
           tar -xvf export.tar build
 
       - name: Login to GHCR
@@ -49,7 +51,7 @@ jobs:
 
       - name: create and push oci artifact
         run: |
-          oras push ghcr.io/sozercan/test/local-ai:${LOCAL_AI_VERSION}-cublas-cuda12-core \
+          oras push ghcr.io/sozercan/test/local-ai:${{ github.event.inputs.localai_version }}-cublas-cuda12-core \
             build/local-ai:application/octet-stream \
             build/backend-assets/:application/octet-stream
 
