@@ -37,7 +37,7 @@ jobs:
           df -H
 
       # need containerd image store for testing local images
-      - uses: crazy-max/ghaction-setup-docker@69b561f709cbd934060981d481ccfc316cfb77b7 # v2.2.0
+      - uses: crazy-max/ghaction-setup-docker@d9be6cade441568ba10037bce5221b8f564981f1 # v3.0.0
         with:
           daemon-config: |
             {
