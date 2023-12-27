@@ -140,6 +140,13 @@ func validateConfig(c *config.Config) error {
 		return errors.New("exllama only supports nvidia cuda runtime. please add 'runtime: cuda' to your aikitfile.yaml")
 	}
 
+	backends := []string{utils.BackendExllama, utils.BackendExllamaV2, utils.BackendStableDiffusion}
+	for _, b := range c.Backends {
+		if !slices.Contains(backends, b) {
+			return errors.Errorf("backend %s is not supported", b)
+		}
+	}
+
 	runtimes := []string{"", utils.RuntimeNVIDIA, utils.RuntimeCPUAVX, utils.RuntimeCPUAVX2, utils.RuntimeCPUAVX512}
 	if !slices.Contains(runtimes, c.Runtime) {
 		return errors.Errorf("runtime %s is not supported", c.Runtime)
