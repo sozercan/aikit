@@ -9,7 +9,7 @@ require (
 	github.com/opencontainers/image-spec v1.1.0-rc5
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.3
-	google.golang.org/grpc v1.60.0
+	google.golang.org/grpc v1.60.1
 	gopkg.in/yaml.v2 v2.4.0
 )
 
