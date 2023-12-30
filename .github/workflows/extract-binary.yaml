@@ -7,28 +7,19 @@ on:
         description: 'Version of local-ai container to extract artifacts from'
         required: true
 
-permissions:
-  packages: write
+permissions: read-all
 
 jobs:
   extract-binary:
     runs-on: ubuntu-latest
     timeout-minutes: 240
     steps:
-      - uses: easimon/maximize-build-space@master
-        with:
-          remove-dotnet: 'true'
-          remove-docker-images: 'true'
-          remove-codeql: 'true'
-          remove-haskell: 'true'
-          remove-android: 'true'
-
-      - name: install oras
-        env:
-          ORAS_VERSION: 1.1.0
+      - name: cleanup disk space
         run: |
-          curl -sLO "https://github.com/oras-project/oras/releases/download/v${ORAS_VERSION}/oras_${ORAS_VERSION}_linux_amd64.tar.gz"
-          tar -zxvf oras_${ORAS_VERSION}_linux_amd64.tar.gz -C /usr/local/bin/ oras
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
       - name: install crane
         env:
@@ -42,19 +33,6 @@ jobs:
           crane export quay.io/go-skynet/local-ai:${{ github.event.inputs.localai_version }}-cublas-cuda12-core > export.tar
           tar -xvf export.tar build
 
-      - name: Login to GHCR
-        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: create and push oci artifact
-        run: |
-          oras push ghcr.io/sozercan/test/local-ai:${{ github.event.inputs.localai_version }}-cublas-cuda12-core \
-            build/local-ai:application/octet-stream \
-            build/backend-assets/:application/octet-stream
-
       - name: publish artifacts
         uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
         with:
@@ -62,3 +40,16 @@ jobs:
           path: |
             build/local-ai
             build/backend-assets/grpc/stablediffusion
+
+      - run: |
+          mkdir -p upload/cuda12
+          cp build/local-ai upload/cuda12/local-ai
+          cp build/backend-assets/grpc/stablediffusion upload/stablediffusion
+
+      - uses: bacongobbler/azure-blob-storage-upload@50f7d898b7697e864130ea04c303ca38b5751c50 # v3.0.0
+        with:
+          source_dir: 'upload'
+          container_name: 'localai'
+          extra_args: '--destination ${{ github.event.inputs.localai_version }}'
+          connection_string: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+          sync: 'true'
