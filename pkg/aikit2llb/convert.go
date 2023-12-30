@@ -17,7 +17,7 @@ const (
 	debianSlim     = "docker.io/library/debian:12-slim"
 	distrolessBase = "gcr.io/distroless/cc-debian12:latest"
 
-	localAIVersion = "v2.2.0"
+	localAIVersion = "v2.3.1"
 	localAIRepo    = "https://github.com/mudler/LocalAI"
 	cudaVersion    = "12-3"
 )
@@ -164,11 +164,6 @@ func installExllama(c *config.Config, s llb.State, merge llb.State) llb.State {
 
 	// clone localai exllama backend only
 	s = s.Run(shf("git clone --filter=blob:none --no-checkout %[1]s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python/%[2]s && git checkout %[3]s && rm -rf .git", localAIRepo, backend, localAIVersion)).Root()
-
-	// workaround until https://github.com/mudler/LocalAI/pull/1484 is merged
-	if backend == utils.BackendExllamaV2 {
-		s = s.Run(sh("sed -i 's/self.seed/None/g' /tmp/localai/backend/python/exllama2/exllama2_backend.py && sed -i 's/bytes(t/bytes(output/g' /tmp/localai/backend/python/exllama2/exllama2_backend.py")).Root()
-	}
 
 	// clone exllama to localai exllama backend path and install python dependencies
 	s = s.Run(shf("git clone --depth 1 %[1]s --branch %[2]s /tmp/%[3]s && mv /tmp/%[3]s/* /tmp/localai/backend/python/%[3]s && rm -rf /tmp/%[3]s && cd /tmp/localai/backend/python/%[3]s && rm -rf .git && pip3 install grpcio protobuf typing-extensions sympy mpmath setuptools numpy --break-system-packages && pip3 install -r /tmp/localai/backend/python/%[3]s/requirements.txt --break-system-packages", exllamaRepo, exllamaTag, backend)).Root()
