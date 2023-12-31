@@ -55,13 +55,18 @@ AIKit comes with pre-made models that you can use out-of-the-box!
 - 🦙 Llama 2 7B Chat: `ghcr.io/sozercan/llama2:7b`
 - 🦙 Llama 2 13B Chat: `ghcr.io/sozercan/llama2:13b`
 - 🐬 Orca 2 13B: `ghcr.io/sozercan/orca2:13b`
+- Ⓜ️ Mixtral 8x7B Instruct: `ghcr.io/sozercan/mixtral:8x7b-instruct`
 
 ### NVIDIA CUDA
 
-- 🦙 Llama 2 7B Chat (CUDA): `ghcr.io/sozercan/llama2:7b-cuda`
-- 🦙 Llama 2 13B Chat (CUDA): `ghcr.io/sozercan/llama2:13b-cuda`
-- 🐬 Orca 2 13B (CUDA): `ghcr.io/sozercan/orca2:13b-cuda`
+- 🦙 Llama 2 7B Chat: `ghcr.io/sozercan/llama2:7b-cuda`
+- 🦙 Llama 2 13B Chat: `ghcr.io/sozercan/llama2:13b-cuda`
+- 🐬 Orca 2 13B: `ghcr.io/sozercan/orca2:13b-cuda`
+- Ⓜ️ Mixtral 8x7B Instruct: `ghcr.io/sozercan/mixtral:8x7b-instruct-cuda`
 
+> [!NOTE]
+> Please see [models folder](./models/) for pre-made model definitions.
+>
 > CUDA models includes CUDA v12. They are used with [NVIDIA GPU acceleration](#gpu-acceleration-support).
 
 ## Getting Started
@@ -70,8 +75,6 @@ AIKit comes with pre-made models that you can use out-of-the-box!
 
 > [!NOTE]
 > This section shows how to create a custom image with models of your choosing. If you want to use one of the pre-made models, skip to [running models](#running-models).
->
-> Please see [models folder](./models/) for pre-made model definitions. You can find more model examples at [go-skynet/model-gallery](https://github.com/go-skynet/model-gallery).
 
 Create an `aikitfile.yaml` with the following structure:
 
