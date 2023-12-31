@@ -15,11 +15,13 @@ jobs:
       matrix:
         model:
          - llama-2-7b-chat
-         - llama-2-13b-chat
-         - orca-2-13b
          - llama-2-7b-chat-cuda
+         - llama-2-13b-chat
          - llama-2-13b-chat-cuda
+         - orca-2-13b
          - orca-2-13b-cuda
+         - mixtral-7x8b-instruct
+         - mixtral-7x8b-instruct-cuda
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
