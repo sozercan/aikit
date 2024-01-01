@@ -20,6 +20,7 @@ jobs:
          - llama-2-7b-chat-cuda
          - llama-2-13b-chat-cuda
          - orca-2-13b-cuda
+         - tinyllama-1.1b-chat
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
