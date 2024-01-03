@@ -130,6 +130,11 @@ func installCuda(c *config.Config, s llb.State, merge llb.State) llb.State {
 	savedState := s
 	s = s.Run(shf("apt-get install -y --no-install-recommends libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean", cudaVersion)).Root()
 
+	// create status.d files for nvidia packages
+	s = s.Run(sh("while IFS= read -r line; do if [[ $line == Package:* ]]; then pkg_name=$(echo $line | cut -d' ' -f2); elif [[ $line == Maintainer:* ]]; then maintainer=$(echo $line | cut -d' ' -f2-); if [[ $maintainer == 'cudatools <cudatools@nvidia.com>' ]]; then pkg_file=/var/lib/dpkg/status.d/${pkg_name}; echo 'Package: '$pkg_name > $pkg_file; echo $line >> $pkg_file; else pkg_file=''; fi; elif [[ -n $pkg_file ]]; then echo $line >> $pkg_file; fi; done < /var/lib/dpkg/status")).Root()
+	// remove old status files
+	s = s.Run(sh("shopt -s extglob && rm -r /var/lib/dpkg/!(status.d) && rm -r /var/lib/apt")).Root()
+
 	// installing dev dependencies used for exllama
 	for b := range c.Backends {
 		if c.Backends[b] == utils.BackendExllama || c.Backends[b] == utils.BackendExllamaV2 {
