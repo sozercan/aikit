@@ -1,16 +1,26 @@
-#syntax=ghcr.io/sozercan/aikit:latest
+#syntax=aikit:test
 apiVersion: v1alpha1
+runtime: avx2
 debug: true
 models:
   - name: tinyllama-1.1b-chat
     source: https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
     sha256: "9fecc3b3cd76bba89d504f29b616eedf7da85b96540e490ca5824d3f7d2776a0"
+    promptTemplates:
+      - name: chat-simple
+        template: |
+          [INST] <<SYS>>{{.SystemPrompt}}<</SYS>> {{.Input}} [/INST]
 config: |
   - name: tinyllama-1.1b-chat
-    backend: llama
+    backend: llama-cpp
     parameters:
-      top_k: 80
-      temperature: 0.2
-      top_p: 0.7
+      top_k: 50
+      temperature: 0.7
+      top_p: 0.95
       model: tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
     context_size: 2048
+    template:
+      chat: chat-simple
+    system_prompt: |
+      You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.  Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.
+      If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.

@@ -1,16 +1,26 @@
-#syntax=ghcr.io/sozercan/aikit:latest
+#syntax=aikit:test
 apiVersion: v1alpha1
 debug: true
+runtime: avx2
 models:
   - name: llama-2-7b-chat
     source: https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q4_K_M.gguf
     sha256: "08a5566d61d7cb6b420c3e4387a39e0078e1f2fe5f055f3a03887385304d4bfa"
+    promptTemplates:
+      - name: chat-simple
+        template: |
+          [INST] <<SYS>>{{.SystemPrompt}}<</SYS>> {{.Input}} [/INST]
 config: |
   - name: llama-2-7b-chat
     backend: llama
     parameters:
-      top_k: 80
+      top_k: 10
       temperature: 0.2
-      top_p: 0.7
+      top_p: 0.95
       model: llama-2-7b-chat.Q4_K_M.gguf
     context_size: 4096
+    template:
+      chat: chat-simple
+    system_prompt: |
+      You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.  Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.
+      If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.

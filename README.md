@@ -51,7 +51,7 @@ See [demos](./docs/demo.md) for demos and examples.
 
 AIKit comes with pre-made models that you can use out-of-the-box!
 
-### CPU
+### CPU (requires AVX)
 - 🦙 Llama 2 7B Chat: `ghcr.io/sozercan/llama2:7b`
 - 🦙 Llama 2 13B Chat: `ghcr.io/sozercan/llama2:13b`
 - 🐬 Orca 2 13B: `ghcr.io/sozercan/orca2:13b`
