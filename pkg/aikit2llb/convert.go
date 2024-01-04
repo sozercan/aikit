@@ -17,7 +17,7 @@ const (
 	debianSlim     = "docker.io/library/debian:12-slim"
 	distrolessBase = "gcr.io/distroless/cc-debian12:latest"
 
-	localAIVersion = "v2.3.1"
+	localAIVersion = "v2.4.0"
 	localAIRepo    = "https://github.com/mudler/LocalAI"
 	cudaVersion    = "12-3"
 )
