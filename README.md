@@ -66,7 +66,7 @@ AIKit comes with pre-made models that you can use out-of-the-box!
 
 > [!NOTE]
 > Please see [models folder](./models/) for pre-made model definitions.
->
+> CPU models requires minimum of [AVX instruction set](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions). You can check if your CPU supports AVX by running `grep avx /proc/cpuinfo`. 
 > CUDA models includes CUDA v12. They are used with [NVIDIA GPU acceleration](#gpu-acceleration-support).
 
 ## Getting Started
