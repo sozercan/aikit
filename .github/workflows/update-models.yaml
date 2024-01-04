@@ -25,13 +25,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
-      - name: cleanup disk space
-        run: |
-          docker system prune -f -a --volumes
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf "/usr/local/share/boost"
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
 
       - name: Harden Runner
         uses: step-security/harden-runner@eb238b55efaa70779f274895e782ed17c84f2895 # v2.6.1
@@ -75,8 +77,8 @@ jobs:
           fi
 
           docker buildx build . \
-            -t ghcr.io/sozercan/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} \
-            -t ghcr.io/sozercan/${MODEL_NAME}:${MODEL_SIZE}${MODEL_TYPE}${MODEL_RUNTIME} \
+            -t ghcr.io/sozercan/test/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} \
+            -t ghcr.io/sozercan/test/${MODEL_NAME}:${MODEL_SIZE}${MODEL_TYPE}${MODEL_RUNTIME} \
             -f models/${{ matrix.model }}.yaml \
             --push --progress plain \
             --sbom=true --provenance=true \
