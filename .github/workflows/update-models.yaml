@@ -25,13 +25,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
-      - uses: easimon/maximize-build-space@fc881a613ad2a34aca9c9624518214ebc21dfc0c # v10
-        with:
-          remove-dotnet: 'true'
-          remove-docker-images: 'true'
-          remove-codeql: 'true'
-          remove-haskell: 'true'
-          remove-android: 'true'
+      - name: cleanup disk space
+        run: |
+          docker system prune -f -a --volumes
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
       - name: Harden Runner
         uses: step-security/harden-runner@eb238b55efaa70779f274895e782ed17c84f2895 # v2.6.1
