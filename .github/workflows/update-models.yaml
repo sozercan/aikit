@@ -15,11 +15,13 @@ jobs:
       matrix:
         model:
          - llama-2-7b-chat
-         - llama-2-13b-chat
-         - orca-2-13b
          - llama-2-7b-chat-cuda
+         - llama-2-13b-chat
          - llama-2-13b-chat-cuda
+         - orca-2-13b
          - orca-2-13b-cuda
+         - mixtral-7x8b-instruct
+         - mixtral-7x8b-instruct-cuda
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
@@ -46,19 +48,27 @@ jobs:
 
       - name: parse matrix
         run: |
-          echo "MODEL_NAME=$(echo ${{ matrix.model }} | sed -E 's/([a-z]+)-([0-9]+)-.*/\1\2/')" >> $GITHUB_ENV
-          echo "MODEL_SIZE=$(echo ${{ matrix.model }} | sed -E 's/[a-z]+-[0-9]+-([0-9]+b).*/\1/')" >> $GITHUB_ENV
-          echo "MODEL_TYPE=$(echo ${{ matrix.model }} | sed -E 's/.*-([a-z]+)(-cuda)?$/\1/' | grep -Eo 'chat')" >> $GITHUB_ENV
-          echo "MODEL_RUNTIME=-$(echo ${{ matrix.model }} | sed -E 's/.*-(cuda)?$/\1/' | grep -Eo 'cuda')" >> $GITHUB_ENV
+          echo "MODEL_NAME=$(echo ${{ matrix.model }} | sed -E 's/([a-z]+)-([0-9]+x[0-9]+b)-.*/\1/' | sed -E 's/([a-z]+)-([0-9]+)-.*/\1\2/')" >> $GITHUB_ENV
+          echo "MODEL_SIZE=$(echo ${{ matrix.model }} | sed -E 's/[a-z]+-([0-9]+x[0-9]+b|[0-9]+\.?[0-9]*b)-.*/\1/' | sed -E 's/[a-z]+-[0-9]+-([0-9]+\.?[0-9]*b).*/\1/')" >> $GITHUB_ENV
+          echo "MODEL_TYPE=-$(echo ${{ matrix.model }} | sed -n -e 's/.*\(chat\).*/\1/p' -e 's/.*\(instruct\).*/\1/p')" >> $GITHUB_ENV
+          echo "MODEL_RUNTIME=-$(echo ${{ matrix.model }} | grep -Eo 'cuda')" >> $GITHUB_ENV
 
       - name: Build and push
         run: |
+          # since empty output includes a dash, we remove it completely if it's only a dash
           if [ "${MODEL_RUNTIME}" == "-" ]; then
             export MODEL_RUNTIME=""
             echo "MODEL_RUNTIME=''" >> $GITHUB_ENV
           fi
 
-          docker buildx build . -t ghcr.io/sozercan/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} \
+          if [ "${MODEL_TYPE}" == "-" ]; then
+            export MODEL_TYPE=""
+            echo "MODEL_TYPE=''" >> $GITHUB_ENV
+          fi
+
+          docker buildx build . \
+            -t ghcr.io/sozercan/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} \
+            -t ghcr.io/sozercan/${MODEL_NAME}:${MODEL_SIZE}${MODEL_TYPE}${MODEL_RUNTIME} \
             -f models/${{ matrix.model }}.yaml \
             --push --progress plain \
             --sbom=true --provenance=true \
