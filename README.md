@@ -55,14 +55,14 @@ AIKit comes with pre-made models that you can use out-of-the-box!
 - 🦙 Llama 2 7B Chat: `ghcr.io/sozercan/llama2:7b`
 - 🦙 Llama 2 13B Chat: `ghcr.io/sozercan/llama2:13b`
 - 🐬 Orca 2 13B: `ghcr.io/sozercan/orca2:13b`
-- Ⓜ️ Mixtral 8x7B Instruct: `ghcr.io/sozercan/mixtral:8x7b-instruct`
+- Ⓜ️ Mixtral 8x7B Instruct: `ghcr.io/sozercan/mixtral:8x7b`
 
 ### NVIDIA CUDA
 
 - 🦙 Llama 2 7B Chat: `ghcr.io/sozercan/llama2:7b-cuda`
 - 🦙 Llama 2 13B Chat: `ghcr.io/sozercan/llama2:13b-cuda`
 - 🐬 Orca 2 13B: `ghcr.io/sozercan/orca2:13b-cuda`
-- Ⓜ️ Mixtral 8x7B Instruct: `ghcr.io/sozercan/mixtral:8x7b-instruct-cuda`
+- Ⓜ️ Mixtral 8x7B Instruct: `ghcr.io/sozercan/mixtral:8x7b-cuda`
 
 > [!NOTE]
 > Please see [models folder](./models/) for pre-made model definitions.
