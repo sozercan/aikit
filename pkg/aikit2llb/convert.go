@@ -127,8 +127,17 @@ func installCuda(c *config.Config, s llb.State, merge llb.State) llb.State {
 	s = s.Run(sh("dpkg -i cuda-keyring_1.1-1_all.deb && rm cuda-keyring_1.1-1_all.deb")).Root()
 	// running apt-get update twice due to nvidia repo
 	s = s.Run(sh("apt-get update && apt-get install -y ca-certificates && apt-get update"), llb.IgnoreCache).Root()
+
 	savedState := s
-	s = s.Run(shf("apt-get install -y --no-install-recommends libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean", cudaVersion)).Root()
+	// install cuda libraries
+	if len(c.Backends) == 0 {
+		s = s.Run(shf("apt-get install -y --no-install-recommends libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean", cudaVersion)).Root()
+	} else {
+		// using a distroless base image here
+		// convert debian package metadata status file to distroless status.d directory
+		// clean up apt directories
+		s = s.Run(bashf("apt-get install -y --no-install-recommends libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean && mkdir -p /var/lib/dpkg/status.d && description_flag=false; while IFS= read -r line || [[ -n $line ]]; do if [[ $line == Package:* ]]; then pkg_name=$(echo $line | cut -d' ' -f2); elif [[ $line == Maintainer:* ]]; then maintainer=$(echo $line | cut -d' ' -f2-); if [[ $maintainer == 'cudatools <cudatools@nvidia.com>' ]]; then pkg_file=/var/lib/dpkg/status.d/${pkg_name}; echo 'Package: '$pkg_name > $pkg_file; echo $line >> $pkg_file; else pkg_file=''; fi; elif [[ -n $pkg_file ]]; then if [[ $line == Description:* ]]; then description_flag=true; elif [[ $line == '' ]]; then description_flag=false; elif ! $description_flag; then echo $line >> $pkg_file; fi; fi; done < /var/lib/dpkg/status && find /var/lib/dpkg -mindepth 1 ! -regex '^/var/lib/dpkg/status\\.d\\(/.*\\)?' -delete && rm -r /var/lib/apt", cudaVersion)).Root()
+	}
 
 	// installing dev dependencies used for exllama
 	for b := range c.Backends {
@@ -231,4 +240,8 @@ func shf(cmd string, v ...interface{}) llb.RunOption {
 
 func sh(cmd string) llb.RunOption {
 	return llb.Args([]string{"/bin/sh", "-c", cmd})
+}
+
+func bashf(cmd string, v ...interface{}) llb.RunOption {
+	return llb.Args([]string{"/bin/bash", "-c", fmt.Sprintf(cmd, v...)})
 }
