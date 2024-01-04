@@ -56,6 +56,7 @@ AIKit comes with pre-made models that you can use out-of-the-box!
 - 🦙 Llama 2 13B Chat: `ghcr.io/sozercan/llama2:13b`
 - 🐬 Orca 2 13B: `ghcr.io/sozercan/orca2:13b`
 - Ⓜ️ Mixtral 8x7B Instruct: `ghcr.io/sozercan/mixtral:8x7b`
+- 🦙 TinyLlama 1.1B Chat: `ghcr.io/sozercan/tinyllama:1.1b`
 
 ### NVIDIA CUDA
 
