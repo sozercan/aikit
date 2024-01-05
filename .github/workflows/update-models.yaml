@@ -2,6 +2,12 @@ name: update-models
 
 on:
   workflow_dispatch:
+    inputs:
+      staging:
+        description: 'push to staging registry'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -74,15 +80,21 @@ jobs:
             echo "MODEL_TYPE=''" >> $GITHUB_ENV
           fi
 
+          if ${{ inputs.staging }}; then
+            export REGISTRY=ghcr.io/sozercan/test
+          else
+            export REGISTRY=ghcr.io/sozercan
+          fi
+
           docker buildx build . \
-            -t ghcr.io/sozercan/test/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} \
-            -t ghcr.io/sozercan/test/${MODEL_NAME}:${MODEL_SIZE}${MODEL_TYPE}${MODEL_RUNTIME} \
+            -t ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} \
+            -t ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE}${MODEL_TYPE}${MODEL_RUNTIME} \
             -f models/${{ matrix.model }}.yaml \
             --push --progress plain \
             --sbom=true --provenance=true \
             --cache-from=type=gha,scope=${MODEL_NAME}-${MODEL_SIZE} \
             --cache-to=type=gha,scope=${MODEL_NAME}-${MODEL_SIZE},mode=max
-          echo "DIGEST=$(cosign triangulate ghcr.io/sozercan/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} --type digest)" >> $GITHUB_ENV
+          echo "DIGEST=$(cosign triangulate ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} --type digest)" >> $GITHUB_ENV
 
       - name: Sign the images with GitHub OIDC Token
         run: cosign sign --yes ${DIGEST}

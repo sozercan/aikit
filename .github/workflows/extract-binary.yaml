@@ -21,7 +21,7 @@ jobs:
           dotnet: true
           haskell: true
           large-packages: true
-          docker-images: false
+          docker-images: false # blob storage action requires an image
           swap-storage: true
 
       - name: install crane
