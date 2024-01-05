@@ -25,20 +25,22 @@ jobs:
           - llama
           - stablediffusion
     steps:
+      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+
       - name: Harden Runner
         uses: step-security/harden-runner@eb238b55efaa70779f274895e782ed17c84f2895 # v2.6.1
         with:
           egress-policy: audit
 
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-
-      - name: cleanup disk space
-        run: |
-          docker system prune -f -a --volumes
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf "/usr/local/share/boost"
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
       # need containerd image store for testing local images
       - uses: crazy-max/ghaction-setup-docker@d9be6cade441568ba10037bce5221b8f564981f1 # v3.0.0

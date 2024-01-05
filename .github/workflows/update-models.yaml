@@ -2,6 +2,12 @@ name: update-models
 
 on:
   workflow_dispatch:
+    inputs:
+      staging:
+        description: 'push to staging registry'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -20,18 +26,18 @@ jobs:
          - llama-2-13b-chat-cuda
          - orca-2-13b
          - orca-2-13b-cuda
-         - mixtral-7x8b-instruct
-         - mixtral-7x8b-instruct-cuda
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
-      - name: cleanup disk space
-        run: |
-          docker system prune -f -a --volumes
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf "/usr/local/share/boost"
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
 
       - name: Harden Runner
         uses: step-security/harden-runner@eb238b55efaa70779f274895e782ed17c84f2895 # v2.6.1
@@ -74,15 +80,21 @@ jobs:
             echo "MODEL_TYPE=''" >> $GITHUB_ENV
           fi
 
+          if ${{ inputs.staging }}; then
+            export REGISTRY=ghcr.io/sozercan/test
+          else
+            export REGISTRY=ghcr.io/sozercan
+          fi
+
           docker buildx build . \
-            -t ghcr.io/sozercan/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} \
-            -t ghcr.io/sozercan/${MODEL_NAME}:${MODEL_SIZE}${MODEL_TYPE}${MODEL_RUNTIME} \
+            -t ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} \
+            -t ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE}${MODEL_TYPE}${MODEL_RUNTIME} \
             -f models/${{ matrix.model }}.yaml \
             --push --progress plain \
             --sbom=true --provenance=true \
             --cache-from=type=gha,scope=${MODEL_NAME}-${MODEL_SIZE} \
             --cache-to=type=gha,scope=${MODEL_NAME}-${MODEL_SIZE},mode=max
-          echo "DIGEST=$(cosign triangulate ghcr.io/sozercan/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} --type digest)" >> $GITHUB_ENV
+          echo "DIGEST=$(cosign triangulate ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} --type digest)" >> $GITHUB_ENV
 
       - name: Sign the images with GitHub OIDC Token
         run: cosign sign --yes ${DIGEST}
