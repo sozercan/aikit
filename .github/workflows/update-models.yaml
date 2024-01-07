@@ -26,6 +26,9 @@ jobs:
          - llama-2-13b-chat-cuda
          - orca-2-13b
          - orca-2-13b-cuda
+        # due to github runner disk space limitations, these do not fit in to runners
+        #  - mixtral-7x8b-instruct
+        #  - mixtral-7x8b-instruct-cuda
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
