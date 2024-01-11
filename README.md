@@ -52,22 +52,29 @@ See [demos](./docs/demo.md) for demos and examples.
 AIKit comes with pre-made models that you can use out-of-the-box!
 
 ### CPU
-- 🦙 Llama 2 7B Chat: `ghcr.io/sozercan/llama2:7b`
-- 🦙 Llama 2 13B Chat: `ghcr.io/sozercan/llama2:13b`
-- 🐬 Orca 2 13B: `ghcr.io/sozercan/orca2:13b`
-- Ⓜ️ Mixtral 8x7B Instruct: `ghcr.io/sozercan/mixtral:8x7b`
+
+| Model     | Parameters | Command                                                         |
+| --------- | ---------- | --------------------------------------------------------------- |
+| 🦙 Llama 2 | 7B         | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama2:7b`    |
+| 🦙 Llama 2 | 13B        | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama2:13b`   |
+| 🐬 Orca 2  | 13B        | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/orca2:13b`    |
+| Ⓜ️ Mixtral | 8x7B       | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/mixtral:8x7b` |
 
 ### NVIDIA CUDA
 
-- 🦙 Llama 2 7B Chat: `ghcr.io/sozercan/llama2:7b-cuda`
-- 🦙 Llama 2 13B Chat: `ghcr.io/sozercan/llama2:13b-cuda`
-- 🐬 Orca 2 13B: `ghcr.io/sozercan/orca2:13b-cuda`
-- Ⓜ️ Mixtral 8x7B Instruct: `ghcr.io/sozercan/mixtral:8x7b-cuda`
+| Model     | Parameters | Command                                                                         |
+| --------- | ---------- | ------------------------------------------------------------------------------- |
+| 🦙 Llama 2 | 7B         | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama2:7b-cuda`    |
+| 🦙 Llama 2 | 13B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama2:13b-cuda`   |
+| 🐬 Orca 2  | 13B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/orca2:13b-cuda`    |
+| Ⓜ️ Mixtral | 8x7B       | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/mixtral:8x7b-cuda` |
 
 > [!NOTE]
 > Please see [models folder](./models/) for pre-made model definitions.
-> 
-> CPU models requires minimum of [AVX instruction set](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions). You can check if your CPU supports AVX by running `grep avx /proc/cpuinfo`. 
+>
+> If not being offloaded to GPU VRAM, minimum of 8GB of RAM is required for 7B models, 16GB of RAM to run 13B models, and 32GB of RAM to run 8x7B models.
+>
+> CPU models requires minimum of [AVX instruction set](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions). You can check if your CPU supports AVX by running `grep avx /proc/cpuinfo`.
 >
 > CUDA models includes CUDA v12. They are used with [NVIDIA GPU acceleration](#gpu-acceleration-support).
 
