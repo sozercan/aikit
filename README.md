@@ -53,21 +53,21 @@ AIKit comes with pre-made models that you can use out-of-the-box!
 
 ### CPU
 
-| Model     | Parameters | Command                                                         |
-| --------- | ---------- | --------------------------------------------------------------- |
-| 🦙 Llama 2 | 7B         | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama2:7b`    |
-| 🦙 Llama 2 | 13B        | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama2:13b`   |
-| 🐬 Orca 2  | 13B        | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/orca2:13b`    |
-| Ⓜ️ Mixtral | 8x7B       | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/mixtral:8x7b` |
+| Model     | Optimization | Parameters | Command                                                         |
+| --------- | ------------ | ---------- | --------------------------------------------------------------- |
+| 🦙 Llama 2 | Chat         | 7B         | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama2:7b`    |
+| 🦙 Llama 2 | Chat         | 13B        | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama2:13b`   |
+| 🐬 Orca 2  |              | 13B        | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/orca2:13b`    |
+| Ⓜ️ Mixtral | Instruct     | 8x7B       | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/mixtral:8x7b` |
 
 ### NVIDIA CUDA
 
-| Model     | Parameters | Command                                                                         |
-| --------- | ---------- | ------------------------------------------------------------------------------- |
-| 🦙 Llama 2 | 7B         | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama2:7b-cuda`    |
-| 🦙 Llama 2 | 13B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama2:13b-cuda`   |
-| 🐬 Orca 2  | 13B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/orca2:13b-cuda`    |
-| Ⓜ️ Mixtral | 8x7B       | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/mixtral:8x7b-cuda` |
+| Model          | Optimization | Parameters | Command                                                                         |
+| -------------- | ------------ | ---------- | ------------------------------------------------------------------------------- |
+| 🦙 Llama 2 Chat | Chat         | 7B         | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama2:7b-cuda`    |
+| 🦙 Llama 2 Chat | Chat         | 13B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama2:13b-cuda`   |
+| 🐬 Orca 2       |              | 13B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/orca2:13b-cuda`    |
+| Ⓜ️ Mixtral      | Instruct     | 8x7B       | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/mixtral:8x7b-cuda` |
 
 > [!NOTE]
 > Please see [models folder](./models/) for pre-made model definitions.
