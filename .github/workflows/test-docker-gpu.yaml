@@ -20,6 +20,7 @@ jobs:
     timeout-minutes: 240
     steps:
       - uses: AutoModality/action-clean@d004b47eb728f2a83316fc70ba9a62ef97278013 # v1.1.0
+      - run: docker system prune -a -f --volumes
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: build aikit
