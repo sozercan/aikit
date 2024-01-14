@@ -42,7 +42,7 @@ jobs:
         run: docker images
 
       - name: run test model
-        run: docker run --name testmodel -d -p 8080:8080 --gpus all testmodel:test
+        run: docker run --name testmodel -d --rm -p 8080:8080 --gpus all testmodel:test
 
       - name: install e2e dependencies
         run: make test-e2e-dependencies
@@ -53,6 +53,8 @@ jobs:
             "model": "llama-2-7b-chat",
             "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
           }'
+
+      - run: docker stop testmodel
 
       - name: save logs
         if: always()
