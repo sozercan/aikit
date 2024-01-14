@@ -19,26 +19,8 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 240
     steps:
-      - uses: AutoModality/action-clean@v1
-
-      - name: Harden Runner
-        uses: step-security/harden-runner@eb238b55efaa70779f274895e782ed17c84f2895 # v2.6.1
-        with:
-          egress-policy: audit
-
+      - uses: AutoModality/action-clean@d004b47eb728f2a83316fc70ba9a62ef97278013 # v1.1.0
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-
-      # need containerd image store for testing local images
-      # - uses: crazy-max/ghaction-setup-docker@d9be6cade441568ba10037bce5221b8f564981f1 # v3.0.0
-      #   with:
-      #     daemon-config: |
-      #       {
-      #         "debug": true,
-      #         "features": {
-      #           "containerd-snapshotter": true
-      #         }
-      #       }
-      # - uses: crazy-max/ghaction-github-runtime@b3a9207c0e1ef41f4cf215303c976869d0c2c1c4 # v3.0.0
 
       - name: build aikit
         run: |
@@ -50,7 +32,7 @@ jobs:
       - name: build test model
         run: |
           docker buildx build . -t testmodel:test \
-            -f test/aikitfile-${{ github.event.inputs.backend }} \
+            -f test/aikitfile-${{ github.event.inputs.backend }}.yaml \
             --load --progress plain \
             --cache-from=type=gha,scope=testmodel \
             --cache-to=type=gha,scope=testmodel,mode=max
