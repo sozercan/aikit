@@ -2,86 +2,71 @@ name: docker-test-gpu
 
 on:
   workflow_dispatch:
-    inputs:
-      backend:
-        type: choice
-        description: Backend type
-        options:
-        - llama-cuda
-        - exllama
-        - exllama2-gptq
-        - exllama2-exl2
+    # inputs:
+    #   backend:
+    #     type: choice
+    #     description: Backend type
+    #     options:
+    #     - llama-cuda
+    #     - exllama
+    #     - exllama2-gptq
+    #     - exllama2-exl2
 
 permissions: read-all
 
 jobs:
   test:
-    runs-on: self-hosted-t4
+    runs-on: self-hosted
     timeout-minutes: 240
+    strategy:
+      fail-fast: true
+      max-parallel: 1
+      matrix:
+        backend:
+          - llama-cuda
+          # - exllama
+          - exllama2-gptq
+          - exllama2-exl2
     steps:
-      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
-        with:
-          tool-cache: true
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: true
-          docker-images: true
-          swap-storage: true
-
-      - name: Harden Runner
-        uses: step-security/harden-runner@eb238b55efaa70779f274895e782ed17c84f2895 # v2.6.1
-        with:
-          egress-policy: audit
-
+      - uses: AutoModality/action-clean@d004b47eb728f2a83316fc70ba9a62ef97278013 # v1.1.0
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-
-      # need containerd image store for testing local images
-      - uses: crazy-max/ghaction-setup-docker@d9be6cade441568ba10037bce5221b8f564981f1 # v3.0.0
-        with:
-          daemon-config: |
-            {
-              "debug": true,
-              "features": {
-                "containerd-snapshotter": true
-              }
-            }
-      - uses: crazy-max/ghaction-github-runtime@b3a9207c0e1ef41f4cf215303c976869d0c2c1c4 # v3.0.0
 
       - name: build aikit
         run: |
           docker buildx build . -t aikit:test \
-            --load --progress plain \
-            --cache-from=type=gha,scope=aikit \
-            --cache-to=type=gha,scope=aikit,mode=max
+            --load --provenance=false --progress plain
 
       - name: build test model
         run: |
           docker buildx build . -t testmodel:test \
-            -f test/aikitfile-${{ github.event.inputs.backend }} \
-            --load --progress plain \
-            --cache-from=type=gha,scope=testmodel \
-            --cache-to=type=gha,scope=testmodel,mode=max
+            -f test/aikitfile-${{ github.event.inputs.backend }}.yaml \
+            --load --provenance=false --progress plain
 
       - name: list images
         run: docker images
 
       - name: run test model
-        run: docker run --name testmodel -d -p 8080:8080 --gpus all testmodel:test
-
-      - name: install e2e dependencies
-        run: make test-e2e-dependencies
+        run: docker run --name testmodel -d --rm -p 8080:8080 --gpus all testmodel:test
 
       - name: run test
         run: |
-          curl http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
+          result=$(curl --fail --retry 5 --retry-all-errors http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
             "model": "llama-2-7b-chat",
             "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
-          }'
+          }')
+          echo $result
+
+          choices=$(echo "$result" | jq '.choices')
+          if [ -z "$choices" ]; then
+            exit 1
+          fi
 
       - name: save logs
         if: always()
         run: docker logs testmodel > /tmp/docker-${{ github.event.inputs.backend }}.log
+
+      - run: docker stop testmodel
+        if: always()
 
       - name: publish test artifacts
         if: always()

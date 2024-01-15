@@ -132,7 +132,6 @@ func installCuda(c *config.Config, s llb.State, merge llb.State) llb.State {
 	// install cuda libraries
 	if len(c.Backends) == 0 {
 		s = s.Run(shf("apt-get install -y --no-install-recommends libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean", cudaVersion)).Root()
-	} else {
 		// using a distroless base image here
 		// convert debian package metadata status file to distroless status.d directory
 		// clean up apt directories
