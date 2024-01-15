@@ -25,17 +25,13 @@ jobs:
       - name: build aikit
         run: |
           docker buildx build . -t aikit:test \
-            --load --progress plain \
-            --cache-from=type=gha,scope=aikit \
-            --cache-to=type=gha,scope=aikit,mode=max
+            --load --progress plain
 
       - name: build test model
         run: |
           docker buildx build . -t testmodel:test \
             -f test/aikitfile-${{ github.event.inputs.backend }}.yaml \
-            --load --progress plain \
-            --cache-from=type=gha,scope=testmodel \
-            --cache-to=type=gha,scope=testmodel,mode=max
+            --load --progress plain
 
       - name: list images
         run: docker images
