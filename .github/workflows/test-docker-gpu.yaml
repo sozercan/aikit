@@ -2,15 +2,6 @@ name: docker-test-gpu
 
 on:
   workflow_dispatch:
-    # inputs:
-    #   backend:
-    #     type: choice
-    #     description: Backend type
-    #     options:
-    #     - llama-cuda
-    #     - exllama
-    #     - exllama2-gptq
-    #     - exllama2-exl2
 
 permissions: read-all
 
@@ -39,7 +30,7 @@ jobs:
       - name: build test model
         run: |
           docker buildx build . -t testmodel:test \
-            -f test/aikitfile-${{ github.event.inputs.backend }}.yaml \
+            -f test/aikitfile-${{ matrix.backend }}.yaml \
             --load --provenance=false --progress plain
 
       - name: list images
@@ -63,7 +54,7 @@ jobs:
 
       - name: save logs
         if: always()
-        run: docker logs testmodel > /tmp/docker-${{ github.event.inputs.backend }}.log
+        run: docker logs testmodel > /tmp/docker-${{ matrix.backend }}.log
 
       - run: docker stop testmodel
         if: always()
@@ -72,6 +63,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@1eb3cb2b3e0f29609092a73eb033bb759a334595 # v4.1.0
         with:
-          name: test-${{ github.event.inputs.backend }}
+          name: test-${{ matrix.backend }}
           path: |
             /tmp/*.log
