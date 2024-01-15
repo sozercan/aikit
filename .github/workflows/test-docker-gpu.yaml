@@ -44,16 +44,17 @@ jobs:
 
       - name: run test
         run: |
-          curl http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
+          curl --fail --retry 5 --retry-all-errors http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
             "model": "llama-2-7b-chat",
             "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
           }'
 
-      - run: docker stop testmodel
-
       - name: save logs
         if: always()
         run: docker logs testmodel > /tmp/docker-${{ github.event.inputs.backend }}.log
+
+      - run: docker stop testmodel
+        if: always()
 
       - name: publish test artifacts
         if: always()
