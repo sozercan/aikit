@@ -60,9 +60,7 @@ jobs:
           echo $result
 
           choices=$(echo "$result" | jq '.choices')
-          errorCode=$(echo "$result" | jq '.error.code')
-
-          if [ -z "$choices" || $result -ne 200 ]; then
+          if [ -z "$choices" ]; then
             exit 1
           fi
 
