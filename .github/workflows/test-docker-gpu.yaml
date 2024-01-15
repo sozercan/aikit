@@ -48,12 +48,9 @@ jobs:
       - name: run test model
         run: docker run --name testmodel -d --rm -p 8080:8080 --gpus all testmodel:test
 
-      - name: install e2e dependencies
-        run: make test-e2e-dependencies
-
       - name: run test
         run: |
-          result=$(curl --fail --retry 1 --retry-all-errors http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
+          result=$(curl --fail --retry 5 --retry-all-errors http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
             "model": "llama-2-7b-chat",
             "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
           }')

@@ -75,16 +75,19 @@ jobs:
       - name: run test model
         run: docker run --name testmodel -d -p 8080:8080 testmodel:test
 
-      - name: install e2e dependencies
-        run: make test-e2e-dependencies
-
       - name: run llama test
         if: matrix.backend == 'llama'
         run: |
-          curl http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
+          result=$(curl --fail --retry 5 --retry-all-errors http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
             "model": "llama-2-7b-chat",
             "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
-          }'
+          }')
+          echo $result
+
+          choices=$(echo "$result" | jq '.choices')
+          if [ -z "$choices" ]; then
+            exit 1
+          fi
 
       - name: run stablediffusion test
         if: matrix.backend == 'stablediffusion'
