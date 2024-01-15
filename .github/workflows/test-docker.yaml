@@ -57,7 +57,7 @@ jobs:
       - name: build aikit
         run: |
           docker buildx build . -t aikit:test \
-            --load --progress plain \
+            --load --provenance=false --progress plain \
             --cache-from=type=gha,scope=aikit \
             --cache-to=type=gha,scope=aikit,mode=max
 
@@ -65,7 +65,7 @@ jobs:
         run: |
           docker buildx build . -t testmodel:test \
             -f test/aikitfile-${{ matrix.backend }}.yaml \
-            --load --progress plain \
+            --load --provenance=false --progress plain \
             --cache-from=type=gha,scope=testmodel \
             --cache-to=type=gha,scope=testmodel,mode=max
 

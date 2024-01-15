@@ -25,13 +25,13 @@ jobs:
       - name: build aikit
         run: |
           docker buildx build . -t aikit:test \
-            --load --progress plain
+            --load --provenance=false --progress plain
 
       - name: build test model
         run: |
           docker buildx build . -t testmodel:test \
             -f test/aikitfile-${{ github.event.inputs.backend }}.yaml \
-            --load --progress plain
+            --load --provenance=false --progress plain
 
       - name: list images
         run: docker images
