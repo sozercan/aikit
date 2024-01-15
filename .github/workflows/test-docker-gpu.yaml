@@ -2,15 +2,15 @@ name: docker-test-gpu
 
 on:
   workflow_dispatch:
-    inputs:
-      backend:
-        type: choice
-        description: Backend type
-        options:
-        - llama-cuda
-        - exllama
-        - exllama2-gptq
-        - exllama2-exl2
+    # inputs:
+    #   backend:
+    #     type: choice
+    #     description: Backend type
+    #     options:
+    #     - llama-cuda
+    #     - exllama
+    #     - exllama2-gptq
+    #     - exllama2-exl2
 
 permissions: read-all
 
@@ -18,15 +18,15 @@ jobs:
   test:
     runs-on: self-hosted
     timeout-minutes: 240
-    # strategy:
-    #   fail-fast: true
-    #   max-parallel: 1
-    #   matrix:
-    #     backend:
-    #       - llama-cuda
-    #       - exllama
-    #       - exllama2-gptq
-    #       - exllama2-exl2
+    strategy:
+      fail-fast: true
+      max-parallel: 1
+      matrix:
+        backend:
+          - llama-cuda
+          # - exllama
+          - exllama2-gptq
+          - exllama2-exl2
     steps:
       - uses: AutoModality/action-clean@d004b47eb728f2a83316fc70ba9a62ef97278013 # v1.1.0
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
