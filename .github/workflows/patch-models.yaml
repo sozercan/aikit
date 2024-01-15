@@ -17,14 +17,14 @@ jobs:
           fail-fast: false
           matrix:
             images:
-              - ghcr.io/sozercan/test/llama2:7b
-              - ghcr.io/sozercan/test/llama2:13b
-              - ghcr.io/sozercan/test/orca2:13b
-              # - ghcr.io/sozercan/mixtral:8x7b
-              - ghcr.io/sozercan/test/llama2:7b-cuda
-              - ghcr.io/sozercan/test/llama2:13b-cuda
-              - ghcr.io/sozercan/test/orca2:13b-cuda
-              # - ghcr.io/sozercan/mixtral:8x7b-cuda
+              - ghcr.io/sozercan/llama2:7b
+              - ghcr.io/sozercan/llama2:13b
+              - ghcr.io/sozercan/orca2:13b
+              - ghcr.io/sozercan/mixtral:8x7b
+              - ghcr.io/sozercan/llama2:7b-cuda
+              - ghcr.io/sozercan/llama2:13b-cuda
+              - ghcr.io/sozercan/orca2:13b-cuda
+              - ghcr.io/sozercan/mixtral:8x7b-cuda
 
         steps:
         - name: Set up Docker Buildx
@@ -40,6 +40,7 @@ jobs:
         - name: Generate Trivy Report
           uses: aquasecurity/trivy-action@d43c1f16c00cfd3978dde6c07f4bbcf9eb6993ca # 0.16.1
           with:
+            timeout: 60m
             scan-type: 'image'
             format: 'json'
             output: 'report.json'
@@ -47,11 +48,11 @@ jobs:
             vuln-type: 'os'
             image-ref: ${{ matrix.images }}
 
-        - name: Check Vuln Count
+        - name: Check vulnerability count
           id: vuln_count
           run: |
-            report_file="report.json"
-            vuln_count=$(jq '.Results | length' "$report_file")
+            cat report.json | jq
+            vuln_count=$(jq '.Results[0].Vulnerabilities | length' report.json)
             echo "vuln_count=$vuln_count" >> $GITHUB_OUTPUT
 
         - name: Copa Action
@@ -66,5 +67,6 @@ jobs:
         - name: Docker Push Patched Image
           if: steps.copa.conclusion == 'success'
           run: |
-            docker tag ${{ steps.copa.outputs.patched-image }} ${{ matrix.images }}-test
-            docker push ${{ matrix.images }}-test
+            docker tag ${{ steps.copa.outputs.patched-image }} ${{ matrix.images }}
+            docker images
+            # docker push ${{ matrix.images }}-test
