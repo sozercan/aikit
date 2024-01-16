@@ -1,10 +1,12 @@
-name: Patch model images
+name: patch-models
 on:
+  # patch weekly
   # schedule:
   #   - cron: "0 0 * * 0"
   workflow_dispatch:
 
 permissions:
+  contents: read
   packages: write
   id-token: write
 
@@ -16,22 +18,30 @@ jobs:
           fail-fast: false
           matrix:
             images:
-              - ghcr.io/sozercan/test/llama-2:7b
-              - ghcr.io/sozercan/test/llama-2:13b
-              - ghcr.io/sozercan/test/orca2:13b
-              # - ghcr.io/sozercan/mixtral:8x7b
-              - ghcr.io/sozercan/test/llama-2:7b-cuda
-              - ghcr.io/sozercan/test/llama-2:13b-cuda
-              - ghcr.io/sozercan/test/orca2:13b-cuda
-              # - ghcr.io/sozercan/mixtral:8x7b-cuda
+              - ghcr.io/sozercan/llama2:7b
+              - ghcr.io/sozercan/llama2:13b
+              - ghcr.io/sozercan/orca2:13b
+              - ghcr.io/sozercan/mixtral:8x7b
+              - ghcr.io/sozercan/llama2:7b-cuda
+              - ghcr.io/sozercan/llama2:13b-cuda
+              - ghcr.io/sozercan/orca2:13b-cuda
+              - ghcr.io/sozercan/mixtral:8x7b-cuda
 
         steps:
         - name: Set up Docker Buildx
           uses: docker/setup-buildx-action@f95db51fddba0c2d1ec667646a06c2ce06100226 # v3.0.0
 
+        - name: Login to GHCR
+          uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+          with:
+            registry: ghcr.io
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
+
         - name: Generate Trivy Report
           uses: aquasecurity/trivy-action@d43c1f16c00cfd3978dde6c07f4bbcf9eb6993ca # 0.16.1
           with:
+            timeout: 60m
             scan-type: 'image'
             format: 'json'
             output: 'report.json'
@@ -39,11 +49,11 @@ jobs:
             vuln-type: 'os'
             image-ref: ${{ matrix.images }}
 
-        - name: Check Vuln Count
+        - name: Check vulnerability count
           id: vuln_count
           run: |
-            report_file="report.json"
-            vuln_count=$(jq '.Results | length' "$report_file")
+            cat report.json | jq
+            vuln_count=$(jq '.Results[0].Vulnerabilities | length' report.json)
             echo "vuln_count=$vuln_count" >> $GITHUB_OUTPUT
 
         - name: Copa Action
@@ -55,15 +65,22 @@ jobs:
             image-report: 'report.json'
             patched-tag: 'patched'
 
-        - name: Login to GHCR
-          if: steps.copa.conclusion == 'success'
-          uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
-          with:
-            registry: ghcr.io
-            username: ${{ github.actor }}
-            password: ${{ secrets.GITHUB_TOKEN }}
+        - name: Install Cosign
+          uses: sigstore/cosign-installer@9614fae9e5c5eddabb09f90a270fcb487c9f7149 # v3.3.0
 
         - name: Docker Push Patched Image
-          if: steps.login.conclusion == 'success'
+          if: steps.copa.conclusion == 'success'
           run: |
-            docker push ${{ steps.copa.outputs.patched-image }}
+            docker tag ${{ steps.copa.outputs.patched-image }} ${{ matrix.images }}
+            docker images
+            docker push ${{ matrix.images }}
+            echo "DIGEST=$(cosign triangulate ${{ matrix.images }} --type digest)" >> $GITHUB_ENV
+
+        - name: Sign the images with GitHub OIDC Token
+          run: cosign sign --yes ${DIGEST}
+
+        - name: Verify image signature
+          run: |
+            cosign verify ${DIGEST} \
+              --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+              --certificate-identity-regexp 'https://github\.com/sozercan/aikit/\.github/workflows/.+'
