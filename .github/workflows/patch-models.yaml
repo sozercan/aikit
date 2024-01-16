@@ -19,13 +19,15 @@ jobs:
           matrix:
             images:
               - ghcr.io/sozercan/llama2:7b
-              - ghcr.io/sozercan/llama2:13b
-              - ghcr.io/sozercan/orca2:13b
-              - ghcr.io/sozercan/mixtral:8x7b
               - ghcr.io/sozercan/llama2:7b-cuda
+              - ghcr.io/sozercan/llama2:13b
               - ghcr.io/sozercan/llama2:13b-cuda
+              - ghcr.io/sozercan/orca2:13b
               - ghcr.io/sozercan/orca2:13b-cuda
+              - ghcr.io/sozercan/mixtral:8x7b
               - ghcr.io/sozercan/mixtral:8x7b-cuda
+              - ghcr.io/sozercan/phi2:2.7b
+              - ghcr.io/sozercan/phi2:2.7b-cuda
 
         steps:
         - name: Set up Docker Buildx

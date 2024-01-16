@@ -68,7 +68,7 @@ func copyModels(c *config.Config, base llb.State, s llb.State) (llb.State, llb.S
 
 	// create config file if defined
 	if c.Config != "" {
-		s = s.Run(shf("echo \"%s\" >> /config.yaml", c.Config)).Root()
+		s = s.Run(shf("echo -n \"%s\" > /config.yaml", c.Config)).Root()
 	}
 
 	for _, model := range c.Models {
@@ -100,7 +100,7 @@ func copyModels(c *config.Config, base llb.State, s llb.State) (llb.State, llb.S
 		// create prompt templates if defined
 		for _, pt := range model.PromptTemplates {
 			if pt.Name != "" && pt.Template != "" {
-				s = s.Run(shf("echo \"%s\" >> /models/%s.tmpl", pt.Template, pt.Name)).Root()
+				s = s.Run(shf("echo -n \"%s\" > /models/%s.tmpl", pt.Template, pt.Name)).Root()
 			}
 		}
 	}

@@ -1,0 +1,30 @@
+#syntax=ghcr.io/sozercan/aikit:latest
+apiVersion: v1alpha1
+debug: true
+runtime: cuda
+models:
+  - name: phi-2-2.7b
+    source: https://huggingface.co/TheBloke/phi-2-GGUF/resolve/main/phi-2.Q4_K_M.gguf
+    sha256: 324356668fa5ba9f4135de348447bb2bbe2467eaa1b8fcfb53719de62fbd2499
+    promptTemplates:
+      - name: instruct
+        template: |
+          Instruct: {{.Input}}
+          Output:
+config: |
+  - name: phi-2-2.7b
+    backend: llama
+    parameters:
+      model: phi-2.Q4_K_M.gguf
+      temperature: 0.2
+      top_k: 40
+      top_p: 0.95
+    context_size: 2048
+    trimsuffix:
+    - '\\\\n'
+    template:
+      chat: instruct
+    gpu_layers: 35
+    f16: true
+    batch: 512
+    mmap: true

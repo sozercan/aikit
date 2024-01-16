@@ -59,6 +59,7 @@ AIKit comes with pre-made models that you can use out-of-the-box!
 | 🦙 Llama 2 | Chat         | 13B        | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama2:13b`   |
 | 🐬 Orca 2  |              | 13B        | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/orca2:13b`    |
 | Ⓜ️ Mixtral | Instruct     | 8x7B       | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/mixtral:8x7b` |
+| 🅿️ Phi 2   |              | 2.7B       | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/phi2:2.7b`    |
 
 ### NVIDIA CUDA
 
@@ -68,6 +69,7 @@ AIKit comes with pre-made models that you can use out-of-the-box!
 | 🦙 Llama 2 Chat | Chat         | 13B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama2:13b-cuda`   |
 | 🐬 Orca 2       |              | 13B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/orca2:13b-cuda`    |
 | Ⓜ️ Mixtral      | Instruct     | 8x7B       | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/mixtral:8x7b-cuda` |
+| 🅿️ Phi 2        |              | 2.7B       | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/phi2:2.7b-cuda`    |
 
 > [!NOTE]
 > Please see [models folder](./models/) for pre-made model definitions.
