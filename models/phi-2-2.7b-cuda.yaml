@@ -15,12 +15,16 @@ config: |
   - name: phi-2-2.7b
     backend: llama
     parameters:
+      model: phi-2.Q4_K_M.gguf
       temperature: 0.2
       top_k: 40
       top_p: 0.95
-      model: phi-2.Q4_K_M.gguf
     context_size: 2048
     trimsuffix:
-    - "\n"
+    - '\\\\n'
     template:
       chat: instruct
+    gpu_layers: 35
+    f16: true
+    batch: 512
+    mmap: true
