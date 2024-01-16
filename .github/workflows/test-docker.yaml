@@ -92,10 +92,16 @@ jobs:
       - name: run stablediffusion test
         if: matrix.backend == 'stablediffusion'
         run: |
-          curl http://127.0.0.1:8080/v1/images/generations -H "Content-Type: application/json" -d '{
+          result=$(curl --fail --retry 5 --retry-all-errors http://127.0.0.1:8080/v1/images/generations -H "Content-Type: application/json" -d '{
             "prompt": "A cute baby llama",
             "size": "256x256"
-          }'
+          }')
+          echo $result
+
+          url=$(echo "$result" | jq '.data[0].url')
+          if [ -z "$url" ]; then
+            exit 1
+          fi
 
       - name: save logs
         if: always()
