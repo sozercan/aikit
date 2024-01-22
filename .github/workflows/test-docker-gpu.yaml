@@ -19,7 +19,7 @@ jobs:
           - exllama2-gptq
           - exllama2-exl2
     steps:
-      - uses: AutoModality/action-clean@d004b47eb728f2a83316fc70ba9a62ef97278013 # v1.1.0
+      - uses: AutoModality/action-clean@11d611e7824ef8f2fe7f05a117d1ffe4c1a090f0 # v1.1.1
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: build aikit
@@ -61,7 +61,7 @@ jobs:
 
       - name: publish test artifacts
         if: always()
-        uses: actions/upload-artifact@1eb3cb2b3e0f29609092a73eb033bb759a334595 # v4.1.0
+        uses: actions/upload-artifact@694cdabd8bdb0f10b2cea11669e1bf5453eed0a6 # v4.2.0
         with:
           name: test-${{ matrix.backend }}
           path: |
