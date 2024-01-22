@@ -32,7 +32,7 @@ func Aikit2LLB(c *config.Config) (llb.State, *specs.Image) {
 
 	// install cuda if runtime is nvidia
 	if c.Runtime == utils.RuntimeNVIDIA {
-		merge = installCuda(c, state, merge)
+		state, merge = installCuda(c, state, merge)
 	}
 
 	// install opencv and friends if stable diffusion backend is being used
@@ -43,6 +43,8 @@ func Aikit2LLB(c *config.Config) (llb.State, *specs.Image) {
 			merge = installExllama(c, state, merge)
 		case utils.BackendStableDiffusion:
 			merge = installOpenCV(state, merge)
+		case utils.BackendMamba:
+			merge = installMamba(state, merge)
 		}
 	}
 
@@ -55,7 +57,7 @@ func getBaseImage(c *config.Config) llb.State {
 		switch c.Backends[b] {
 		case utils.BackendExllama:
 		case utils.BackendExllamaV2:
-			return llb.Image(debianSlim)
+		case utils.BackendMamba:
 		case utils.BackendStableDiffusion:
 			return llb.Image(debianSlim)
 		}
@@ -117,7 +119,7 @@ func fileNameFromURL(urlString string) string {
 	return path.Base(parsedURL.Path)
 }
 
-func installCuda(c *config.Config, s llb.State, merge llb.State) llb.State {
+func installCuda(c *config.Config, s llb.State, merge llb.State) (llb.State, llb.State) {
 	cudaKeyringURL := "https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/cuda-keyring_1.1-1_all.deb"
 	cudaKeyring := llb.HTTP(cudaKeyringURL)
 	s = s.File(
@@ -149,10 +151,15 @@ func installCuda(c *config.Config, s llb.State, merge llb.State) llb.State {
 
 			s = s.Run(sh(exllamaDeps)).Root()
 		}
+
+		if c.Backends[b] == utils.BackendMamba {
+			mambaDeps := fmt.Sprintf("apt-get install -y --no-install-recommends cuda-crt-%[1]s cuda-cudart-dev-%[1]s cuda-nvcc-%[1]s && apt-get clean", cudaVersion)
+			s = s.Run(sh(mambaDeps)).Root()
+		}
 	}
 
 	diff := llb.Diff(savedState, s)
-	return llb.Merge([]llb.State{merge, diff})
+	return s, llb.Merge([]llb.State{merge, diff})
 }
 
 func installExllama(c *config.Config, s llb.State, merge llb.State) llb.State {
@@ -175,6 +182,23 @@ func installExllama(c *config.Config, s llb.State, merge llb.State) llb.State {
 
 	// clone exllama to localai exllama backend path and install python dependencies
 	s = s.Run(shf("git clone --depth 1 %[1]s --branch %[2]s /tmp/%[3]s && mv /tmp/%[3]s/* /tmp/localai/backend/python/%[3]s && rm -rf /tmp/%[3]s && cd /tmp/localai/backend/python/%[3]s && rm -rf .git && pip3 install grpcio protobuf typing-extensions sympy mpmath setuptools numpy --break-system-packages && pip3 install -r /tmp/localai/backend/python/%[3]s/requirements.txt --break-system-packages", exllamaRepo, exllamaTag, backend)).Root()
+
+	diff := llb.Diff(savedState, s)
+	return llb.Merge([]llb.State{merge, diff})
+}
+
+func installMamba(s llb.State, merge llb.State) llb.State {
+	backend := "mamba"
+
+	s = s.Run(sh("apt-get update && apt-get install --no-install-recommends -y git python3-pip && apt-get clean"), llb.IgnoreCache).Root()
+
+	savedState := s
+
+	s = s.Run(sh(" apt-get install --no-install-recommends -y python3 && apt-get clean"), llb.IgnoreCache).Root()
+
+	s = s.Run(shf("git clone --filter=blob:none --no-checkout %[1]s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python/%[2]s && git checkout %[3]s && rm -rf .git", localAIRepo, backend, localAIVersion)).Root()
+
+	s = s.Run(shf("pip3 install packaging numpy torch==2.1.0 --break-system-packages && pip3 install causal-conv1d==1.0.0 mamba-ssm==1.0.1 --break-system-packages")).Root()
 
 	diff := llb.Diff(savedState, s)
 	return llb.Merge([]llb.State{merge, diff})

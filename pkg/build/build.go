@@ -136,11 +136,13 @@ func validateConfig(c *config.Config) error {
 		return errors.New("cannot specify both exllama and exllamav2 at this time")
 	}
 
-	if (slices.Contains(c.Backends, utils.BackendExllama) || slices.Contains(c.Backends, utils.BackendExllamaV2)) && c.Runtime != utils.RuntimeNVIDIA {
-		return errors.New("exllama only supports nvidia cuda runtime. please add 'runtime: cuda' to your aikitfile.yaml")
+	// TODO: cannot speicify both exllama and mamba at this time
+
+	if (slices.Contains(c.Backends, utils.BackendExllama) || slices.Contains(c.Backends, utils.BackendExllamaV2) || slices.Contains(c.Backends, utils.BackendMamba)) && c.Runtime != utils.RuntimeNVIDIA {
+		return errors.New("exllama and mamba only supports nvidia cuda runtime. please add 'runtime: cuda' to your aikitfile.yaml")
 	}
 
-	backends := []string{utils.BackendExllama, utils.BackendExllamaV2, utils.BackendStableDiffusion}
+	backends := []string{utils.BackendExllama, utils.BackendExllamaV2, utils.BackendStableDiffusion, utils.BackendMamba}
 	for _, b := range c.Backends {
 		if !slices.Contains(backends, b) {
 			return errors.Errorf("backend %s is not supported", b)
