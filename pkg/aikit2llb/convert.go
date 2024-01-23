@@ -53,26 +53,14 @@ func Aikit2LLB(c *config.Config) (llb.State, *specs.Image) {
 }
 
 func getBaseImage(c *config.Config) llb.State {
-	for b := range c.Backends {
-		switch c.Backends[b] {
-		case utils.BackendExllama:
-		case utils.BackendExllamaV2:
-		case utils.BackendMamba:
-		case utils.BackendStableDiffusion:
-			return llb.Image(debianSlim)
-		}
+	if len(c.Backends) > 0 {
+		return llb.Image(debianSlim)
 	}
 	return llb.Image(distrolessBase)
 }
 
 func copyModels(c *config.Config, base llb.State, s llb.State) (llb.State, llb.State) {
 	savedState := s
-
-	// create config file if defined
-	if c.Config != "" {
-		s = s.Run(shf("echo -n \"%s\" > /config.yaml", c.Config)).Root()
-	}
-
 	for _, model := range c.Models {
 		var opts []llb.HTTPOption
 		opts = append(opts, llb.Filename(fileNameFromURL(model.Source)))
@@ -106,6 +94,12 @@ func copyModels(c *config.Config, base llb.State, s llb.State) (llb.State, llb.S
 			}
 		}
 	}
+
+	// create config file if defined
+	if c.Config != "" {
+		s = s.Run(shf("echo -n \"%s\" > /config.yaml", c.Config)).Root()
+	}
+
 	diff := llb.Diff(savedState, s)
 	merge := llb.Merge([]llb.State{base, diff})
 	return s, merge
@@ -127,10 +121,11 @@ func installCuda(c *config.Config, s llb.State, merge llb.State) (llb.State, llb
 		llb.WithCustomName("Copying "+fileNameFromURL(cudaKeyringURL)), //nolint: goconst
 	)
 	s = s.Run(sh("dpkg -i cuda-keyring_1.1-1_all.deb && rm cuda-keyring_1.1-1_all.deb")).Root()
+
+	savedState := s
 	// running apt-get update twice due to nvidia repo
 	s = s.Run(sh("apt-get update && apt-get install -y ca-certificates && apt-get update"), llb.IgnoreCache).Root()
 
-	savedState := s
 	// install cuda libraries
 	if len(c.Backends) == 0 {
 		s = s.Run(shf("apt-get install -y --no-install-recommends libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean", cudaVersion)).Root()
@@ -189,16 +184,13 @@ func installExllama(c *config.Config, s llb.State, merge llb.State) llb.State {
 
 func installMamba(s llb.State, merge llb.State) llb.State {
 	backend := "mamba"
-
-	s = s.Run(sh("apt-get update && apt-get install --no-install-recommends -y git python3-pip && apt-get clean"), llb.IgnoreCache).Root()
-
 	savedState := s
-
-	s = s.Run(sh(" apt-get install --no-install-recommends -y python3 && apt-get clean"), llb.IgnoreCache).Root()
+	// libexpat1 is requirement but git is not. however libexpat1 is a dependency of git
+	s = s.Run(sh("apt-get install --no-install-recommends -y git python3 python3-dev python3-pip libssl3 openssl && apt-get clean"), llb.IgnoreCache).Root()
 
 	s = s.Run(shf("git clone --filter=blob:none --no-checkout %[1]s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python/%[2]s && git checkout %[3]s && rm -rf .git", localAIRepo, backend, localAIVersion)).Root()
 
-	s = s.Run(shf("pip3 install packaging numpy torch==2.1.0 --break-system-packages && pip3 install causal-conv1d==1.0.0 mamba-ssm==1.0.1 --break-system-packages")).Root()
+	s = s.Run(shf("pip3 install packaging numpy torch==2.1.0 grpcio protobuf --break-system-packages && pip3 install causal-conv1d==1.0.0 mamba-ssm==1.0.1 --break-system-packages")).Root()
 
 	diff := llb.Diff(savedState, s)
 	return llb.Merge([]llb.State{merge, diff})
