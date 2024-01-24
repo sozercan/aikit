@@ -1,4 +1,6 @@
-# API Specifications
+---
+title: API Specifications
+---
 
 ## v1alpha1
 

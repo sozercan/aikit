@@ -1,16 +1,17 @@
+name: deploy-docs
 on:
   push:
     branches:
       - main
     paths:
       - '.github/workflows/deploy-docs.yaml'
-      - 'docs/**'
+      - 'website/**'
   pull_request:
     branches:
       - main
     paths:
       - '.github/workflows/deploy-docs.yaml'
-      - 'docs/**'
+      - 'website/**'
 
 permissions:
   contents: read
@@ -53,9 +54,9 @@ jobs:
       - run: yarn build
 
       - name: Deploy to GitHub Pages
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push' && github.repository == 'sozercan/aikit'
+        # if: github.ref == 'refs/heads/main' && github.event_name == 'push' && github.repository == 'sozercan/aikit'
         uses: peaceiris/actions-gh-pages@373f7f263a76c20808c831209c920827a82a2847 # v3.9.3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/build
+          publish_dir: ./website/build
           destination_dir: ./docs
