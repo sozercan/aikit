@@ -158,13 +158,13 @@ func installCuda(c *config.Config, s llb.State, merge llb.State) (llb.State, llb
 }
 
 func installExllama(c *config.Config, s llb.State, merge llb.State) llb.State {
-	backend := "exllama"
+	backend := utils.BackendExllama
 	exllamaRepo := "https://github.com/turboderp/exllama"
 	exllamaTag := "master"
 	for b := range c.Backends {
 		if c.Backends[b] == utils.BackendExllamaV2 {
 			exllamaRepo = "https://github.com/turboderp/exllamav2"
-			backend = "exllama2"
+			backend = utils.BackendExllamaV2
 			exllamaTag = "v0.0.11"
 		}
 	}
@@ -173,7 +173,7 @@ func installExllama(c *config.Config, s llb.State, merge llb.State) llb.State {
 	s = s.Run(sh("apt-get update && apt-get install --no-install-recommends -y git ca-certificates python3-pip python3-dev g++ && apt-get clean"), llb.IgnoreCache).Root()
 
 	// clone localai exllama backend only
-	s = s.Run(shf("git clone --filter=blob:none --no-checkout %[1]s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python/%[2]s && git checkout %[3]s && rm -rf .git", localAIRepo, backend, localAIVersion)).Root()
+	s = cloneLocalAI(s, backend)
 
 	// clone exllama to localai exllama backend path and install python dependencies
 	s = s.Run(shf("git clone --depth 1 %[1]s --branch %[2]s /tmp/%[3]s && mv /tmp/%[3]s/* /tmp/localai/backend/python/%[3]s && rm -rf /tmp/%[3]s && cd /tmp/localai/backend/python/%[3]s && rm -rf .git && pip3 install grpcio protobuf typing-extensions sympy mpmath setuptools numpy --break-system-packages && pip3 install -r /tmp/localai/backend/python/%[3]s/requirements.txt --break-system-packages", exllamaRepo, exllamaTag, backend)).Root()
@@ -183,12 +183,11 @@ func installExllama(c *config.Config, s llb.State, merge llb.State) llb.State {
 }
 
 func installMamba(s llb.State, merge llb.State) llb.State {
-	backend := "mamba"
 	savedState := s
 	// libexpat1 is requirement but git is not. however libexpat1 is a dependency of git
 	s = s.Run(sh("apt-get install --no-install-recommends -y git python3 python3-dev python3-pip libssl3 openssl && apt-get clean"), llb.IgnoreCache).Root()
 
-	s = s.Run(shf("git clone --filter=blob:none --no-checkout %[1]s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python/%[2]s && git checkout %[3]s && rm -rf .git", localAIRepo, backend, localAIVersion)).Root()
+	s = cloneLocalAI(s, utils.BackendMamba)
 
 	s = s.Run(shf("pip3 install packaging numpy torch==2.1.0 grpcio protobuf --break-system-packages && pip3 install causal-conv1d==1.0.0 mamba-ssm==1.0.1 --break-system-packages")).Root()
 
@@ -247,6 +246,10 @@ func addLocalAI(c *config.Config, s llb.State, merge llb.State) (llb.State, llb.
 
 	diff := llb.Diff(savedState, s)
 	return s, llb.Merge([]llb.State{merge, diff})
+}
+
+func cloneLocalAI(s llb.State, backend string) llb.State {
+	return s.Run(shf("git clone --filter=blob:none --no-checkout %[1]s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python/%[2]s && git checkout %[3]s && rm -rf .git", localAIRepo, backend, localAIVersion)).Root()
 }
 
 func shf(cmd string, v ...interface{}) llb.RunOption {
