@@ -45,7 +45,7 @@ const config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+            'https://github.com/sozercan/aikit/blob/main/website/docs/',
         },
         blog: false,
         theme: {
@@ -69,8 +69,9 @@ const config = {
         items: [
           {
             href: 'https://github.com/sozercan/aikit',
-            label: 'GitHub',
             position: 'right',
+            className: 'header-github-link',
+            'aria-label': 'GitHub repository',
           },
         ],
       },
