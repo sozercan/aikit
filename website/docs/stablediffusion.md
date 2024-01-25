@@ -4,6 +4,14 @@ title: Stable Diffusion
 
 https://github.com/EdVince/Stable-Diffusion-NCNN
 
+This backend:
+- provides support for Stable Diffusion models
+- does not support CUDA runtime yet
+
+:::note
+This is an experimental backend and it may change in the future.
+:::
+
 ## Example
 
 :::warning

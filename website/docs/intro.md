@@ -13,7 +13,7 @@ AIKit uses [LocalAI](https://localai.io/) under-the-hood to run inference. Local
 - 🤏 Minimal image size, resulting in less vulnerabilities and smaller attack surface with a custom [distroless](https://github.com/GoogleContainerTools/distroless)-based image
 - 🚀 [Easy to use declarative configuration](specs.md)
 - ✨ OpenAI API compatible to use with any OpenAI API compatible client
-- 📸 [Multi-modal model support](demo.md#vision-with-llava)
+- 📸 [Multi-modal model support](vision.md)
 - 🖼️ Image generation support with Stable Diffusion
 - 🦙 Support for GGUF ([`llama`](https://github.com/ggerganov/llama.cpp)), GPTQ ([`exllama`](https://github.com/turboderp/exllama) or [`exllama2`](https://github.com/turboderp/exllamav2)), EXL2 ([`exllama2`](https://github.com/turboderp/exllamav2)), and GGML ([`llama-ggml`](https://github.com/ggerganov/llama.cpp)) formats
 - 🚢 [Kubernetes deployment ready](#kubernetes-deployment)

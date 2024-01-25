@@ -32,7 +32,7 @@ const sidebars = {
       items: [
         'create-images',
         'specs',
-        'output',
+        'vision',
         'gpu',
         'kubernetes',
         'cosign',
