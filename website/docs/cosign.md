@@ -1,4 +1,6 @@
-# Image verification
+---
+title: Image Verification
+---
 
 AIKit and pre-made models are keyless signed with OIDC in GitHub Actions with [cosign](https://github.com/sigstore/cosign). You can verify the images with the following commands:
 
