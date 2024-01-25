@@ -9,6 +9,7 @@ const (
 	BackendStableDiffusion = "stablediffusion"
 	BackendExllama         = "exllama"
 	BackendExllamaV2       = "exllama2"
+	BackendMamba           = "mamba"
 
 	APIv1alpha1 = "v1alpha1"
 )

@@ -46,12 +46,19 @@ func emptyImage(c *config.Config) *specs.Image {
 	}
 
 	for b := range c.Backends {
-		if c.Backends[b] == utils.BackendExllama || c.Backends[b] == utils.BackendExllamaV2 {
+		switch c.Backends[b] {
+		case utils.BackendExllama, utils.BackendExllamaV2:
 			exllamaEnv := []string{
 				"EXTERNAL_GRPC_BACKENDS=exllama:/tmp/localai/backend/python/exllama/exllama.py,exllama2:/tmp/localai/backend/python/exllama2/exllama2_backend.py",
 				"CUDA_HOME=/usr/local/cuda",
 			}
 			img.Config.Env = append(img.Config.Env, exllamaEnv...)
+		case utils.BackendMamba:
+			mambaEnv := []string{
+				"EXTERNAL_GRPC_BACKENDS=mamba:/tmp/localai/backend/python/mamba/backend_mamba.py",
+				"CUDA_HOME=/usr/local/cuda",
+			}
+			img.Config.Env = append(img.Config.Env, mambaEnv...)
 		}
 	}
 
