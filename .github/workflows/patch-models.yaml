@@ -1,8 +1,8 @@
 name: patch-models
 on:
   # patch weekly
-  # schedule:
-  #   - cron: "0 0 * * 0"
+  schedule:
+    - cron: "0 0 * * 0"
   workflow_dispatch:
 
 permissions:
@@ -71,11 +71,14 @@ jobs:
             image: ${{ matrix.images }}
             image-report: 'report.json'
             patched-tag: 'patched'
+            timeout: 30m
 
         - name: Install Cosign
+          if: steps.copa.conclusion == 'success'
           uses: sigstore/cosign-installer@9614fae9e5c5eddabb09f90a270fcb487c9f7149 # v3.3.0
 
         - name: Docker Push Patched Image
+          id: push
           if: steps.copa.conclusion == 'success'
           run: |
             docker tag ${{ steps.copa.outputs.patched-image }} ${{ matrix.images }}
@@ -84,9 +87,12 @@ jobs:
             echo "DIGEST=$(cosign triangulate ${{ matrix.images }} --type digest)" >> $GITHUB_ENV
 
         - name: Sign the images with GitHub OIDC Token
+          id: sign
+          if: steps.push.conclusion == 'success'
           run: cosign sign --yes ${DIGEST}
 
         - name: Verify image signature
+          if: steps.sign.conclusion == 'success'
           run: |
             cosign verify ${DIGEST} \
               --certificate-oidc-issuer https://token.actions.githubusercontent.com \
