@@ -44,15 +44,24 @@ jobs:
         run: docker run --name testmodel -d --rm -p 8080:8080 --gpus all testmodel:test
 
       - name: run test
+        if: matrix.backend != 'mamba'
         run: |
-          if [ "${{ matrix.backend }}" == "mamba" ]; then
-            MODEL_NAME="mamba-chat"
-          else
-            MODEL_NAME="llama-2-7b-chat"
+          result=$(curl --fail --retry 10 --retry-all-errors http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
+            "model": "llama-2-7b-chat",
+            "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
+          }')
+          echo $result
+
+          choices=$(echo "$result" | jq '.choices')
+          if [ -z "$choices" ]; then
+            exit 1
           fi
 
+      - name: run test
+        if: matrix.backend == 'mamba'
+        run: |
           result=$(curl --fail --retry 10 --retry-all-errors http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
-            "model": ${MODEL_NAME},
+            "model": "mamba-chat",
             "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
           }')
           echo $result
