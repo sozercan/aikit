@@ -14,15 +14,42 @@
 /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
   sidebar: [
-    'intro',
-    'quick-start',
-    'premade-models',
-    'demo',
-    'create-images',
-    'specs',
-    'gpu',
-    'kubernetes',
-    'cosign',
+    {
+      type: 'category',
+      label: 'Getting Started',
+      collapsed: false,
+      items: [
+        'intro',
+        'quick-start',
+        'premade-models',
+        'demo',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Features',
+      collapsed: false,
+      items: [
+        'create-images',
+        'specs',
+        'output',
+        'gpu',
+        'kubernetes',
+        'cosign',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Supported Backends',
+      collapsed: false,
+      items: [
+        'llama-cpp',
+        'exllama',
+        'exllama2',
+        'mamba',
+        'stablediffusion',
+      ],
+    },
   ],
 };
 
