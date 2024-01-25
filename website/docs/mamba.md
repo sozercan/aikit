@@ -2,9 +2,15 @@
 title: Mamba
 ---
 
-Mamba is a new state space model architecture showing promising performance on information-dense data such as language modeling, where previous subquadratic models fall short of Transformers.
+[Mamba](https://github.com/state-spaces/mamba) is a new state space model architecture showing promising performance on information-dense data such as language modeling, where previous subquadratic models fall short of Transformers.
 
-https://github.com/state-spaces/mamba
+This backend:
+- provides support for Mamba models
+- requires CUDA runtime
+
+:::note
+This is an experimental backend and it may change in the future.
+:::
 
 ## Example
 
