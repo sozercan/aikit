@@ -17,7 +17,15 @@ jobs:
       - name: Harden Runner
         uses: step-security/harden-runner@eb238b55efaa70779f274895e782ed17c84f2895 # v2.6.1
         with:
-          egress-policy: audit
+          egress-policy: block
+          allowed-endpoints: >
+            azcopyvnext.azureedge.net:443
+            cdn03.quay.io:443
+            dc.services.visualstudio.com:443
+            github.com:443
+            *.githubusercontent.com:443
+            quay.io:443
+            *.blob.core.windows.net:443
 
       - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:
