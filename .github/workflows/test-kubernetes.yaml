@@ -34,7 +34,21 @@ jobs:
       - name: Harden Runner
         uses: step-security/harden-runner@eb238b55efaa70779f274895e782ed17c84f2895 # v2.6.1
         with:
-          egress-policy: audit
+          egress-policy: block
+          allowed-endpoints: >
+            auth.docker.io:443
+            cdn-lfs.huggingface.co:443
+            cdn.dl.k8s.io:443
+            dl.k8s.io:443
+            download.docker.com:443
+            gcr.io:443
+            github.com:443
+            huggingface.co:443
+            *.githubusercontent.com:443
+            production.cloudflare.docker.com:443
+            proxy.golang.org:443
+            registry-1.docker.io:443
+            storage.googleapis.com:443
 
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
