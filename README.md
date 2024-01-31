@@ -8,7 +8,7 @@ AIKit is a quick, easy, and local or cloud-agnostic way to get started to host a
 
 AIKit uses [LocalAI](https://localai.io/) under-the-hood to run inference. LocalAI provides a drop-in replacement REST API that is OpenAI API compatible, so you can use any OpenAI API compatible client, such as [Kubectl AI](https://github.com/sozercan/kubectl-ai), [Chatbot-UI](https://github.com/sozercan/chatbot-ui) and many more, to send requests to open-source LLMs powered by AIKit!
 
-For full documentation, please see [AIKit website](https://sozercan.github.io/aikit/).
+👉 For full documentation, please see [AIKit website](https://sozercan.github.io/aikit/)!
 
 ## Features
 
@@ -23,6 +23,7 @@ For full documentation, please see [AIKit website](https://sozercan.github.io/ai
 - 📦 Supports multiple models with a single image
 - 🖥️ [Supports GPU-accelerated inferencing with NVIDIA GPUs](#nvidia)
 - 🔐 [Signed images for `aikit` and pre-made models](https://sozercan.github.io/aikit/cosign)
+- 🌈 Support for non-proprietary and self-hosted container registries to store model images
 
 ## Quick Start
 
@@ -69,13 +70,4 @@ AIKit comes with pre-made models that you can use out-of-the-box!
 | Ⓜ️ Mixtral      | Instruct     | 8x7B       | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/mixtral:8x7b-cuda` | [Apache](https://choosealicense.com/licenses/apache-2.0/)                           |
 | 🅿️ Phi 2        | Instruct     | 2.7B       | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/phi2:2.7b-cuda`    | [MIT](https://huggingface.co/microsoft/phi-2/resolve/main/LICENSE)                  |
 
-> [!NOTE]
-> Please see [models folder](./models/) for pre-made model definitions.
->
-> If not being offloaded to GPU VRAM, minimum of 8GB of RAM is required for 7B models, 16GB of RAM to run 13B models, and 32GB of RAM to run 8x7B models.
->
-> CPU models requires minimum of [AVX instruction set](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions). You can check if your CPU supports AVX by running `grep avx /proc/cpuinfo`.
->
-> CUDA models includes CUDA v12. They are used with [NVIDIA GPU acceleration](#gpu-acceleration-support).
-
-For more information and how to create your own images, please see [full documentation](https://sozercan.github.io/aikit/).
+👉 For more information and how to create your own images, please see [AIKit website](https://sozercan.github.io/aikit/).
