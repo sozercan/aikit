@@ -31,7 +31,7 @@ jobs:
         # due to github runner disk space limitations, these do not fit in to runners
         #  - mixtral-7x8b-instruct
         #  - mixtral-7x8b-instruct-cuda
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 360
     steps:
       - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1

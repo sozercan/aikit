@@ -18,7 +18,7 @@ permissions: read-all
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 240
     strategy:
       fail-fast: false
@@ -26,8 +26,12 @@ jobs:
         backend:
           - llama
           - stablediffusion
+        os:
+          - ubuntu-22.04
+          - macos-14
     steps:
       - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+        if: matrix.os == 'ubuntu-22.04'
         with:
           tool-cache: true
           android: true
@@ -138,4 +142,3 @@ jobs:
           path: |
             /tmp/*.log
             /tmp/images/*.png
-
