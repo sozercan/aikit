@@ -20,3 +20,6 @@ AIKit uses [LocalAI](https://localai.io/) under-the-hood to run inference. Local
 - 📦 Supports multiple models with a single image
 - 🖥️ [Supports GPU-accelerated inferencing with NVIDIA GPUs](gpu.md)
 - 🔐 [Signed images for `aikit` and pre-made models](cosign.md)
+- 🌈 Support for non-proprietary and self-hosted container registries to store model images
+
+To get started, please see [Quick Start](quick-start.md)!
