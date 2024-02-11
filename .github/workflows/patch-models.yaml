@@ -55,16 +55,21 @@ jobs:
             username: ${{ github.actor }}
             password: ${{ secrets.GITHUB_TOKEN }}
 
-        - name: Generate Trivy Report
-          uses: aquasecurity/trivy-action@d43c1f16c00cfd3978dde6c07f4bbcf9eb6993ca # 0.16.1
-          with:
-            timeout: 60m
-            scan-type: 'image'
-            format: 'json'
-            output: 'report.json'
-            ignore-unfixed: true
-            vuln-type: 'os'
-            image-ref: ${{ matrix.images }}
+        - name: Download Trivy
+          run: |
+            TRIVY_VERSION=$(
+                curl --silent "https://api.github.com/repos/aquasecurity/trivy/releases/latest" | \
+                grep '"tag_name":' | \
+                sed -E 's/.*"v([^"]+)".*/\1/'
+            )
+            wget https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz
+            tar zxvf trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz
+            mv trivy /usr/local/bin
+            rm trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz
+
+        - name: Scan with Trivy
+          run: |
+            trivy image --vuln-type os --exit-code 0 --format json --output report.json --timeout 60m --ignore-unfixed ${{ matrix.images }}
 
         - name: Check vulnerability count
           id: vuln_count
