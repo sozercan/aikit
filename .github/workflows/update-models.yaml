@@ -64,6 +64,7 @@ jobs:
             tuf-repo-cdn.sigstore.dev:443
             sertaccdn.azureedge.net:443
             developer.download.nvidia.com:443
+            deb.debian.org:80
 
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
