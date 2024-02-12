@@ -37,7 +37,7 @@ jobs:
           egress-policy: block
           allowed-endpoints: >
             auth.docker.io:443
-            cdn-lfs.huggingface.co:443
+            *.huggingface.co:443
             cdn.dl.k8s.io:443
             dl.k8s.io:443
             download.docker.com:443

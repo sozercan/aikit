@@ -50,12 +50,12 @@ jobs:
           egress-policy: block
           allowed-endpoints: >
             auth.docker.io:443
-            cdn-lfs.huggingface.co:443
+            *.huggingface.co:443
             fulcio.sigstore.dev:443
             gcr.io:443
             ghcr.io:443
             github.com:443
-            *.huggingface.co:443
+            huggingface.co:443
             *.githubusercontent.com:443
             production.cloudflare.docker.com:443
             registry-1.docker.io:443
