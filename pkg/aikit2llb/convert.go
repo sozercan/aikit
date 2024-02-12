@@ -17,7 +17,7 @@ const (
 	debianSlim     = "docker.io/library/debian:12-slim"
 	distrolessBase = "gcr.io/distroless/cc-debian12:latest"
 
-	localAIVersion = "v2.6.1"
+	localAIVersion = "v2.8.0"
 	localAIRepo    = "https://github.com/mudler/LocalAI"
 	cudaVersion    = "12-3"
 )
@@ -201,7 +201,8 @@ func installOpenCV(s llb.State, merge llb.State) llb.State {
 	s = s.Run(sh("echo 'deb http://deb.debian.org/debian bullseye main' | tee -a /etc/apt/sources.list")).Root()
 	// pinning libdap packages to bullseye version due to symbol error
 	libdapVersion := "3.20.7-6"
-	s = s.Run(shf("apt-get update && mkdir -p /tmp/generated/images && apt-get install -y libopencv-imgcodecs4.5 libgomp1 libdap27=%[1]s libdapclient6v5=%[1]s && apt-get clean", libdapVersion), llb.IgnoreCache).Root()
+	libPath := "/usr/lib/x86_64-linux-gnu"
+	s = s.Run(shf("apt-get update && mkdir -p /tmp/generated/images && apt-get install -y libopencv-imgcodecs4.5 libgomp1 libdap27=%[1]s libdapclient6v5=%[1]s && apt-get clean && ln -s %[2]s/libopencv_core.so.4.5 %[2]s/libopencv_core.so.4.5d && ln -s %[2]s/libopencv_imgcodecs.so.4.5 %[2]s/libopencv_imgcodecs.so.4.5d", libdapVersion, libPath), llb.IgnoreCache).Root()
 	diff := llb.Diff(savedState, s)
 	merge = llb.Merge([]llb.State{merge, diff})
 

@@ -26,6 +26,9 @@ jobs:
           rm -rf ./.??* || true
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
+        # use default docker driver builder with containerd image store for local aikit image
+      - run: docker buildx use default
+
       - name: build aikit
         run: |
           docker buildx build . -t aikit:test \
