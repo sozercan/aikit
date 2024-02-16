@@ -54,12 +54,10 @@ jobs:
         with:
           name: artifacts
           path: |
-            build/local-ai
             build/backend-assets/grpc/stablediffusion
 
       - run: |
-          mkdir -p upload/cuda12
-          cp build/local-ai upload/cuda12/local-ai
+          mkdir -p upload
           cp build/backend-assets/grpc/stablediffusion upload/stablediffusion
 
       - uses: bacongobbler/azure-blob-storage-upload@50f7d898b7697e864130ea04c303ca38b5751c50 # v3.0.0
