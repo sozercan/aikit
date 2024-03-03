@@ -1,0 +1,84 @@
+name: docker-test-finetune
+
+on:
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  test:
+    runs-on: self-hosted
+    timeout-minutes: 360
+    steps:
+      - name: cleanup workspace
+        run: |
+          rm -rf ./* || true
+          rm -rf ./.??* || true
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+        # use default docker driver builder with containerd image store for local aikit image
+        # must have insecure security entitlement for finetuning
+        # these must be setup before running this test
+      - run: docker buildx use default
+
+      - name: build aikit
+        run: |
+          docker build . -t aikit:test \
+            --load --provenance=false --progress plain
+
+      - name: build finetuned model
+        run: |
+          docker build --allow security.insecure \
+            --file test/aikitfile-unsloth.yaml --output _output \
+            --target unsloth --progress plain .
+
+      - name: check if finetuned model exists
+        run: test -f _output/model-q4_k_m.gguf
+      
+      - name: build custom model
+        working-directory: _output
+        run: |
+          docker build . -t custommodel:test \
+            -f test/aikitfile-unsloth-custom.yaml \
+            --load --provenance=false --progress plain
+
+      - name: list images
+        run: docker images
+
+      - name: run test model
+        run: docker run --name custommodel -d --rm -p 8080:8080 --gpus all custommodel:test
+
+      - name: run test
+        run: |
+          result=$(curl --fail --retry 10 --retry-all-errors http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
+            "model": "custom",
+            "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
+          }')
+          echo $result
+
+          choices=$(echo "$result" | jq '.choices')
+          if [ -z "$choices" ]; then
+            exit 1
+          fi
+
+      - name: save logs
+        if: always()
+        run: docker logs custommodel > /tmp/docker.log
+
+      - run: docker stop custommodel
+        if: always()
+
+      - run: docker system prune -a -f --volumes
+        if: always()
+
+      - run: clean up output
+        if: always()
+        run: rm -rf _output
+
+      - name: publish test artifacts
+        if: always()
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+        with:
+          name: test
+          path: |
+            /tmp/*.log
