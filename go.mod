@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/containerd/containerd v1.7.13
-	github.com/moby/buildkit v0.13.0-rc2
+	github.com/moby/buildkit v0.13.0-rc3
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.0
 	github.com/pkg/errors v0.9.1
