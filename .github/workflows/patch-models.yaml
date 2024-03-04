@@ -62,7 +62,7 @@ jobs:
               *.blob.core.windows.net:443
 
         - name: Set up Docker Buildx
-          uses: docker/setup-buildx-action@f95db51fddba0c2d1ec667646a06c2ce06100226 # v3.0.0
+          uses: docker/setup-buildx-action@0d103c3126aa41d772a8362f6aa67afac040f80c # v3.1.0
 
         - name: Login to GHCR
           uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
@@ -115,7 +115,7 @@ jobs:
         - name: Copa Action
           if: steps.vuln_count.outputs.vuln_count != '0'
           id: copa
-          uses: project-copacetic/copa-action@eeead828bce6f0a1437c305abfb77004605995a9 # v1.2.0
+          uses: project-copacetic/copa-action@3843e22efdca421adb37aa8dec103a0f1db68544 # v1.2.1
           with:
             image: ${{ matrix.images }}
             image-report: 'report.json'
