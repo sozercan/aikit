@@ -1,0 +1,31 @@
+#syntax=ghcr.io/sozercan/aikit:latest
+apiVersion: v1alpha1
+debug: true
+runtime: cuda
+models:
+  - name: gemma
+    source: https://huggingface.co/lmstudio-ai/gemma-2b-it-GGUF/resolve/main/gemma-2b-it-q4_k_m.gguf
+    sha256: 144b3eb4fb500556034a29172cfa2b17f28cfce7c7698ac3467600adc510efcd
+    promptTemplates:
+      - name: instruct
+        template: |
+          <start_of_turn>user
+          {{ if .SystemPrompt }}{{ .SystemPrompt }} {{ end }}{{ .Input }}<end_of_turn>
+          <start_of_turn>model
+          <end_of_turn>
+config: |
+  - name: gemma
+    backend: llama
+    parameters:
+      model: gemma-2b-it-q4_k_m.gguf
+    context_size: 8192
+    template:
+      chat: instruct
+    repeat_penalty: 1
+    stopwords:
+     - \"<start_of_turn>\"
+     - \"<end_of_turn>\"
+    gpu_layers: 35
+    f16: true
+    batch: 512
+    mmap: true
