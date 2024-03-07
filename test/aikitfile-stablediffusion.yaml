@@ -1,6 +1,7 @@
 #syntax=aikit:test
 apiVersion: v1alpha1
 debug: true
+runtime: avx2
 backends:
   - stablediffusion
 models:
