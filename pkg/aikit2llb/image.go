@@ -1,8 +1,6 @@
 package aikit2llb
 
 import (
-	"strings"
-
 	"github.com/moby/buildkit/util/system"
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/sozercan/aikit/pkg/aikit/config"
@@ -11,17 +9,16 @@ import (
 
 func NewImageConfig(c *config.Config) *specs.Image {
 	img := emptyImage(c)
-
-	var params []string
-	if c.Config != "" {
-		params = append(params, "--config-file=/config.yaml")
-	}
+	var debug, config string
 	if c.Debug {
-		params = append(params, "--debug")
+		debug = "--debug"
 	}
-	paramString := strings.Join(params, " ")
+	if c.Config != "" {
+		config = "--config-file=/config.yaml"
+	}
 
-	img.Config.Entrypoint = []string{"local-ai", paramString}
+	img.Config.Entrypoint = []string{"local-ai"}
+	img.Config.Cmd = []string{debug, config}
 	return img
 }
 
