@@ -11,16 +11,17 @@ import (
 
 func NewImageConfig(c *config.Config) *specs.Image {
 	img := emptyImage(c)
-	var debug, config string
-	if c.Debug {
-		debug = "--debug"
-	}
-	if c.Config != "" {
-		config = "--config-file=/config.yaml"
-	}
 
-	params := strings.TrimSpace(debug + " " + config)
-	img.Config.Entrypoint = []string{"local-ai", params}
+	var params []string
+	if c.Config != "" {
+		params = append(params, "--config-file=/config.yaml")
+	}
+	if c.Debug {
+		params = append(params, "--debug")
+	}
+	paramString := strings.Join(params, " ")
+
+	img.Config.Entrypoint = []string{"local-ai", paramString}
 	return img
 }
 
