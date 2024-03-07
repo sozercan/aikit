@@ -1,6 +1,6 @@
 #syntax=aikit:test
 apiVersion: v1alpha1
-# debug: true
+debug: true
 runtime: avx2
 models:
   - name: llama-2-7b-chat
