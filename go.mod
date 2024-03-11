@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/containerd/containerd v1.7.13
-	github.com/moby/buildkit v0.13.0-rc3
+	github.com/moby/buildkit v0.13.0
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.0
 	github.com/pkg/errors v0.9.1
@@ -40,7 +40,7 @@ require (
 	github.com/moby/sys/signal v0.7.0 // indirect
 	github.com/secure-systems-lab/go-securesystemslib v0.8.0 // indirect
 	github.com/shibumi/go-pathspec v1.3.0 // indirect
-	github.com/tonistiigi/fsutil v0.0.0-20240223190444-7a889f53dbf6 // indirect
+	github.com/tonistiigi/fsutil v0.0.0-20240301111122-7525a1af2bb5 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.48.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.48.0 // indirect
 	go.opentelemetry.io/otel v1.23.1 // indirect
