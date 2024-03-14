@@ -2,8 +2,7 @@
 title: Exllama v2 (GPTQ and EXL2)
 ---
 
-[ExLlamaV2](https://github.com/turboderp/exllamav2
-) is an inference library for running local LLMs on modern consumer GPUs.
+[ExLlamaV2](https://github.com/turboderp/exllamav2) is an inference library for running local LLMs on modern consumer GPUs.
 
 This backend:
 - provides support for GPTQ and EXL2 models

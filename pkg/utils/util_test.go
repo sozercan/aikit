@@ -1,10 +1,10 @@
-package aikit2llb
+package utils
 
 import (
 	"testing"
 )
 
-func Test_fileNameFromURL(t *testing.T) {
+func Test_FileNameFromURL(t *testing.T) {
 	type args struct {
 		urlString string
 	}
@@ -31,8 +31,8 @@ func Test_fileNameFromURL(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := fileNameFromURL(tt.args.urlString); got != tt.want {
-				t.Errorf("fileNameFromURL() = %v, want %v", got, tt.want)
+			if got := FileNameFromURL(tt.args.urlString); got != tt.want {
+				t.Errorf("FileNameFromURL() = %v, want %v", got, tt.want)
 			}
 		})
 	}

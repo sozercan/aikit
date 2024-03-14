@@ -1,4 +1,4 @@
-package aikit2llb
+package inference
 
 import (
 	"github.com/moby/buildkit/util/system"
@@ -7,7 +7,7 @@ import (
 	"github.com/sozercan/aikit/pkg/utils"
 )
 
-func NewImageConfig(c *config.Config) *specs.Image {
+func NewImageConfig(c *config.InferenceConfig) *specs.Image {
 	img := emptyImage(c)
 	cmd := []string{}
 	if c.Debug {
@@ -22,7 +22,7 @@ func NewImageConfig(c *config.Config) *specs.Image {
 	return img
 }
 
-func emptyImage(c *config.Config) *specs.Image {
+func emptyImage(c *config.InferenceConfig) *specs.Image {
 	img := &specs.Image{
 		Platform: specs.Platform{
 			Architecture: "amd64",

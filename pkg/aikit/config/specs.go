@@ -5,31 +5,19 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-func NewFromBytes(b []byte) (*Config, error) {
-	c := &Config{}
-	if err := yaml.Unmarshal(b, c); err != nil {
-		return nil, errors.Wrap(err, "unmarshal config")
+func NewFromBytes(b []byte) (*InferenceConfig, *FineTuneConfig, error) {
+	inferenceConfig := &InferenceConfig{}
+	fineTuneConfig := &FineTuneConfig{}
+	var err error
+	err = yaml.Unmarshal(b, inferenceConfig)
+	if err == nil {
+		return inferenceConfig, nil, nil
 	}
-	return c, nil
-}
 
-type Config struct {
-	APIVersion string   `yaml:"apiVersion"`
-	Debug      bool     `yaml:"debug,omitempty"`
-	Runtime    string   `yaml:"runtime,omitempty"`
-	Backends   []string `yaml:"backends,omitempty"`
-	Models     []Model  `yaml:"models"`
-	Config     string   `yaml:"config,omitempty"`
-}
+	err = yaml.Unmarshal(b, fineTuneConfig)
+	if err == nil {
+		return nil, fineTuneConfig, nil
+	}
 
-type Model struct {
-	Name            string           `yaml:"name"`
-	Source          string           `yaml:"source"`
-	SHA256          string           `yaml:"sha256,omitempty"`
-	PromptTemplates []PromptTemplate `yaml:"promptTemplates,omitempty"`
-}
-
-type PromptTemplate struct {
-	Name     string `yaml:"name,omitempty"`
-	Template string `yaml:"template,omitempty"`
+	return nil, nil, errors.Wrap(err, "unmarshal config")
 }

@@ -27,6 +27,7 @@ jobs:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
         # use default docker driver builder with containerd image store for local aikit image
+        # these must be setup before running this test
       - run: docker buildx use default
 
       - name: build aikit
