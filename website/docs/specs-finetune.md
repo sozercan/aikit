@@ -38,7 +38,7 @@ Example:
 apiVersion: v1alpha1
 baseModel: unsloth/mistral-7b-instruct-v0.2-bnb-4bit
 datasets:
-  - source: "yahma/alpaca-cleaned"
+  - source: yahma/alpaca-cleaned
     type: alpaca
 config:
   unsloth:

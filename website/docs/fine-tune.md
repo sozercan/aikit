@@ -39,8 +39,10 @@ Create a YAML file with your configuration. For example, minimum config looks li
 apiVersion: v1alpha1
 baseModel: unsloth/llama-2-7b-bnb-4bit # base model to be fine tuned. this can be any model from Huggingface. For unsloth optimized base models, see https://huggingface.co/unsloth
 datasets:
-  - source: "yahma/alpaca-cleaned" # data set to be used for fine tuning. This can be a Huggingface dataset or a URL pointing to a JSON file
+  - source: yahma/alpaca-cleaned # data set to be used for fine tuning. This can be a Huggingface dataset or a URL pointing to a JSON file
     type: alpaca # type of dataset. only alpaca is supported at this time.
+config:
+  unsloth:
 ```
 
 For full configuration, please refer to [Fine Tune API Specifications](./specs-finetune.md)
