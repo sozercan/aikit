@@ -7,6 +7,7 @@ import (
 	"github.com/moby/buildkit/util/system"
 	"github.com/sozercan/aikit/pkg/aikit/config"
 	"github.com/sozercan/aikit/pkg/utils"
+	"github.com/sozercan/aikit/pkg/version"
 	"gopkg.in/yaml.v2"
 )
 
@@ -48,10 +49,8 @@ func Aikit2LLB(c *config.FineTuneConfig) llb.State {
 		// uv does not support installing xformers via unsloth pyproject
 		state = state.Run(utils.Shf("pip install --upgrade pip uv && uv venv --system-site-packages && %[1]s && uv pip install packaging torch==2.1.0 ipython ninja packaging bitsandbytes setuptools wheel psutil && uv pip install flash-attn --no-build-isolation && python -m pip install 'unsloth[cu121_ampere] @ git+https://github.com/unslothai/unsloth.git@%[2]s'", sourceVenv, unslothCommitSHA)).Root()
 
-		// TODO: uncomment before release
-		// version := version.Version
-		// unslothScriptURL := fmt.Sprintf("https://raw.githubusercontent.com/sozercan/aikit/%s/pkg/finetune/target_unsloth.py", version)
-		unslothScriptURL := "https://raw.githubusercontent.com/sozercan/aikit/finetune/pkg/finetune/target_unsloth.py"
+		version := version.Version
+		unslothScriptURL := fmt.Sprintf("https://raw.githubusercontent.com/sozercan/aikit/%s/pkg/finetune/target_unsloth.py", version)
 		var opts []llb.HTTPOption
 		opts = append(opts, llb.Chmod(0o755))
 		unslothScript := llb.HTTP(unslothScriptURL, opts...)
