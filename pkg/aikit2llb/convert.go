@@ -17,7 +17,7 @@ const (
 	debianSlim     = "docker.io/library/debian:12-slim"
 	distrolessBase = "gcr.io/distroless/cc-debian12:latest"
 
-	localAIVersion = "v2.9.0"
+	localAIVersion = "v2.10.0"
 	localAIRepo    = "https://github.com/mudler/LocalAI"
 	cudaVersion    = "12-3"
 )
@@ -206,7 +206,7 @@ func installOpenCV(s llb.State, merge llb.State) llb.State {
 	diff := llb.Diff(savedState, s)
 	merge = llb.Merge([]llb.State{merge, diff})
 
-	sdURL := fmt.Sprintf("https://sertaccdn.azureedge.net/localai/%s/stablediffusion", localAIVersion)
+	sdURL := fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%s/stablediffusion", localAIVersion)
 	var opts []llb.HTTPOption
 	opts = append(opts, llb.Filename("stablediffusion"))
 	opts = append(opts, llb.Chmod(0o755))
