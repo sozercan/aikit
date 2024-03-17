@@ -1,7 +1,7 @@
 name: pre-release
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # used for testing
   push:
     branches:
       - main
@@ -16,16 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
-      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
-        with:
-          tool-cache: true
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: true
-          docker-images: true
-          swap-storage: true
-
       - name: Harden Runner
         uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
         with:
@@ -45,6 +35,9 @@ jobs:
             tuf-repo-cdn.sigstore.dev:443
 
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          fetch-tags: true
+          fetch-depth: 0
 
       - name: Install Cosign
         uses: sigstore/cosign-installer@e1523de7571e31dbe865fd2e80c5c7c23ae71eb4 # v3.4.0
@@ -59,13 +52,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: set LDFLAGS
+      - name: Set LDFLAGS
         run: |
           set -x
           GIT_COMMIT=$(git rev-list --abbrev-commit --tags --max-count=1)
-          GIT_TAG=$(git describe --abbrev=0 --tags ${GIT_COMMIT} 2>/dev/null || true)
-          echo LDFLAGS="-X github.com/sozercan/aikit/pkg/version.Version=${GIT_TAG:%=%}" >> $GITHUB_ENV
-          echo $LDFLAGS
+          GIT_TAG=$(git describe --abbrev=0 --tags ${GIT_COMMIT} 2>/dev/null)
+          echo LDFLAGS="-X github.com/sozercan/aikit/pkg/version.Version=${GIT_TAG}" >> $GITHUB_ENV
 
       - name: Build and push
         uses: docker/build-push-action@af5a7ed5ba88268d5278f7203fb52cd833f66d6e # v5.2.0
@@ -78,6 +70,10 @@ jobs:
           cache-to: type=gha,scope=aikit,mode=max
           sbom: true
           provenance: true
+          build-args: |
+            LDFLAGS=${{ env.LDFLAGS }}
+        env:
+          LDFLAGS: ${{ env.LDFLAGS }}
 
       # - name: Sign the images with GitHub OIDC Token
       #   env:

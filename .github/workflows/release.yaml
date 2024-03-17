@@ -1,10 +1,9 @@
 name: release
 
 on:
-  workflow_dispatch:
-  # push:
-  #   tags:
-  #     - v*
+  push:
+    tags:
+      - v*
 
 permissions:
   contents: write
@@ -16,16 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
-      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
-        with:
-          tool-cache: true
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: true
-          docker-images: true
-          swap-storage: true
-
       - name: Harden Runner
         uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
         with:
@@ -46,6 +35,9 @@ jobs:
             tuf-repo-cdn.sigstore.dev:443
 
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          fetch-tags: true
+          fetch-depth: 0
 
       - name: Install Cosign
         uses: sigstore/cosign-installer@e1523de7571e31dbe865fd2e80c5c7c23ae71eb4 # v3.4.0
@@ -67,19 +59,17 @@ jobs:
           images: ghcr.io/sozercan/aikit
           tags: type=semver,pattern={{raw}}
 
-      - name: set LDFLAGS
+      - name: Set LDFLAGS
         run: |
           set -x
           GIT_COMMIT=$(git rev-list --abbrev-commit --tags --max-count=1)
-          GIT_TAG=$(git describe --abbrev=0 --tags ${GIT_COMMIT} 2>/dev/null || true)
-          echo LDFLAGS="-X github.com/sozercan/aikit/pkg/version.Version=${GIT_TAG:%=%}" >> $GITHUB_ENV
-          echo $LDFLAGS
+          GIT_TAG=$(git describe --abbrev=0 --tags ${GIT_COMMIT} 2>/dev/null)
+          echo LDFLAGS="-X github.com/sozercan/aikit/pkg/version.Version=${GIT_TAG}" >> $GITHUB_ENV
 
       - name: Build and push
         uses: docker/build-push-action@af5a7ed5ba88268d5278f7203fb52cd833f66d6e # v5.2.0
         id: build-and-push
         with:
-          # push: false
           push: true
           tags: |
             ${{ steps.docker_meta.outputs.tags }}
@@ -88,22 +78,26 @@ jobs:
           cache-to: type=gha,scope=aikit,mode=max
           sbom: true
           provenance: true
+          build-args: |
+            LDFLAGS=${{ env.LDFLAGS }}
+        env:
+          LDFLAGS: ${{ env.LDFLAGS }}
 
-      # - name: Sign the images with GitHub OIDC Token
-      #   env:
-      #     DIGEST: ${{ steps.build-and-push.outputs.digest }}
-      #   run: cosign sign --yes "ghcr.io/sozercan/aikit@${DIGEST}"
+      - name: Sign the images with GitHub OIDC Token
+        env:
+          DIGEST: ${{ steps.build-and-push.outputs.digest }}
+        run: cosign sign --yes "ghcr.io/sozercan/aikit@${DIGEST}"
 
-      # - name: Verify image signature
-      #   env:
-      #     DIGEST: ${{ steps.build-and-push.outputs.digest }}
-      #   run: |
-      #     cosign verify ghcr.io/sozercan/aikit@${DIGEST} \
-      #       --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-      #       --certificate-identity https://github.com/sozercan/aikit/.github/workflows/release.yaml@$GITHUB_REF
+      - name: Verify image signature
+        env:
+          DIGEST: ${{ steps.build-and-push.outputs.digest }}
+        run: |
+          cosign verify ghcr.io/sozercan/aikit@${DIGEST} \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+            --certificate-identity https://github.com/sozercan/aikit/.github/workflows/release.yaml@$GITHUB_REF
 
-      # - name: Create GitHub release
-      #   uses: marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0 # v1.2.1
-      #   with:
-      #     repo_token: "${{ secrets.GITHUB_TOKEN }}"
-      #     prerelease: false
+      - name: Create GitHub release
+        uses: marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0 # v1.2.1
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
