@@ -74,15 +74,15 @@ jobs:
         env:
           LDFLAGS: ${{ env.LDFLAGS }}
 
-      # - name: Sign the images with GitHub OIDC Token
-      #   env:
-      #     DIGEST: ${{ steps.build-and-push.outputs.digest }}
-      #   run: cosign sign --yes "ghcr.io/sozercan/aikit@${DIGEST}"
+      - name: Sign the images with GitHub OIDC Token
+        env:
+          DIGEST: ${{ steps.build-and-push.outputs.digest }}
+        run: cosign sign --yes "ghcr.io/sozercan/aikit@${DIGEST}"
 
-      # - name: Verify image signature
-      #   env:
-      #     DIGEST: ${{ steps.build-and-push.outputs.digest }}
-      #   run: |
-      #     cosign verify ghcr.io/sozercan/aikit@${DIGEST} \
-      #       --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-      #       --certificate-identity https://github.com/sozercan/aikit/.github/workflows/pre-release.yaml@refs/heads/main
+      - name: Verify image signature
+        env:
+          DIGEST: ${{ steps.build-and-push.outputs.digest }}
+        run: |
+          cosign verify ghcr.io/sozercan/aikit@${DIGEST} \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+            --certificate-identity https://github.com/sozercan/aikit/.github/workflows/pre-release.yaml@refs/heads/main
