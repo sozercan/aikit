@@ -69,6 +69,8 @@ jobs:
           cache-to: type=gha,scope=aikit,mode=max
           sbom: true
           provenance: true
+          build-args: |
+            LDFLAGS=${LDFLAGS}
 
       # - name: Sign the images with GitHub OIDC Token
       #   env:
