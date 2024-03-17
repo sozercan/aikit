@@ -35,6 +35,8 @@ jobs:
             tuf-repo-cdn.sigstore.dev:443
 
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          fetch-tags: true
 
       - name: Install Cosign
         uses: sigstore/cosign-installer@e1523de7571e31dbe865fd2e80c5c7c23ae71eb4 # v3.4.0
@@ -53,7 +55,7 @@ jobs:
         run: |
           set -x
           GIT_COMMIT=$(git rev-list --abbrev-commit --tags --max-count=1)
-          GIT_TAG=$(git describe --abbrev=0 --tags ${GIT_COMMIT} 2>/dev/null || true)
+          GIT_TAG=$(git describe --abbrev=0 --tags ${GIT_COMMIT} 2>/dev/null)
           echo LDFLAGS="-X github.com/sozercan/aikit/pkg/version.Version=${GIT_TAG}" >> $GITHUB_ENV
           echo $LDFLAGS
 
