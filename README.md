@@ -18,10 +18,10 @@ AIKit offers two main capabilities:
 
 - 🐳 No GPU, Internet access or additional tools needed except for [Docker](https://docs.docker.com/desktop/install/linux-install/)!
 - 🤏 Minimal image size, resulting in less vulnerabilities and smaller attack surface with a custom [distroless](https://github.com/GoogleContainerTools/distroless)-based image
-- 🎵 [Fine tune support]((https://sozercan.github.io/aikit/fine-tune)
-- 🚀 Easy to use declarative configuration for [inference]((https://sozercan.github.io/aikit/specs-inference) and [fine tuning]((https://sozercan.github.io/aikit/specs-finetune)
+- 🎵 [Fine tune support](https://sozercan.github.io/aikit/fine-tune)
+- 🚀 Easy to use declarative configuration for [inference](https://sozercan.github.io/aikit/specs-inference) and [fine tuning](https://sozercan.github.io/aikit/specs-finetune)
 - ✨ OpenAI API compatible to use with any OpenAI API compatible client
-- 📸 [Multi-modal model support]((https://sozercan.github.io/aikit/vision)
+- 📸 [Multi-modal model support](https://sozercan.github.io/aikit/vision)
 - 🖼️ Image generation support with [Stable Diffusion](https://sozercan.github.io/aikit/stablediffusion)
 - 🦙 Support for GGUF ([`llama`](https://github.com/ggerganov/llama.cpp)), GPTQ ([`exllama`](https://github.com/turboderp/exllama) or [`exllama2`](https://github.com/turboderp/exllamav2)), EXL2 ([`exllama2`](https://github.com/turboderp/exllamav2)), and GGML ([`llama-ggml`](https://github.com/ggerganov/llama.cpp)) and [Mamba](https://github.com/state-spaces/mamba) models
 - 🚢 [Kubernetes deployment ready](#kubernetes-deployment)
