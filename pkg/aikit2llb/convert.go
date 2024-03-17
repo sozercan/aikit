@@ -206,7 +206,7 @@ func installOpenCV(s llb.State, merge llb.State) llb.State {
 	diff := llb.Diff(savedState, s)
 	merge = llb.Merge([]llb.State{merge, diff})
 
-	sdURL := fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%s/stablediffusion", localAIVersion)
+	sdURL := fmt.Sprintf("https://sertaccdn.azureedge.net/localai/%s/stablediffusion", localAIVersion)
 	var opts []llb.HTTPOption
 	opts = append(opts, llb.Filename("stablediffusion"))
 	opts = append(opts, llb.Chmod(0o755))
