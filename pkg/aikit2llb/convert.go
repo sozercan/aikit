@@ -17,7 +17,7 @@ const (
 	debianSlim     = "docker.io/library/debian:12-slim"
 	distrolessBase = "gcr.io/distroless/cc-debian12:latest"
 
-	localAIVersion = "v2.9.0"
+	localAIVersion = "v2.10.0"
 	localAIRepo    = "https://github.com/mudler/LocalAI"
 	cudaVersion    = "12-3"
 )
@@ -97,7 +97,7 @@ func copyModels(c *config.Config, base llb.State, s llb.State) (llb.State, llb.S
 
 	// create config file if defined
 	if c.Config != "" {
-		s = s.Run(shf("echo -n \"%s\" > /config.yaml", c.Config)).Root()
+		s = s.Run(shf("mkdir -p /configuration && echo -n \"%s\" > /config.yaml", c.Config)).Root()
 	}
 
 	diff := llb.Diff(savedState, s)
