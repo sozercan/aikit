@@ -81,7 +81,7 @@ jobs:
       - run: docker stop testmodel
         if: always()
 
-      - run: docker system prune -a -f --volumes
+      - run: docker system prune -a -f --volumes || true
         if: always()
 
       - name: publish test artifacts
