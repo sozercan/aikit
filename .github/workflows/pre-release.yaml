@@ -70,7 +70,9 @@ jobs:
           sbom: true
           provenance: true
           build-args: |
-            LDFLAGS=${LDFLAGS}
+            LDFLAGS=${{ env.LDFLAGS }}
+        env:
+          LDFLAGS: ${{ env.LDFLAGS }}
 
       # - name: Sign the images with GitHub OIDC Token
       #   env:
