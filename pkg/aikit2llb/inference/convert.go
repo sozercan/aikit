@@ -16,7 +16,7 @@ import (
 const (
 	distrolessBase = "gcr.io/distroless/cc-debian12:latest"
 
-	localAIVersion = "v2.9.0"
+	localAIVersion = "v2.10.0"
 	localAIRepo    = "https://github.com/mudler/LocalAI"
 	cudaVersion    = "12-3"
 )
@@ -109,7 +109,7 @@ func copyModels(c *config.InferenceConfig, base llb.State, s llb.State) (llb.Sta
 
 	// create config file if defined
 	if c.Config != "" {
-		s = s.Run(utils.Shf("echo -n \"%s\" > /config.yaml", c.Config)).Root()
+		s = s.Run(utils.Shf("mkdir -p /configuration && echo -n \"%s\" > /config.yaml", c.Config)).Root()
 	}
 
 	diff := llb.Diff(savedState, s)
