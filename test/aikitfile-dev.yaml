@@ -1,4 +1,4 @@
-#syntax=ghcr.io/sozercan/aikit:dev
+#syntax=ghcr.io/sozercan/aikit/inference:dev
 apiVersion: v1alpha1
 debug: true
 models:

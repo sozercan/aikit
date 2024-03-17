@@ -1,5 +1,5 @@
 ---
-title: API Specifications
+title: Inference API Specifications
 ---
 
 ## v1alpha1
@@ -11,7 +11,7 @@ runtime: # optional. defaults to avx. can be "avx", "avx2", "avx512", "cuda"
 backends: # optional. list of additional backends. can be "stablediffusion", "exllama" or "exllama2"
 models: # required. list of models to build
   - name: # required. name of the model
-    source: # required. source of the model. must be a url
+    source: # required. source of the model. can be a url or a local file
     sha256: # optional. sha256 hash of the model file
     promptTemplates: # optional. list of prompt templates for a model
       - name: # required. name of the template

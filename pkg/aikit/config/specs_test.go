@@ -14,7 +14,7 @@ func TestNewFromBytes(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *Config
+		want    *InferenceConfig
 		wantErr bool
 	}{
 		{
@@ -29,7 +29,7 @@ models:
 - name: test
   source: foo
 `)},
-			want: &Config{
+			want: &InferenceConfig{
 				APIVersion: utils.APIv1alpha1,
 				Runtime:    utils.RuntimeCPUAVX512,
 				Backends: []string{
@@ -56,13 +56,13 @@ foo
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewFromBytes(tt.args.b)
+			infCfg, _, err := NewFromBytes(tt.args.b)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewFromBytes() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewFromBytes() = %v, want %v", got, tt.want)
+			if !reflect.DeepEqual(infCfg, tt.want) {
+				t.Errorf("NewFromBytes() = %v, want %v", infCfg, tt.want)
 			}
 		})
 	}

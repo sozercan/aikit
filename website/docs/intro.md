@@ -3,15 +3,23 @@ title: Introduction
 slug: /
 ---
 
-AIKit is a quick, easy, and local or cloud-agnostic way to get started to host and deploy large language models (LLMs) for inference. No GPU, internet access or additional tools are needed to get started except for [Docker](https://docs.docker.com/desktop/install/linux-install/)!
+AIKit is a one-stop shop to quickly get started to host, deploy, build and fine-tune large language models (LLMs).
 
-AIKit uses [LocalAI](https://localai.io/) under-the-hood to run inference. LocalAI provides a drop-in replacement REST API that is OpenAI API compatible, so you can use any OpenAI API compatible client, such as [Kubectl AI](https://github.com/sozercan/kubectl-ai), [Chatbot-UI](https://github.com/sozercan/chatbot-ui) and many more, to send requests to open-source LLMs powered by AIKit!
+AIKit offers two main capabilities:
+
+- **Inference**: AIKit uses [LocalAI](https://localai.io/), which supports a wide range of inference capabilities and formats. LocalAI provides a drop-in replacement REST API that is OpenAI API compatible, so you can use any OpenAI API compatible client, such as [Kubectl AI](https://github.com/sozercan/kubectl-ai), [Chatbot-UI](https://github.com/sozercan/chatbot-ui) and many more, to send requests to open-source LLMs!
+
+- **Fine Tuning**: AIKit uses [Unsloth](https://github.com/unslothai/unsloth) for fast, memory efficient, and easy fine-tuning experience.
+
+To get started, please see [Quick Start](quick-start.md)!
 
 ## Features
 
-- 🐳 No GPU, Internet access or additional tools needed except for [Docker](https://docs.docker.com/desktop/install/linux-install/)!
+- 💡 No GPU, or Internet access is required for inference!
+- 🐳 No additional tools are needed except for [Docker](https://docs.docker.com/desktop/install/linux-install/)!
 - 🤏 Minimal image size, resulting in less vulnerabilities and smaller attack surface with a custom [distroless](https://github.com/GoogleContainerTools/distroless)-based image
-- 🚀 [Easy to use declarative configuration](specs.md)
+- 🎵 [Fine tune support](fine-tune.md)
+- 🚀 Easy to use declarative configuration for [inference](specs-inference.md) and [fine tuning](specs-finetune.md)
 - ✨ OpenAI API compatible to use with any OpenAI API compatible client
 - 📸 [Multi-modal model support](vision.md)
 - 🖼️ Image generation support with Stable Diffusion
@@ -21,5 +29,3 @@ AIKit uses [LocalAI](https://localai.io/) under-the-hood to run inference. Local
 - 🖥️ [Supports GPU-accelerated inferencing with NVIDIA GPUs](gpu.md)
 - 🔐 [Signed images for `aikit` and pre-made models](cosign.md)
 - 🌈 Support for non-proprietary and self-hosted container registries to store model images
-
-To get started, please see [Quick Start](quick-start.md)!
