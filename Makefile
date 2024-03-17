@@ -1,6 +1,6 @@
 REGISTRY ?= ghcr.io/sozercan
-KIND_VERSION ?= 0.20.0
-KUBERNETES_VERSION ?= 1.29.0
+KIND_VERSION ?= 0.22.0
+KUBERNETES_VERSION ?= 1.29.3
 TAG ?= test
 OUTPUT_TYPE ?= type=docker
 TEST_IMAGE_NAME ?= testmodel
