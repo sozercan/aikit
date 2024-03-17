@@ -1,11 +1,7 @@
 name: pre-release
 
 on:
-<<<<<<< HEAD
   workflow_dispatch: # used for testing
-=======
-  workflow_dispatch:
->>>>>>> main
   push:
     branches:
       - main

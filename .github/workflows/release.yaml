@@ -1,10 +1,9 @@
 name: release
 
 on:
-  workflow_dispatch:
-  # push:
-  #   tags:
-  #     - v*
+  push:
+    tags:
+      - v*
 
 permissions:
   contents: write
@@ -84,21 +83,21 @@ jobs:
         env:
           LDFLAGS: ${{ env.LDFLAGS }}
 
-      # - name: Sign the images with GitHub OIDC Token
-      #   env:
-      #     DIGEST: ${{ steps.build-and-push.outputs.digest }}
-      #   run: cosign sign --yes "ghcr.io/sozercan/aikit@${DIGEST}"
+      - name: Sign the images with GitHub OIDC Token
+        env:
+          DIGEST: ${{ steps.build-and-push.outputs.digest }}
+        run: cosign sign --yes "ghcr.io/sozercan/aikit@${DIGEST}"
 
-      # - name: Verify image signature
-      #   env:
-      #     DIGEST: ${{ steps.build-and-push.outputs.digest }}
-      #   run: |
-      #     cosign verify ghcr.io/sozercan/aikit@${DIGEST} \
-      #       --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-      #       --certificate-identity https://github.com/sozercan/aikit/.github/workflows/release.yaml@$GITHUB_REF
+      - name: Verify image signature
+        env:
+          DIGEST: ${{ steps.build-and-push.outputs.digest }}
+        run: |
+          cosign verify ghcr.io/sozercan/aikit@${DIGEST} \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+            --certificate-identity https://github.com/sozercan/aikit/.github/workflows/release.yaml@$GITHUB_REF
 
-      # - name: Create GitHub release
-      #   uses: marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0 # v1.2.1
-      #   with:
-      #     repo_token: "${{ secrets.GITHUB_TOKEN }}"
-      #     prerelease: false
+      - name: Create GitHub release
+        uses: marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0 # v1.2.1
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
