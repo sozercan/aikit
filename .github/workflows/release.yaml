@@ -2,9 +2,9 @@ name: release
 
 on:
   workflow_dispatch: # used for testing
-  # push:
-  #   tags:
-  #     - v*
+  push:
+    tags:
+      - v*
 
 permissions:
   contents: write
@@ -57,13 +57,12 @@ jobs:
           images: ghcr.io/sozercan/aikit
           tags: type=semver,pattern={{raw}}
 
-      - name: set LDFLAGS
+      - name: Set LDFLAGS
         run: |
           set -x
           GIT_COMMIT=$(git rev-list --abbrev-commit --tags --max-count=1)
-          GIT_TAG=$(git describe --abbrev=0 --tags ${GIT_COMMIT} 2>/dev/null || true)
+          GIT_TAG=$(git describe --abbrev=0 --tags ${GIT_COMMIT} 2>/dev/null)
           echo LDFLAGS="-X github.com/sozercan/aikit/pkg/version.Version=${GIT_TAG}" >> $GITHUB_ENV
-          echo $LDFLAGS
 
       - name: Build and push
         uses: docker/build-push-action@af5a7ed5ba88268d5278f7203fb52cd833f66d6e # v5.2.0

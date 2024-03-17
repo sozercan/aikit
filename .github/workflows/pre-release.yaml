@@ -52,20 +52,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: set LDFLAGS
+      - name: Set LDFLAGS
         run: |
           set -x
           GIT_COMMIT=$(git rev-list --abbrev-commit --tags --max-count=1)
           GIT_TAG=$(git describe --abbrev=0 --tags ${GIT_COMMIT} 2>/dev/null)
           echo LDFLAGS="-X github.com/sozercan/aikit/pkg/version.Version=${GIT_TAG}" >> $GITHUB_ENV
-          echo $LDFLAGS
 
       - name: Build and push
         uses: docker/build-push-action@af5a7ed5ba88268d5278f7203fb52cd833f66d6e # v5.2.0
         id: build-and-push
         with:
-          # push: true
-          push: false
+          push: true
           tags: ghcr.io/sozercan/aikit:dev
           cache-from: type=gha,scope=aikit
           cache-to: type=gha,scope=aikit,mode=max
