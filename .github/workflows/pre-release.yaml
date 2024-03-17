@@ -1,7 +1,11 @@
 name: pre-release
 
 on:
+<<<<<<< HEAD
   workflow_dispatch: # used for testing
+=======
+  workflow_dispatch:
+>>>>>>> main
   push:
     branches:
       - main
@@ -63,7 +67,8 @@ jobs:
         uses: docker/build-push-action@af5a7ed5ba88268d5278f7203fb52cd833f66d6e # v5.2.0
         id: build-and-push
         with:
-          push: true
+          # push: true
+          push: false
           tags: ghcr.io/sozercan/aikit:dev
           cache-from: type=gha,scope=aikit
           cache-to: type=gha,scope=aikit,mode=max
@@ -74,15 +79,15 @@ jobs:
         env:
           LDFLAGS: ${{ env.LDFLAGS }}
 
-      - name: Sign the images with GitHub OIDC Token
-        env:
-          DIGEST: ${{ steps.build-and-push.outputs.digest }}
-        run: cosign sign --yes "ghcr.io/sozercan/aikit@${DIGEST}"
+      # - name: Sign the images with GitHub OIDC Token
+      #   env:
+      #     DIGEST: ${{ steps.build-and-push.outputs.digest }}
+      #   run: cosign sign --yes "ghcr.io/sozercan/aikit@${DIGEST}"
 
-      - name: Verify image signature
-        env:
-          DIGEST: ${{ steps.build-and-push.outputs.digest }}
-        run: |
-          cosign verify ghcr.io/sozercan/aikit@${DIGEST} \
-            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-            --certificate-identity https://github.com/sozercan/aikit/.github/workflows/pre-release.yaml@refs/heads/main
+      # - name: Verify image signature
+      #   env:
+      #     DIGEST: ${{ steps.build-and-push.outputs.digest }}
+      #   run: |
+      #     cosign verify ghcr.io/sozercan/aikit@${DIGEST} \
+      #       --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+      #       --certificate-identity https://github.com/sozercan/aikit/.github/workflows/pre-release.yaml@refs/heads/main
