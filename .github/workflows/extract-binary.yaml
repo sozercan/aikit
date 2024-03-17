@@ -1,0 +1,69 @@
+name: extract-binary
+
+on:
+  workflow_dispatch:
+    inputs:
+      localai_version:
+        description: 'Version of local-ai container to extract artifacts from'
+        required: true
+
+permissions: read-all
+
+jobs:
+  extract-binary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            azcopyvnext.azureedge.net:443
+            cdn03.quay.io:443
+            dc.services.visualstudio.com:443
+            github.com:443
+            *.githubusercontent.com:443
+            quay.io:443
+            *.blob.core.windows.net:443
+
+      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: false # blob storage action requires an image
+          swap-storage: true
+
+      - name: install crane
+        env:
+          CRANE_VERSION: 0.17.0
+        run: |
+          curl -sLO "https://github.com/google/go-containerregistry/releases/download/v${CRANE_VERSION}/go-containerregistry_Linux_x86_64.tar.gz"
+          tar -zxvf go-containerregistry_Linux_x86_64.tar.gz -C /usr/local/bin/ crane
+
+      - name: extract artifacts from local-ai container
+        run: |
+          crane export quay.io/go-skynet/local-ai:${{ github.event.inputs.localai_version }}-cublas-cuda12-core > export.tar
+          tar -xvf export.tar build
+
+      - name: publish artifacts
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+        with:
+          name: artifacts
+          path: |
+            build/backend-assets/grpc/stablediffusion
+
+      - run: |
+          mkdir -p upload
+          cp build/backend-assets/grpc/stablediffusion upload/stablediffusion
+
+      - uses: bacongobbler/azure-blob-storage-upload@50f7d898b7697e864130ea04c303ca38b5751c50 # v3.0.0
+        with:
+          source_dir: 'upload'
+          container_name: 'localai'
+          extra_args: '--destination ${{ github.event.inputs.localai_version }}'
+          connection_string: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+          sync: 'true'
