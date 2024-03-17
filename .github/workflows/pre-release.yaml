@@ -1,6 +1,7 @@
 name: pre-release
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -58,26 +59,35 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: set LDFLAGS
+        run: |
+          set -x
+          GIT_COMMIT=$(git rev-list --abbrev-commit --tags --max-count=1)
+          GIT_TAG=$(git describe --abbrev=0 --tags ${GIT_COMMIT} 2>/dev/null || true)
+          echo LDFLAGS="-X github.com/sozercan/aikit/pkg/version.Version=${GIT_TAG:%=%}" >> $GITHUB_ENV
+          echo $LDFLAGS
+
       - name: Build and push
         uses: docker/build-push-action@af5a7ed5ba88268d5278f7203fb52cd833f66d6e # v5.2.0
         id: build-and-push
         with:
-          push: true
+          # push: true
+          push: false
           tags: ghcr.io/sozercan/aikit:dev
           cache-from: type=gha,scope=aikit
           cache-to: type=gha,scope=aikit,mode=max
           sbom: true
           provenance: true
 
-      - name: Sign the images with GitHub OIDC Token
-        env:
-          DIGEST: ${{ steps.build-and-push.outputs.digest }}
-        run: cosign sign --yes "ghcr.io/sozercan/aikit@${DIGEST}"
+      # - name: Sign the images with GitHub OIDC Token
+      #   env:
+      #     DIGEST: ${{ steps.build-and-push.outputs.digest }}
+      #   run: cosign sign --yes "ghcr.io/sozercan/aikit@${DIGEST}"
 
-      - name: Verify image signature
-        env:
-          DIGEST: ${{ steps.build-and-push.outputs.digest }}
-        run: |
-          cosign verify ghcr.io/sozercan/aikit@${DIGEST} \
-            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-            --certificate-identity https://github.com/sozercan/aikit/.github/workflows/pre-release.yaml@refs/heads/main
+      # - name: Verify image signature
+      #   env:
+      #     DIGEST: ${{ steps.build-and-push.outputs.digest }}
+      #   run: |
+      #     cosign verify ghcr.io/sozercan/aikit@${DIGEST} \
+      #       --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+      #       --certificate-identity https://github.com/sozercan/aikit/.github/workflows/pre-release.yaml@refs/heads/main
