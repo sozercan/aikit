@@ -3,7 +3,7 @@ module github.com/sozercan/aikit
 go 1.21
 
 require (
-	github.com/containerd/containerd v1.7.13
+	github.com/containerd/containerd v1.7.14
 	github.com/moby/buildkit v0.13.0
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.0
