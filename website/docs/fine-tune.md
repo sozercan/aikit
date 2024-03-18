@@ -5,15 +5,15 @@ title: Fine Tuning
 Fine tuning process allows the adaptation of pre-trained models to domain-specific data. At this time, AIKit fine tuning process is only supported with NVIDIA GPUs.
 
 :::note
-Due to current BuildKit and NVIDIA limitations, your host GPU driver version must match the driver that AIKit will install into the container during build.
+Due to limitations with BuildKit and NVIDIA, it is essential that the GPU driver version on your host matches the version AIKit will install in the container during the build process.
 
-To find your host GPU driver version, you can run `nvidia-smi` or `cat /proc/driver/nvidia/version`
+To determine your host GPU driver version, you can execute `nvidia-smi` or `cat /proc/driver/nvidia/version`.
 
-For a list of supported driver versions for AIKit, please refer to https://download.nvidia.com/XFree86/Linux-x86_64/
+For information on the GPU driver versions supported by AIKit, please visit https://download.nvidia.com/XFree86/Linux-x86_64/.
 
-If you don't see your host GPU driver version in that list, you'll need to install one that's matching the version in that list. You don't need to install drivers from that location, only the versions need to match.
+Should your host GPU driver version not be listed, you will need to update to a compatible version available in the NVIDIA downloads mentioned above. It's important to note that there's no need to directly install drivers from the NVIDIA downloads; the versions simply need to be consistent.
 
-This might be further optimizated in the future to remove this requirement, if possible.
+We hope to optimize this process in the future to eliminate this requirement.
 :::
 
 ## Getting Started
@@ -41,10 +41,10 @@ Create a YAML file with your configuration. For example, minimum config looks li
 ```yaml
 #syntax=ghcr.io/sozercan/aikit:latest
 apiVersion: v1alpha1
-baseModel: unsloth/llama-2-7b-bnb-4bit # base model to be fine tuned. this can be any model from Huggingface. For unsloth optimized base models, see https://huggingface.co/unsloth
+baseModel: "unsloth/llama-2-7b-bnb-4bit" # base model to be fine tuned. this can be any model from Huggingface. For unsloth optimized base models, see https://huggingface.co/unsloth
 datasets:
-  - source: yahma/alpaca-cleaned # data set to be used for fine tuning. This can be a Huggingface dataset or a URL pointing to a JSON file
-    type: alpaca # type of dataset. only alpaca is supported at this time.
+  - source: "yahma/alpaca-cleaned" # data set to be used for fine tuning. This can be a Huggingface dataset or a URL pointing to a JSON file
+    type: "alpaca" # type of dataset. only alpaca is supported at this time.
 config:
   unsloth:
 ```
@@ -93,6 +93,6 @@ This is a known issue with BuildKit and might be related to disk speed. For more
 
 ### Build fails with `ERROR 404: Not Found.`
 
-This is due to mismatching host and container GPU driver versions. Please refer to the note at the top of this page for more information.
+This issue arises from a discrepancy between the GPU driver versions on your host and the container. Unfortunately, a matching version for your host driver is not available in the NVIDIA downloads at this time. For further details, please consult the note provided at the beginning of this page.
 
 If you are on Windows Subsystem for Linux (WSL), WSL doesn't expose the host driver version information on `/proc/driver/nvidia/version`. Due to this limitation, WSL is not supported at this time.
