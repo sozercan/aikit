@@ -26,6 +26,10 @@ Create a builder with the following configuration:
 docker buildx create --name aikit-builder --use --buildkitd-flags '--allow-insecure-entitlement security.insecure'
 ```
 
+:::tip
+Additionally, you can build using other BuildKit drivers, such as [Kubernetes driver](https://docs.docker.com/build/drivers/kubernetes/) by setting `--driver=kubernetes` if you are interested in building using a Kubernetes cluster. Please see [BuildKit Drivers](https://docs.docker.com/build/drivers/) for more information.
+:::
+
 ## Targets and Configuration
 
 AIKit is capable of supporting multiple fine tuning implementation targets. At this time, [Unsloth](https://github.com/unslothai/unsloth) is the only supported target, but can be extended for other fine tuning implementations in the future.
@@ -45,11 +49,20 @@ config:
   unsloth:
 ```
 
-For full configuration, please refer to [Fine Tune API Specifications](./specs-finetune.md)
+For full configuration, please refer to [Fine Tune API Specifications](./specs-finetune.md).
 
 :::note
 Please refer to [Unsloth documentation](https://github.com/unslothai/unsloth) for more information about Unsloth configuration.
 :::
+
+#### Example Configuration
+
+:::warning
+Please make sure to change syntax to `#syntax=ghcr.io/sozercan/aikit:latest` in the example below.
+:::
+
+https://github.com/sozercan/aikit/blob/main/test/aikitfile-unsloth.yaml
+
 
 ## Build
 
