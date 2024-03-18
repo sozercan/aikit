@@ -10,7 +10,7 @@ AIKit offers two main capabilities:
 
 - **Inference**: AIKit uses [LocalAI](https://localai.io/), which supports a wide range of inference capabilities and formats. LocalAI provides a drop-in replacement REST API that is OpenAI API compatible, so you can use any OpenAI API compatible client, such as [Kubectl AI](https://github.com/sozercan/kubectl-ai), [Chatbot-UI](https://github.com/sozercan/chatbot-ui) and many more, to send requests to open-source LLMs!
 
-- **Fine Tuning**: AIKit offers an extensible fine tuning interface. It supports [Unsloth](https://github.com/unslothai/unsloth) for fast, memory efficient, and easy fine-tuning experience.
+- **[Fine Tuning](https://sozercan.github.io/aikit/fine-tune)**: AIKit offers an extensible fine tuning interface. It supports [Unsloth](https://github.com/unslothai/unsloth) for fast, memory efficient, and easy fine-tuning experience.
 
 👉 For full documentation, please see [AIKit website](https://sozercan.github.io/aikit/)!
 
@@ -75,4 +75,6 @@ AIKit comes with pre-made models that you can use out-of-the-box!
 | Ⓜ️ Mixtral      | Instruct     | 8x7B       | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/mixtral:8x7b-cuda` | [Apache](https://choosealicense.com/licenses/apache-2.0/)                           |
 | 🅿️ Phi 2        | Instruct     | 2.7B       | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/phi2:2.7b-cuda`    | [MIT](https://huggingface.co/microsoft/phi-2/resolve/main/LICENSE)                  |
 
-👉 For more information and how to create your own images, please see [AIKit website](https://sozercan.github.io/aikit/).
+## What's next?
+
+👉 For more information and how to fine tune models or create your own images, please see [AIKit website](https://sozercan.github.io/aikit/)!
