@@ -29,3 +29,7 @@ To get started, please see [Quick Start](quick-start.md)!
 - 🖥️ [Supports GPU-accelerated inferencing with NVIDIA GPUs](gpu.md)
 - 🔐 [Signed images for `aikit` and pre-made models](cosign.md)
 - 🌈 Support for non-proprietary and self-hosted container registries to store model images
+
+## What's next?
+
+👉 Please see [Quick Start](quick-start.md) for getting started!
