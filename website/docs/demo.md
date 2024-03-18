@@ -4,7 +4,7 @@ title: Demos
 
 ## Fine Tuning Mistral 7b with OpenHermes dataset and building a model image for inference
 
-[![Fine Tuning Mistral 7b with OpenHermes dataset and building a model image for inference](https://www.youtube.com/watch?v=FZuVb-9i-94)]
+https://www.youtube.com/watch?v=FZuVb-9i-94
 
 ## Building an image with a Llama 2 model
 
