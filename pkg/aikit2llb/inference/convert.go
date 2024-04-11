@@ -16,8 +16,8 @@ import (
 const (
 	distrolessBase = "gcr.io/distroless/cc-debian12:latest"
 
-	localAIVersion = "v2.10.0"
 	localAIRepo    = "https://github.com/mudler/LocalAI"
+	localAIVersion = "v2.12.3"
 	cudaVersion    = "12-3"
 )
 
