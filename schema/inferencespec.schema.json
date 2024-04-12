@@ -34,11 +34,7 @@
 			"type": "object",
 			"required": [
 				"apiVersion",
-				"debug",
-				"runtime",
-				"backends",
-				"models",
-				"config"
+				"models"
 			]
 		},
 		"Model": {
@@ -63,9 +59,7 @@
 			"type": "object",
 			"required": [
 				"name",
-				"source",
-				"sha256",
-				"promptTemplates"
+				"source"
 			]
 		},
 		"PromptTemplate": {
@@ -78,11 +72,7 @@
 				}
 			},
 			"additionalProperties": false,
-			"type": "object",
-			"required": [
-				"name",
-				"template"
-			]
+			"type": "object"
 		}
 	}
 }
