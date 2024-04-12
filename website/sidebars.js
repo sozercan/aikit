@@ -59,6 +59,14 @@ const sidebars = {
         'stablediffusion',
       ],
     },
+    {
+      type: 'category',
+      label: 'Contributing',
+      collapsed: false,
+      items: [
+        'release',
+      ],
+    },
   ],
 };
 
