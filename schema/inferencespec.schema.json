@@ -5,54 +5,54 @@
 	"$defs": {
 		"InferenceConfig": {
 			"properties": {
-				"APIVersion": {
+				"apiVersion": {
 					"type": "string"
 				},
-				"Debug": {
+				"debug": {
 					"type": "boolean"
 				},
-				"Runtime": {
+				"runtime": {
 					"type": "string"
 				},
-				"Backends": {
+				"backends": {
 					"items": {
 						"type": "string"
 					},
 					"type": "array"
 				},
-				"Models": {
+				"models": {
 					"items": {
 						"$ref": "#/$defs/Model"
 					},
 					"type": "array"
 				},
-				"Config": {
+				"config": {
 					"type": "string"
 				}
 			},
 			"additionalProperties": false,
 			"type": "object",
 			"required": [
-				"APIVersion",
-				"Debug",
-				"Runtime",
-				"Backends",
-				"Models",
-				"Config"
+				"apiVersion",
+				"debug",
+				"runtime",
+				"backends",
+				"models",
+				"config"
 			]
 		},
 		"Model": {
 			"properties": {
-				"Name": {
+				"name": {
 					"type": "string"
 				},
-				"Source": {
+				"source": {
 					"type": "string"
 				},
-				"SHA256": {
+				"sha256": {
 					"type": "string"
 				},
-				"PromptTemplates": {
+				"promptTemplates": {
 					"items": {
 						"$ref": "#/$defs/PromptTemplate"
 					},
@@ -62,26 +62,26 @@
 			"additionalProperties": false,
 			"type": "object",
 			"required": [
-				"Name",
-				"Source",
-				"SHA256",
-				"PromptTemplates"
+				"name",
+				"source",
+				"sha256",
+				"promptTemplates"
 			]
 		},
 		"PromptTemplate": {
 			"properties": {
-				"Name": {
+				"name": {
 					"type": "string"
 				},
-				"Template": {
+				"template": {
 					"type": "string"
 				}
 			},
 			"additionalProperties": false,
 			"type": "object",
 			"required": [
-				"Name",
-				"Template"
+				"name",
+				"template"
 			]
 		}
 	}

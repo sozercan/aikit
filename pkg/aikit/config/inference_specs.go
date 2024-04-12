@@ -2,22 +2,22 @@
 package config
 
 type InferenceConfig struct {
-	APIVersion string   `yaml:"apiVersion"`
-	Debug      bool     `yaml:"debug"`
-	Runtime    string   `yaml:"runtime"`
-	Backends   []string `yaml:"backends"`
-	Models     []Model  `yaml:"models"`
-	Config     string   `yaml:"config"`
+	APIVersion string   `yaml:"apiVersion" json:"apiVersion" jsonschema:"required"`
+	Debug      bool     `yaml:"debug" json:"debug"`
+	Runtime    string   `yaml:"runtime" json:"runtime"`
+	Backends   []string `yaml:"backends" json:"backends"`
+	Models     []Model  `yaml:"models" json:"models" jsonschema:"required"`
+	Config     string   `yaml:"config" json:"config"`
 }
 
 type Model struct {
-	Name            string           `yaml:"name"`
-	Source          string           `yaml:"source"`
-	SHA256          string           `yaml:"sha256"`
-	PromptTemplates []PromptTemplate `yaml:"promptTemplates"`
+	Name            string           `yaml:"name" json:"name"`
+	Source          string           `yaml:"source" json:"source"`
+	SHA256          string           `yaml:"sha256" json:"sha256"`
+	PromptTemplates []PromptTemplate `yaml:"promptTemplates" json:"promptTemplates"`
 }
 
 type PromptTemplate struct {
-	Name     string `yaml:"name"`
-	Template string `yaml:"template"`
+	Name     string `yaml:"name" json:"name"`
+	Template string `yaml:"template" json:"template"`
 }
