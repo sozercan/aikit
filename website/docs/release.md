@@ -15,17 +15,20 @@ git push origin v0.1.0
 
 - Once release is done, trigger [update models](https://github.com/sozercan/aikit/actions/workflows/update-models.yaml) action to update the pre-built models.
 
-> [!NOTE]
-> At this time, Mixtral 8x7b model does not fit into GitHub runners due to its size. It is built and pushed to GHCR manually.
-> ```shell
-> docker buildx build . -t ghcr.io/sozercan/mixtral:8x7b \
->   -t ghcr.io/sozercan/mixtral:8x7b-instruct \
->   -f models/mixtral-7x8b-instruct.yaml \
->   --push --progress=plain --provenance=true --sbom=true
->```
->
->```shell
->docker buildx build . -t ghcr.io/sozercan/mixtral:8x7b-cuda -t ghcr.io/sozercan/mixtral:8x7b-instruct-cuda \
->   -f models/mixtral-7x8b-instruct-cuda.yaml \
->   --push --progress=plain --provenance=true --sbom=true
->```
+:::note
+
+At this time, Mixtral 8x7b model does not fit into GitHub runners due to its size. It is built and pushed to GHCR manually.
+
+```shell
+docker buildx build . -t ghcr.io/sozercan/mixtral:8x7b \
+  -t ghcr.io/sozercan/mixtral:8x7b-instruct \
+  -f models/mixtral-7x8b-instruct.yaml \
+  --push --progress=plain --provenance=true --sbom=true
+```
+
+```shell
+docker buildx build . -t ghcr.io/sozercan/mixtral:8x7b-cuda -t ghcr.io/sozercan/mixtral:8x7b-instruct-cuda \
+  -f models/mixtral-7x8b-instruct-cuda.yaml \
+  --push --progress=plain --provenance=true --sbom=true
+```
+:::
