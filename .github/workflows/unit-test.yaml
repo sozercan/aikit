@@ -39,6 +39,15 @@ jobs:
           go-version: "1.22"
           check-latest: true
 
+      - name: validate spec gen
+        run: |
+          go generate ./... || exit $?
+          git diff --exit-code
+          if [ $? -ne 0 ]; then
+            echo "::error::Missing updates to generated files. Please run 'go generate' and commit the changes"
+            exit 1
+          fi
+
       - name: go mod tidy
         run: |
           go mod tidy

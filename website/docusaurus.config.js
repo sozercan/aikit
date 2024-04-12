@@ -9,7 +9,7 @@ import {themes as prismThemes} from 'prism-react-renderer';
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'AIKit',
-  tagline: 'Dinosaurs are cool',
+  tagline: 'Fine-tune, build, and deploy open-source LLMs easily!',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here

@@ -1,3 +1,4 @@
+//go:generate go run ../../../cmd/gen-jsonschema ../../../schema/inferencespec.schema.json
 package config
 
 type InferenceConfig struct {

@@ -1,3 +1,4 @@
+//go:generate go run ../../../cmd/gen-jsonschema ../../../schema/finetunespec.schema.json
 package config
 
 type FineTuneConfig struct {

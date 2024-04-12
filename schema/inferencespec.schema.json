@@ -1,0 +1,88 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://github.com/sozercan/aikit/pkg/aikit/config/inference-config",
+	"$ref": "#/$defs/InferenceConfig",
+	"$defs": {
+		"InferenceConfig": {
+			"properties": {
+				"APIVersion": {
+					"type": "string"
+				},
+				"Debug": {
+					"type": "boolean"
+				},
+				"Runtime": {
+					"type": "string"
+				},
+				"Backends": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"Models": {
+					"items": {
+						"$ref": "#/$defs/Model"
+					},
+					"type": "array"
+				},
+				"Config": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"APIVersion",
+				"Debug",
+				"Runtime",
+				"Backends",
+				"Models",
+				"Config"
+			]
+		},
+		"Model": {
+			"properties": {
+				"Name": {
+					"type": "string"
+				},
+				"Source": {
+					"type": "string"
+				},
+				"SHA256": {
+					"type": "string"
+				},
+				"PromptTemplates": {
+					"items": {
+						"$ref": "#/$defs/PromptTemplate"
+					},
+					"type": "array"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"Name",
+				"Source",
+				"SHA256",
+				"PromptTemplates"
+			]
+		},
+		"PromptTemplate": {
+			"properties": {
+				"Name": {
+					"type": "string"
+				},
+				"Template": {
+					"type": "string"
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"required": [
+				"Name",
+				"Template"
+			]
+		}
+	}
+}
