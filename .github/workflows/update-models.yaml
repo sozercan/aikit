@@ -122,9 +122,11 @@ jobs:
           echo "DIGEST=$(cosign triangulate ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} --type digest)" >> $GITHUB_ENV
 
       - name: Sign the images with GitHub OIDC Token
+        if: ${{ !inputs.staging }}
         run: cosign sign --yes ${DIGEST}
 
       - name: Verify image signature
+        if: ${{ !inputs.staging }}
         run: |
           cosign verify ${DIGEST} \
             --certificate-oidc-issuer https://token.actions.githubusercontent.com \
