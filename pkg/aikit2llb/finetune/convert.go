@@ -7,13 +7,12 @@ import (
 	"github.com/moby/buildkit/util/system"
 	"github.com/sozercan/aikit/pkg/aikit/config"
 	"github.com/sozercan/aikit/pkg/utils"
-	"github.com/sozercan/aikit/pkg/version"
 	"gopkg.in/yaml.v2"
 )
 
 const (
-	// https://github.com/unslothai/unsloth/releases/tag/February-2024
-	unslothCommitSHA = "dbba69b085b9d6049b57b48b882af7e9f29df5b2"
+	// https://github.com/unslothai/unsloth/releases/tag/April-Llama-3-2024
+	unslothCommitSHA = "88eee5026716a81e8f42a20fa83cae24eb35e45e"
 	nvidiaMknod      = "mknod --mode 666 /dev/nvidiactl c 195 255 && mknod --mode 666 /dev/nvidia-uvm c 235 0 && mknod --mode 666 /dev/nvidia-uvm-tools c 235 1 && mknod --mode 666 /dev/nvidia0 c 195 0 && nvidia-smi"
 	sourceVenv       = ". .venv/bin/activate"
 )
@@ -49,7 +48,8 @@ func Aikit2LLB(c *config.FineTuneConfig) llb.State {
 		// uv does not support installing xformers via unsloth pyproject
 		state = state.Run(utils.Shf("pip install --upgrade pip uv && uv venv --system-site-packages && %[1]s && uv pip install packaging torch==2.1.0 ipython ninja packaging bitsandbytes setuptools wheel psutil && uv pip install flash-attn --no-build-isolation && python -m pip install 'unsloth[cu121_ampere] @ git+https://github.com/unslothai/unsloth.git@%[2]s'", sourceVenv, unslothCommitSHA)).Root()
 
-		version := version.Version
+		// version := version.Version
+		version := "llama3" // TODO: remove this
 		unslothScriptURL := fmt.Sprintf("https://raw.githubusercontent.com/sozercan/aikit/%s/pkg/finetune/target_unsloth.py", version)
 		var opts []llb.HTTPOption
 		opts = append(opts, llb.Chmod(0o755))
