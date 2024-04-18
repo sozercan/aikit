@@ -1,20 +1,20 @@
-#syntax=aikit:test
+#syntax=ghcr.io/sozercan/aikit:latest
 apiVersion: v1alpha1
 debug: true
 runtime: cuda
 models:
-  - name: llama-2-7b-chat
-    source: https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q4_K_M.gguf
-    sha256: "08a5566d61d7cb6b420c3e4387a39e0078e1f2fe5f055f3a03887385304d4bfa"
+  - name: llama-3-8b-instruct
+    source: https://huggingface.co/NousResearch/Meta-Llama-3-8B-Instruct-GGUF/resolve/main/Meta-Llama-3-8B-Instruct-Q4_K_M.gguf
+    sha256: "170c177e91ca68a07c730ad49dce9f63e96a4e6ead86c11ad6cfbc6066af6242"
 config: |
-  - name: llama-2-7b-chat
+  - name: llama-3-8b-instruct
     backend: llama
     parameters:
       top_k: 80
       temperature: 0.2
       top_p: 0.7
-      model: llama-2-7b-chat.Q4_K_M.gguf
-    context_size: 4096
+      model: Meta-Llama-3-8B-Instruct-Q4_K_M.gguf
+    context_size: 8192
     gpu_layers: 35
     f16: true
     batch: 512
