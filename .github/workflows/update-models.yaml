@@ -20,14 +20,17 @@ jobs:
       fail-fast: false
       matrix:
         model:
-         - llama-2-7b-chat
-         - llama-2-7b-chat-cuda
-         - llama-2-13b-chat
-         - llama-2-13b-chat-cuda
-         - orca-2-13b
-         - orca-2-13b-cuda
-         - phi-2-2.7b
-         - phi-2-2.7b-cuda
+        # TODO: remove this before merge
+        #  - llama-2-7b-chat
+        #  - llama-2-7b-chat-cuda
+        #  - llama-2-13b-chat
+        #  - llama-2-13b-chat-cuda
+        #  - orca-2-13b
+        #  - orca-2-13b-cuda
+        #  - phi-2-2.7b
+        #  - phi-2-2.7b-cuda
+         - llama-3-8b-instruct
+         - llama-3-8b-instruct-cuda
         # due to github runner disk space limitations, these do not fit in to runners
         #  - mixtral-7x8b-instruct
         #  - mixtral-7x8b-instruct-cuda
