@@ -9,13 +9,11 @@ models:
       - name: instruct
         template: |
           <|start_header_id|>{{if eq .RoleName \"assistant\"}}assistant{{else if eq .RoleName \"system\"}}system{{else if eq .RoleName \"user\"}}user{{end}}<|end_header_id|>{{if .Content}}{{.Content}}{{end}}<|eot_id|>
+
 config: |
   - name: llama-3-8b-instruct
     backend: llama
     parameters:
-      top_k: 80
-      temperature: 0.2
-      top_p: 0.7
       model: Meta-Llama-3-8B-Instruct-Q4_K_M.gguf
     context_size: 8192
     template:
@@ -25,3 +23,4 @@ config: |
     - <|end_header_id|>
     - <|eot_id|>
     - <|reserved_special_token
+    system_prompt: \"Respond to the user in a friendly and helpful tone. Generate human-like text based on the input, and use markdown when appropriate. If the user asks for something outside of your capabilities, politely tell the user what you can and can't do. Keep the response concise and relevant to the user's request.\"

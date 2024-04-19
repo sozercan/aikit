@@ -19,7 +19,7 @@ config: |
       top_p: 0.7
       model: Meta-Llama-3-8B-Instruct-Q4_K_M.gguf
     context_size: 8192
-    gpu_layers: 35
+    gpu_layers: 33
     f16: true
     batch: 512
     mmap: true
