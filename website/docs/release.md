@@ -17,11 +17,10 @@ git push origin v0.1.0
 
 :::note
 
-At this time, Mixtral 8x7b model does not fit into GitHub runners due to its size. It is built and pushed to GHCR manually.
+At this time, Mixtral 8x7b and Llama 3 70b models does not fit into GitHub runners due to their size. It is built and pushed to GHCR manually.
 
 ```shell
-docker buildx build . -t ghcr.io/sozercan/mixtral:8x7b \
-  -t ghcr.io/sozercan/mixtral:8x7b-instruct \
+docker buildx build . -t ghcr.io/sozercan/mixtral:8x7b -t ghcr.io/sozercan/mixtral:8x7b-instruct \
   -f models/mixtral-7x8b-instruct.yaml \
   --push --progress=plain --provenance=true --sbom=true
 ```
@@ -29,6 +28,18 @@ docker buildx build . -t ghcr.io/sozercan/mixtral:8x7b \
 ```shell
 docker buildx build . -t ghcr.io/sozercan/mixtral:8x7b-cuda -t ghcr.io/sozercan/mixtral:8x7b-instruct-cuda \
   -f models/mixtral-7x8b-instruct-cuda.yaml \
+  --push --progress=plain --provenance=true --sbom=true
+```
+
+```shell
+docker buildx build . -t ghcr.io/sozercan/llama3:70b -t ghcr.io/sozercan/llama3:70b-instruct \
+  -f models/llama-3-70b-instruct.yaml \
+  --push --progress=plain --provenance=true --sbom=true
+```
+
+```shell
+docker buildx build . -t ghcr.io/sozercan/llama3:70b-cuda -t ghcr.io/sozercan/llama3:70b-instruct-cuda \
+  -f models/llama-3-70b-instruct-cuda.yaml \
   --push --progress=plain --provenance=true --sbom=true
 ```
 :::
