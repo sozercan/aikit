@@ -50,6 +50,9 @@ func Aikit2LLB(c *config.FineTuneConfig) llb.State {
 		state = state.Run(utils.Shf("pip install --upgrade pip uv && uv venv --system-site-packages && %[1]s && uv pip install packaging torch==2.1.0 ipython ninja packaging bitsandbytes setuptools wheel psutil && uv pip install flash-attn --no-build-isolation && python -m pip install 'unsloth[cu121_ampere] @ git+https://github.com/unslothai/unsloth.git@%[2]s'", sourceVenv, unslothCommitSHA)).Root()
 
 		version := version.Version
+		if version == "" {
+			version = "main"
+		}
 		unslothScriptURL := fmt.Sprintf("https://raw.githubusercontent.com/sozercan/aikit/%s/pkg/finetune/target_unsloth.py", version)
 		var opts []llb.HTTPOption
 		opts = append(opts, llb.Chmod(0o755))

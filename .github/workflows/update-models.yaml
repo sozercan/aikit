@@ -24,6 +24,8 @@ jobs:
          - llama-2-7b-chat-cuda
          - llama-2-13b-chat
          - llama-2-13b-chat-cuda
+         - llama-3-8b-instruct
+         - llama-3-8b-instruct-cuda
          - orca-2-13b
          - orca-2-13b-cuda
          - phi-2-2.7b
@@ -119,9 +121,11 @@ jobs:
           echo "DIGEST=$(cosign triangulate ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} --type digest)" >> $GITHUB_ENV
 
       - name: Sign the images with GitHub OIDC Token
+        if: ${{ !inputs.staging }}
         run: cosign sign --yes ${DIGEST}
 
       - name: Verify image signature
+        if: ${{ !inputs.staging }}
         run: |
           cosign verify ${DIGEST} \
             --certificate-oidc-issuer https://token.actions.githubusercontent.com \
