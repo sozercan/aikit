@@ -9,6 +9,7 @@ AIKit comes with pre-made models that you can use out-of-the-box!
 | Model     | Optimization | Parameters | Command                                                         | License                                                                             |
 | --------- | ------------ | ---------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
 | 🦙 Llama 3 | Instruct     | 8B         | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama3:8b`    | [Llama](https://ai.meta.com/llama/license/)                                         |
+| 🦙 Llama 3 | Instruct     | 70B        | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama3:70b`   | [Llama](https://ai.meta.com/llama/license/)                                         |
 | 🦙 Llama 2 | Chat         | 7B         | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama2:7b`    | [Llama](https://ai.meta.com/llama/license/)                                         |
 | 🦙 Llama 2 | Chat         | 13B        | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama2:13b`   | [Llama](https://ai.meta.com/llama/license/)                                         |
 | 🐬 Orca 2  |              | 13B        | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/orca2:13b`    | [Microsoft Research](https://huggingface.co/microsoft/Orca-2-13b/blob/main/LICENSE) |
@@ -20,6 +21,7 @@ AIKit comes with pre-made models that you can use out-of-the-box!
 | Model     | Optimization | Parameters | Command                                                                         | License                                                                             |
 | --------- | ------------ | ---------- | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
 | 🦙 Llama 3 | Instruct     | 8B         | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama3:8b-cuda`    | [Llama](https://ai.meta.com/llama/license/)                                         |
+| 🦙 Llama 3 | Instruct     | 70B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama3:70b-cuda`   | [Llama](https://ai.meta.com/llama/license/)                                         |
 | 🦙 Llama 2 | Chat         | 7B         | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama2:7b-cuda`    | [Llama](https://ai.meta.com/llama/license/)                                         |
 | 🦙 Llama 2 | Chat         | 13B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama2:13b-cuda`   | [Llama](https://ai.meta.com/llama/license/)                                         |
 | 🐬 Orca 2  |              | 13B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/orca2:13b-cuda`    | [Microsoft Research](https://huggingface.co/microsoft/Orca-2-13b/blob/main/LICENSE) |
