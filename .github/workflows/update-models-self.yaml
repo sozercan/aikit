@@ -22,8 +22,8 @@ jobs:
         model:
          - llama-3-70b-instruct
          - llama-3-70b-instruct-cuda
-         - mixtral-7x8b-instruct
-         - mixtral-7x8b-instruct-cuda
+        #  - mixtral-7x8b-instruct
+        #  - mixtral-7x8b-instruct-cuda
     runs-on: self-hosted
     timeout-minutes: 360
     steps:
