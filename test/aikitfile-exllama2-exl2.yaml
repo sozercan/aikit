@@ -5,16 +5,28 @@ runtime: cuda
 backends:
   - exllama2
 models:
-  - name: Llama2-7B-chat-exl2/output.safetensors
-    source: https://huggingface.co/turboderp/Llama2-7B-chat-exl2/resolve/2.5bpw/output.safetensors
-  - name: Llama2-7B-chat-exl2/tokenizer.model
-    source: https://huggingface.co/turboderp/Llama2-7B-chat-exl2/resolve/2.5bpw/tokenizer.model
-  - name: Llama2-7B-chat-exl2/config.json
-    source: https://huggingface.co/turboderp/Llama2-7B-chat-exl2/raw/2.5bpw/config.json
+  - name: Llama-3-8B-Instruct-exl2/tokenizer.model
+    source: https://huggingface.co/turboderp/Llama-3-8B-Instruct-exl2/resolve/6.0bpw/tokenizer.model
+  - name: Llama-3-8B-Instruct-exl2/config.json
+    source: https://huggingface.co/turboderp/Llama-3-8B-Instruct-exl2/raw/6.0bpw/config.json
+  - name: Llama-3-8B-Instruct-exl2/output.safetensors
+    source: https://huggingface.co/turboderp/Llama-3-8B-Instruct-exl2/resolve/6.0bpw/output.safetensors
+    promptTemplates:
+      - name: instruct
+        template: |
+          <|start_header_id|>{{if eq .RoleName \"assistant\"}}assistant{{else if eq .RoleName \"system\"}}system{{else if eq .RoleName \"user\"}}user{{end}}<|end_header_id|>{{if .Content}}{{.Content}}{{end}}<|eot_id|>
 config: |
-  - name: llama-2-7b-chat
+  - name: llama-3-8b-instruct
     backend: exllama2
     context_size: 4096
     parameters:
-      model: "Llama2-7B-chat-exl2"
-      temperature: 0.2
+      model: "Llama-3-8B-Instruct-exl2"
+    context_size: 8192
+    template:
+      chat_message: \"instruct\"
+    stopwords:
+    - <|start_header_id|>
+    - <|end_header_id|>
+    - <|eot_id|>
+    - <|reserved_special_token
+    system_prompt: \"Respond to the user in a friendly and helpful tone. Generate human-like text based on the input, and use markdown when appropriate. If the user asks for something outside of your capabilities, politely tell the user what you can and can't do. Keep the response concise and relevant to the user's request.\"

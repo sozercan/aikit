@@ -15,12 +15,4 @@ config: |
     backend: llama
     parameters:
       model: Meta-Llama-3-8B-Instruct.Q4_K_M.gguf
-    context_size: 8192
-    template:
-      chat_message: \"instruct\"
-    stopwords:
-    - <|start_header_id|>
-    - <|end_header_id|>
-    - <|eot_id|>
-    - <|reserved_special_token
-    system_prompt: \"Respond to the user in a friendly and helpful tone. Generate human-like text based on the input, and use markdown when appropriate. If the user asks for something outside of your capabilities, politely tell the user what you can and can't do. Keep the response concise and relevant to the user's request.\"
+D
