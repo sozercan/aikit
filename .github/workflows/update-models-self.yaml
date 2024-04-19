@@ -1,4 +1,4 @@
-name: update-models
+name: update-models-self
 
 on:
   workflow_dispatch:
@@ -15,7 +15,7 @@ permissions:
   id-token: write
 
 jobs:
- update-models:
+ update-models-self:
     strategy:
       fail-fast: false
       matrix:
@@ -93,4 +93,4 @@ jobs:
         run: |
           cosign verify ${DIGEST} \
             --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-            --certificate-identity https://github.com/sozercan/aikit/.github/workflows/update-models.yaml@refs/heads/main
+            --certificate-identity-regexp 'https://github\.com/sozercan/aikit/\.github/workflows/.+'
