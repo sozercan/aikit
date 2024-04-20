@@ -6,9 +6,9 @@ backends:
   - exllama2
 models:
   - name: Llama-3-8B-Instruct-exl2/tokenizer.model
-    source: https://huggingface.co/turboderp/Llama-3-8B-Instruct-exl2/resolve/6.0bpw/tokenizer.model
+    source: https://huggingface.co/turboderp/Llama-3-8B-Instruct-exl2/resolve/6.0bpw/tokenizer.json
   - name: Llama-3-8B-Instruct-exl2/config.json
-    source: https://huggingface.co/turboderp/Llama-3-8B-Instruct-exl2/raw/6.0bpw/config.json
+    source: https://huggingface.co/turboderp/Llama-3-8B-Instruct-exl2/raw/6.0bpw/tokenizer_config.json
   - name: Llama-3-8B-Instruct-exl2/output.safetensors
     source: https://huggingface.co/turboderp/Llama-3-8B-Instruct-exl2/resolve/6.0bpw/output.safetensors
     promptTemplates:
@@ -18,7 +18,6 @@ models:
 config: |
   - name: llama-3-8b-instruct
     backend: exllama2
-    context_size: 4096
     parameters:
       model: "Llama-3-8B-Instruct-exl2"
     context_size: 8192
