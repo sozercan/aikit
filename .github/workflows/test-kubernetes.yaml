@@ -50,7 +50,7 @@ jobs:
             registry-1.docker.io:443
             storage.googleapis.com:443
 
-      - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+      - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4.1.3
 
       # need containerd image store for testing local images
       - uses: crazy-max/ghaction-setup-docker@c2351bbd0bfab8cd65e684219ad8ea46a6d093f3 # v3.1.0
@@ -118,7 +118,7 @@ jobs:
 
       - name: publish logs
         if: always()
-        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+        uses: actions/upload-artifact@1746f4ab65b179e0ea60a494b83293b640dd5bba # v4.3.2
         with:
           name: kind-logs
           path: ${KIND_LOGS_PATH}
