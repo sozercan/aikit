@@ -6,11 +6,17 @@ models:
     source: https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi-3-mini-4k-instruct-q4.gguf
     sha256: 4fed7364ee3e0c7cb4fe0880148bfdfcd1b630981efa0802a6b62ee52e7da97e
     promptTemplates:
-      - name: instruct
+      - name: chatMsg
         template: |
-          <|user|>
-          {{ .Content }}<|end|>
+          <|{{ .RoleName }}|>
+          {{.Content}}<|end|>
+      - name: chat
+        template: |
+          {{.Input}}
           <|assistant|>
+      - name: completion
+        template: |
+          {{.Input}}
 config: |
   - name: phi-3-3.8b
     backend: llama
@@ -19,7 +25,9 @@ config: |
       n_keep: 4
     context_size: 4096
     template:
-      chat: instruct
+      chat_message: chatMsg
+      chat: chat
+      completion: completion
     stopwords:
     - <|user|>
     - <|assistant|>
