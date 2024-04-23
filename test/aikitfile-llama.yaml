@@ -3,34 +3,24 @@ apiVersion: v1alpha1
 debug: true
 runtime: avx2
 models:
-  - name: phi-3-3.8b
-    source: https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi-3-mini-4k-instruct-q4.gguf
-    sha256: 4fed7364ee3e0c7cb4fe0880148bfdfcd1b630981efa0802a6b62ee52e7da97e
+  - name: llama-3-8b-instruct
+    source: https://huggingface.co/QuantFactory/Meta-Llama-3-8B-Instruct-GGUF/resolve/main/Meta-Llama-3-8B-Instruct.Q4_K_M.gguf
+    sha256: "647a2b64cbcdbe670432d0502ebb2592b36dd364d51a9ef7a1387b7a4365781f"
     promptTemplates:
-      - name: chatMsg
+      - name: instruct
         template: |
-          <|{{ .RoleName }}|>
-          {{.Content}}<|end|>
-      - name: chat
-        template: |
-          {{.Input}}
-          <|assistant|>
-      - name: completion
-        template: |
-          {{.Input}}
+          <|start_header_id|>{{if eq .RoleName \"assistant\"}}assistant{{else if eq .RoleName \"system\"}}system{{else if eq .RoleName \"user\"}}user{{end}}<|end_header_id|>{{if .Content}}{{.Content}}{{end}}<|eot_id|>
 config: |
-  - name: phi-3-3.8b
+  - name: llama-3-8b-instruct
     backend: llama
     parameters:
-      model: Phi-3-mini-4k-instruct-q4.gguf
-      n_keep: 4
-    context_size: 4096
+      model: Meta-Llama-3-8B-Instruct.Q4_K_M.gguf
+    context_size: 8192
     template:
-      chat_message: chatMsg
-      chat: chat
-      completion: completion
+      chat_message: \"instruct\"
     stopwords:
-    - <|user|>
-    - <|assistant|>
-    - <|end|>
-    - <|endoftext|>
+    - <|start_header_id|>
+    - <|end_header_id|>
+    - <|eot_id|>
+    - <|reserved_special_token
+    system_prompt: \"Respond to the user in a friendly and helpful tone. Generate human-like text based on the input, and use markdown when appropriate. If the user asks for something outside of your capabilities, politely tell the user what you can and can't do. Keep the response concise and relevant to the user's request.\"
