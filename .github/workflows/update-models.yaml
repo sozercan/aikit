@@ -26,10 +26,8 @@ jobs:
          - llama-2-13b-chat-cuda
          - llama-3-8b-instruct
          - llama-3-8b-instruct-cuda
-         - orca-2-13b
-         - orca-2-13b-cuda
-         - phi-2-2.7b
-         - phi-2-2.7b-cuda
+         - phi-3-3.8b
+         - phi-3-3.8b-cuda
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
