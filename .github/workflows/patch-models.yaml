@@ -22,15 +22,14 @@ jobs:
               - ghcr.io/sozercan/llama2:7b-cuda
               - ghcr.io/sozercan/llama2:13b
               - ghcr.io/sozercan/llama2:13b-cuda
-              - ghcr.io/sozercan/orca2:13b
-              - ghcr.io/sozercan/orca2:13b-cuda
-              - ghcr.io/sozercan/mixtral:8x7b
-              - ghcr.io/sozercan/mixtral:8x7b-cuda
-              - ghcr.io/sozercan/phi2:2.7b
-              - ghcr.io/sozercan/phi2:2.7b-cuda
               - ghcr.io/sozercan/llama3:8b
               - ghcr.io/sozercan/llama3:8b-cuda
-
+              - ghcr.io/sozercan/llama3:70b
+              - ghcr.io/sozercan/llama3:70b-cuda
+              - ghcr.io/sozercan/mixtral:8x7b
+              - ghcr.io/sozercan/mixtral:8x7b-cuda
+              - ghcr.io/sozercan/phi3:3.8b
+              - ghcr.io/sozercan/phi3:3.8b-cuda
         steps:
         - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
           with:
