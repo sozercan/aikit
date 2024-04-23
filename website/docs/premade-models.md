@@ -36,3 +36,23 @@ CPU models requires minimum of [AVX instruction set](https://en.wikipedia.org/wi
 
 CUDA models includes CUDA v12. They are used with [NVIDIA GPU acceleration](#gpu-acceleration-support).
 :::
+
+## Deprecated Models
+
+The following pre-made models are deprecated and no longer updated. Images will continue to be pullable, if needed.
+
+If you need to use these specific models, you can always [create your own images](./create-images.md), and host in a container registry of your choice!
+
+### CPU
+
+| Model    | Optimization | Parameters | Command                                                      | License                                                                             |
+| -------- | ------------ | ---------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| 🐬 Orca 2 |              | 13B        | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/orca2:13b` | [Microsoft Research](https://huggingface.co/microsoft/Orca-2-13b/blob/main/LICENSE) |
+| 🅿️ Phi 2  | Instruct     | 2.7B       | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/phi2:2.7b` | [MIT](https://huggingface.co/microsoft/phi-2/resolve/main/LICENSE)                  |
+
+### NVIDIA CUDA
+
+| Model    | Optimization | Parameters | Command                                                                      | License                                                                             |
+| -------- | ------------ | ---------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| 🐬 Orca 2 |              | 13B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/orca2:13b-cuda` | [Microsoft Research](https://huggingface.co/microsoft/Orca-2-13b/blob/main/LICENSE) |
+| 🅿️ Phi 2  | Instruct     | 2.7B       | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/phi2:2.7b-cuda` | [MIT](https://huggingface.co/microsoft/phi-2/resolve/main/LICENSE)                  |
