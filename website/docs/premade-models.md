@@ -24,7 +24,6 @@ AIKit comes with pre-made models that you can use out-of-the-box!
 | 🦙 Llama 2 | Chat         | 7B         | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama2:7b-cuda`    | [Llama](https://ai.meta.com/llama/license/)                                         |
 | 🦙 Llama 2 | Chat         | 13B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama2:13b-cuda`   | [Llama](https://ai.meta.com/llama/license/)                                         |
 | Ⓜ️ Mixtral | Instruct     | 8x7B       | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/mixtral:8x7b-cuda` | [Apache](https://choosealicense.com/licenses/apache-2.0/)                           |
-|           |
 | 🅿️ Phi 3   | Instruct     | 3.8B       | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/phi3:3.8b-cuda`               | [MIT](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct/resolve/main/LICENSE) |
 
 :::note
