@@ -55,27 +55,29 @@ That's it! 🎉 API is OpenAI compatible so this is a drop-in replacement for an
 
 AIKit comes with pre-made models that you can use out-of-the-box!
 
+If it doesn't include a specific model, you can always [create your own images](https://sozercan.github.io/aikit/premade-models/), and host in a container registry of your choice!
+
 ### CPU
 
-| Model     | Optimization | Parameters | Command                                                         | License                                                                             |
-| --------- | ------------ | ---------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| 🦙 Llama 3 | Instruct     | 8B         | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama3:8b`    | [Llama](https://ai.meta.com/llama/license/)                                         |
-| 🦙 Llama 3 | Instruct     | 70B        | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama3:70b`   | [Llama](https://ai.meta.com/llama/license/)                                         |
-| 🦙 Llama 2 | Chat         | 7B         | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama2:7b`    | [Llama](https://ai.meta.com/llama/license/)                                         |
-| 🦙 Llama 2 | Chat         | 13B        | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama2:13b`   | [Llama](https://ai.meta.com/llama/license/)                                         |
-| Ⓜ️ Mixtral | Instruct     | 8x7B       | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/mixtral:8x7b` | [Apache](https://choosealicense.com/licenses/apache-2.0/)                           |
-| 🅿️ Phi 3   | Instruct     | 3.8B       | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/phi3:3.8b`    | [MIT](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct/resolve/main/LICENSE) |
+| Model     | Optimization | Parameters | Command                                                         | Model Name              | License                                                                             |
+| --------- | ------------ | ---------- | --------------------------------------------------------------- | ----------------------- | ----------------------------------------------------------------------------------- |
+| 🦙 Llama 3 | Instruct     | 8B         | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama3:8b`    | `llama-3-8b-instruct`   | [Llama](https://ai.meta.com/llama/license/)                                         |
+| 🦙 Llama 3 | Instruct     | 70B        | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama3:70b`   | `llama-3-70b-instruct`  | [Llama](https://ai.meta.com/llama/license/)                                         |
+| 🦙 Llama 2 | Chat         | 7B         | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama2:7b`    | `llama-2-7b-chat`       | [Llama](https://ai.meta.com/llama/license/)                                         |
+| 🦙 Llama 2 | Chat         | 13B        | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama2:13b`   | `llama-2-13b-chat`      | [Llama](https://ai.meta.com/llama/license/)                                         |
+| Ⓜ️ Mixtral | Instruct     | 8x7B       | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/mixtral:8x7b` | `mixtral-8x7b-instruct` | [Apache](https://choosealicense.com/licenses/apache-2.0/)                           |
+| 🅿️ Phi 3   | Instruct     | 3.8B       | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/phi3:3.8b`    | `phi-3-3.8b`            | [MIT](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct/resolve/main/LICENSE) |
 
 ### NVIDIA CUDA
 
-| Model     | Optimization | Parameters | Command                                                                         | License                                                                             |
-| --------- | ------------ | ---------- | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| 🦙 Llama 3 | Instruct     | 8B         | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama3:8b-cuda`    | [Llama](https://ai.meta.com/llama/license/)                                         |
-| 🦙 Llama 3 | Instruct     | 70B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama3:70b-cuda`   | [Llama](https://ai.meta.com/llama/license/)                                         |
-| 🦙 Llama 2 | Chat         | 7B         | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama2:7b-cuda`    | [Llama](https://ai.meta.com/llama/license/)                                         |
-| 🦙 Llama 2 | Chat         | 13B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama2:13b-cuda`   | [Llama](https://ai.meta.com/llama/license/)                                         |
-| Ⓜ️ Mixtral | Instruct     | 8x7B       | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/mixtral:8x7b-cuda` | [Apache](https://choosealicense.com/licenses/apache-2.0/)                           |
-| 🅿️ Phi 3   | Instruct     | 3.8B       | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/phi3:3.8b-cuda`               | [MIT](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct/resolve/main/LICENSE) |
+| Model     | Optimization | Parameters | Command                                                                         | Model Name              | License                                                                             |
+| --------- | ------------ | ---------- | ------------------------------------------------------------------------------- | ----------------------- | ----------------------------------------------------------------------------------- |
+| 🦙 Llama 3 | Instruct     | 8B         | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama3:8b-cuda`    | `llama-3-8b-instruct`   | [Llama](https://ai.meta.com/llama/license/)                                         |
+| 🦙 Llama 3 | Instruct     | 70B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama3:70b-cuda`   | `llama-3-70b-instruct`  | [Llama](https://ai.meta.com/llama/license/)                                         |
+| 🦙 Llama 2 | Chat         | 7B         | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama2:7b-cuda`    | `llama-2-7b-chat`       | [Llama](https://ai.meta.com/llama/license/)                                         |
+| 🦙 Llama 2 | Chat         | 13B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama2:13b-cuda`   | `llama-2-13b-chat`      | [Llama](https://ai.meta.com/llama/license/)                                         |
+| Ⓜ️ Mixtral | Instruct     | 8x7B       | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/mixtral:8x7b-cuda` | `mixtral-8x7b-instruct` | [Apache](https://choosealicense.com/licenses/apache-2.0/)                           |
+| 🅿️ Phi 3   | Instruct     | 3.8B       | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/phi3:3.8b-cuda`    | `phi-3-3.8b`            | [MIT](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct/resolve/main/LICENSE) |
 
 ## What's next?
 
