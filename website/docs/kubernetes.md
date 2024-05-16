@@ -2,13 +2,15 @@
 title: Kubernetes Deployment
 ---
 
-It is easy to get started to deploy your models to Kubernetes!
+It is easy to get started to deploy your models to Kubernetes! You can deploy your models [manually](#manual-deployment) or use the provided [Helm chart](#helm-chart).
 
 Make sure you have a Kubernetes cluster running and `kubectl` is configured to talk to it, and your model images are accessible from the cluster.
 
 :::tip
 You can use [kind](https://kind.sigs.k8s.io/) to create a local Kubernetes cluster for testing purposes.
 :::
+
+## Manual Deployment
 
 ```bash
 # create a deployment
