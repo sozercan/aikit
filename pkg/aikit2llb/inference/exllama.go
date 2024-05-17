@@ -21,7 +21,7 @@ func installExllama(c *config.InferenceConfig, s llb.State, merge llb.State) llb
 	s = cloneLocalAI(s, backend)
 
 	// clone exllama to localai exllama backend path and install python dependencies
-	s = s.Run(utils.Shf("cd /tmp/localai/backend/python/%[1]s && rm -rf .git && . $HOME/.cargo/env && python3 -m grpc_tools.protoc -I../.. --python_out=. --grpc_python_out=. backend.proto && export BUILD_TYPE=cublas && bash -c ./install.sh", backend)).Root()
+	s = s.Run(utils.Shf("cd /tmp/localai/backend/python/%[1]s && rm -rf .git && . $HOME/.cargo/env && python3 -m grpc_tools.protoc -I../.. --python_out=. --grpc_python_out=. backend.proto && export BUILD_TYPE=cublas && ./install.sh", backend)).Root()
 
 	diff := llb.Diff(savedState, s)
 	return llb.Merge([]llb.State{merge, diff})
