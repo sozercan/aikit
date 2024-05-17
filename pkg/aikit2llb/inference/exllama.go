@@ -8,9 +8,13 @@ import (
 
 func installExllama(c *config.InferenceConfig, s llb.State, merge llb.State) llb.State {
 	backend := utils.BackendExllama
+	exllamaRepo := "https://github.com/turboderp/exllama"
+	exllamaTag := "master"
 	for b := range c.Backends {
 		if c.Backends[b] == utils.BackendExllamaV2 {
+			exllamaRepo = "https://github.com/turboderp/exllamav2"
 			backend = utils.BackendExllamaV2
+			exllamaTag = "v0.0.12"
 		}
 	}
 
@@ -21,7 +25,10 @@ func installExllama(c *config.InferenceConfig, s llb.State, merge llb.State) llb
 	s = cloneLocalAI(s, backend)
 
 	// clone exllama to localai exllama backend path and install python dependencies
-	s = s.Run(utils.Bashf("cd /tmp/localai/backend/python/%[1]s && source $HOME/.cargo/env && python3 -m grpc_tools.protoc -I../.. --python_out=. --grpc_python_out=. backend.proto && BUILD_TYPE=cublas bash -x ./install.sh", backend)).Root()
+	s = s.Run(utils.Shf("git clone --depth 1 %[1]s --branch %[2]s /tmp/%[3]s && mv /tmp/%[3]s/* /tmp/localai/backend/python/%[3]s && rm -rf /tmp/%[3]s && cd /tmp/localai/backend/python/%[3]s && rm -rf .git && source $HOME/.cargo/env && python3 -m grpc_tools.protoc -I../.. --python_out=. --grpc_python_out=. backend.proto && uv venv && source .venv/bin/activate && uv pip install --no-build-isolation --requirement requirements-install.txt && EXLLAMA_NOCOMPILE= uv pip install --no-build-isolation", exllamaRepo, exllamaTag, backend)).Root()
+
+	// clone exllama to localai exllama backend path and install python dependencies
+	s = s.Run(utils.Bashf("cd /tmp/localai/backend/python/%[1]s && source $HOME/.cargo/env && python3 -m grpc_tools.protoc -I../.. --python_out=. --grpc_python_out=. backend.proto && uv pip install --no-build-isolation --requirement requirements-install.txt && ", backend)).Root()
 
 	diff := llb.Diff(savedState, s)
 	return llb.Merge([]llb.State{merge, diff})
