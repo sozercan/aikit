@@ -18,6 +18,7 @@ const (
 
 	localAIRepo    = "https://github.com/mudler/LocalAI"
 	localAIVersion = "v2.15.0"
+	localAICommit = "e2de8a88f70d18291eb34ceb035be79dc73d3be6"
 	cudaVersion    = "12-3"
 )
 
@@ -189,5 +190,5 @@ func addLocalAI(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.St
 }
 
 func cloneLocalAI(s llb.State, backend string) llb.State {
-	return s.Run(utils.Shf("git clone --filter=blob:none --no-checkout %[1]s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python/%[2]s && git checkout %[3]s && rm -rf .git", localAIRepo, backend, localAIVersion)).Root()
+	return s.Run(utils.Shf("git clone --filter=blob:none --no-checkout %[1]s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python/%[2]s && git checkout %[3]s && rm -rf .git", localAIRepo, backend, localAICommit)).Root()
 }
