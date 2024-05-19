@@ -18,22 +18,23 @@ const (
 
 	localAIRepo    = "https://github.com/mudler/LocalAI"
 	localAIVersion = "v2.15.0"
+	// temporary commit until v2.16.0, used for python backends
 	localAICommit = "e2de8a88f70d18291eb34ceb035be79dc73d3be6"
-	cudaVersion    = "12-3"
+	cudaVersion   = "12-3"
 )
 
 func Aikit2LLB(c *config.InferenceConfig) (llb.State, *specs.Image) {
 	var merge llb.State
 	state := llb.Image(utils.DebianSlim)
-	// base := getBaseImage(c)
+	base := getBaseImage(c)
 
-	// state, merge = copyModels(c, base, state)
+	state, merge = copyModels(c, base, state)
 	state, merge = addLocalAI(c, state, merge)
 
-	// // install cuda if runtime is nvidia
-	// if c.Runtime == utils.RuntimeNVIDIA {
-	// 	state, merge = installCuda(c, state, merge)
-	// }
+	// install cuda if runtime is nvidia
+	if c.Runtime == utils.RuntimeNVIDIA {
+		state, merge = installCuda(c, state, merge)
+	}
 
 	// install opencv and friends if stable diffusion backend is being used
 	for b := range c.Backends {
