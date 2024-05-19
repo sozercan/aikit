@@ -17,7 +17,7 @@ const (
 	distrolessBase = "gcr.io/distroless/cc-debian12:latest"
 
 	localAIRepo    = "https://github.com/mudler/LocalAI"
-	localAIVersion = "v2.14.0"
+	localAIVersion = "v2.15.0"
 	cudaVersion    = "12-3"
 )
 
