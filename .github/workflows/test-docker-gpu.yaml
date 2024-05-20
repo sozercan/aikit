@@ -15,7 +15,7 @@ jobs:
       matrix:
         backend:
           # - llama-cuda
-          # - exllama # https://github.com/sozercan/aikit/issues/94
+          - exllama # https://github.com/sozercan/aikit/issues/94
           - exllama2-gptq
           - exllama2-exl2
           - mamba
