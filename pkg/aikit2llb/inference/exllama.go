@@ -19,7 +19,7 @@ func installExllama(c *config.InferenceConfig, s llb.State, merge llb.State) llb
 	}
 
 	savedState := s
-	s = s.Run(utils.Sh("apt-get update && apt-get install --no-install-recommends -y bash git ca-certificates python3-pip python3-dev python3-venv make g++ curl && curl -LsSf https://astral.sh/uv/install.sh | sh && pip install grpcio-tools --break-system-packages && apt-get clean"), llb.IgnoreCache).Root()
+	s = s.Run(utils.Sh("apt-get update && apt-get install --no-install-recommends -y bash git ca-certificates python3-pip python3-dev python3-venv python-is-python3 make g++ curl && curl -LsSf https://astral.sh/uv/install.sh | sh && pip install grpcio-tools --break-system-packages && apt-get clean"), llb.IgnoreCache).Root()
 
 	// clone localai exllama backend only
 	s = cloneLocalAI(s)
