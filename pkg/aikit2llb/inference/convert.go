@@ -190,6 +190,6 @@ func addLocalAI(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.St
 	return s, llb.Merge([]llb.State{merge, diff})
 }
 
-func cloneLocalAI(s llb.State, backend string) llb.State {
-	return s.Run(utils.Shf("git clone --filter=blob:none --no-checkout %[1]s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python/%[2]s && git checkout %[3]s && rm -rf .git", localAIRepo, backend, localAICommit)).Root()
+func cloneLocalAI(s llb.State) llb.State {
+	return s.Run(utils.Shf("git clone --filter=blob:none --no-checkout %[1]s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python && git checkout %[2]s && rm -rf .git", localAIRepo, localAICommit)).Root()
 }
