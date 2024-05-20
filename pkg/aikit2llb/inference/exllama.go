@@ -8,13 +8,9 @@ import (
 
 func installExllama(c *config.InferenceConfig, s llb.State, merge llb.State) llb.State {
 	backend := utils.BackendExllama
-	// exllamaRepo := "https://github.com/turboderp/exllama"
-	// exllamaTag := "master"
 	for b := range c.Backends {
 		if c.Backends[b] == utils.BackendExllamaV2 {
-			// exllamaRepo = "https://github.com/turboderp/exllamav2"
 			backend = utils.BackendExllamaV2
-			// exllamaTag = "v0.0.12"
 		}
 	}
 

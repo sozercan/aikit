@@ -39,8 +39,7 @@ func Aikit2LLB(c *config.InferenceConfig) (llb.State, *specs.Image) {
 	// install opencv and friends if stable diffusion backend is being used
 	for b := range c.Backends {
 		switch c.Backends[b] {
-		case utils.BackendExllama:
-		case utils.BackendExllamaV2:
+		case utils.BackendExllama, utils.BackendExllamaV2:
 			merge = installExllama(c, state, merge)
 		case utils.BackendStableDiffusion:
 			merge = installOpenCV(state, merge)
