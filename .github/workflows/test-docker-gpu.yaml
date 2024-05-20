@@ -16,8 +16,8 @@ jobs:
         backend:
           # - llama-cuda
           - exllama # https://github.com/sozercan/aikit/issues/94
-          - exllama2-gptq
-          - exllama2-exl2
+          # - exllama2-gptq
+          # - exllama2-exl2
           - mamba
     steps:
       - name: cleanup workspace
