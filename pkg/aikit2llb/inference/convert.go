@@ -168,12 +168,14 @@ func addLocalAI(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.St
 	switch c.Runtime {
 	case utils.RuntimeNVIDIA:
 		localAIURL = fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%s/local-ai-cuda12-Linux-x86_64", localAIVersion)
-	case utils.RuntimeCPUAVX2:
-		localAIURL = fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%s/local-ai-avx2-Linux-x86_64", localAIVersion)
-	case utils.RuntimeCPUAVX512:
-		localAIURL = fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%s/local-ai-avx512-Linux-x86_64", localAIVersion)
-	case utils.RuntimeCPUAVX, "":
-		localAIURL = fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%s/local-ai-avx-Linux-x86_64", localAIVersion)
+	case utils.RuntimeCPUAVX2, utils.RuntimeCPUAVX512, utils.RuntimeCPUAVX, "":
+		localAIURL = fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%s/local-ai-Linux-x86_64", localAIVersion)
+		// case utils.RuntimeCPUAVX2:
+		// 	localAIURL = fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%s/local-ai-avx2-Linux-x86_64", localAIVersion)
+		// case utils.RuntimeCPUAVX512:
+		// 	localAIURL = fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%s/local-ai-avx512-Linux-x86_64", localAIVersion)
+		// case utils.RuntimeCPUAVX, "":
+		// 	localAIURL = fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%s/local-ai-avx-Linux-x86_64", localAIVersion)
 	}
 
 	var opts []llb.HTTPOption
