@@ -16,22 +16,9 @@ func installOpenCV(s llb.State, merge llb.State) llb.State {
 	diff := llb.Diff(savedState, s)
 	merge = llb.Merge([]llb.State{merge, diff})
 
-	// sdURL := fmt.Sprintf("https://sertaccdn.azureedge.net/localai/%s/stablediffusion", localAIVersion)
 	// https://github.com/mudler/LocalAI/actions/runs/9227834555 (v2.16.0)
 	// temporary fix for stablediffusion
 	sdURL := "https://nightly.link/mudler/LocalAI/actions/runs/9227834555/stablediffusion.zip"
 	merge = merge.Run(utils.Shf("mkdir -p /tmp/localai/backend_data/backend-assets/grpc/ && curl -L %s -o stablediffusion.zip && unzip stablediffusion.zip -d /tmp/localai/backend_data/backend-assets/grpc && chmod +x stablediffusion", sdURL)).Root()
-	// var opts []llb.HTTPOption
-	// opts = append(opts, llb.Filename("stablediffusion"))
-	// opts = append(opts, llb.Chmod(0o755))
-	// var copyOpts []llb.CopyOption
-	// copyOpts = append(copyOpts, &llb.CopyInfo{
-	// 	CreateDestPath: true,
-	// })
-	// sd := llb.HTTP(sdURL, opts...)
-	// merge = merge.File(
-	// 	llb.Copy(sd, "stablediffusion", "/tmp/localai/backend_data/backend-assets/grpc/stablediffusion", copyOpts...),
-	// 	llb.WithCustomName("Copying stable diffusion backend"), //nolint: goconst
-	// )
 	return merge
 }
