@@ -10,14 +10,14 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 240
     strategy:
-      fail-fast: true
+      fail-fast: false
       max-parallel: 1
       matrix:
         backend:
           # - llama-cuda
-          # - exllama # https://github.com/sozercan/aikit/issues/94
-          # - exllama2-gptq
-          # - exllama2-exl2
+          - exllama # https://github.com/sozercan/aikit/issues/94
+          - exllama2-gptq
+          - exllama2-exl2
           - mamba
     steps:
       - name: cleanup workspace
