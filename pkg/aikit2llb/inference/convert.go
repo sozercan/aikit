@@ -17,9 +17,9 @@ const (
 	distrolessBase = "gcr.io/distroless/cc-debian12:latest"
 
 	localAIRepo    = "https://github.com/mudler/LocalAI"
-	localAIVersion = "v2.14.0"
+	localAIVersion = "v2.15.0"
 	// temporary commit until v2.16.0, used for python backends.
-	localAICommit = "e2de8a88f70d18291eb34ceb035be79dc73d3be6"
+	localAICommit = "ee4f722bf8ef5cf597c7168c760933ba365e5b3b"
 	cudaVersion   = "12-3"
 )
 
