@@ -127,7 +127,7 @@ func installCuda(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.S
 
 	savedState := s
 	// running apt-get update twice due to nvidia repo
-	s = s.Run(utils.Sh("apt-get update && apt-get install -y ca-certificates && apt-get update"), llb.IgnoreCache).Root()
+	s = s.Run(utils.Sh("apt-get update && apt-get install --no-install-recommends -y ca-certificates && apt-get update"), llb.IgnoreCache).Root()
 
 	// install cuda libraries
 	if len(c.Backends) == 0 {
