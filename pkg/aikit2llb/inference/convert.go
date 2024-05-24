@@ -17,10 +17,8 @@ const (
 	distrolessBase = "gcr.io/distroless/cc-debian12:latest"
 
 	localAIRepo    = "https://github.com/mudler/LocalAI"
-	localAIVersion = "v2.15.0"
-	// temporary commit until v2.16.0, used for python backends.
-	localAICommit = "ee4f722bf8ef5cf597c7168c760933ba365e5b3b"
-	cudaVersion   = "12-3"
+	localAIVersion = "v2.16.0"
+	cudaVersion    = "12-3"
 )
 
 func Aikit2LLB(c *config.InferenceConfig) (llb.State, *specs.Image) {
@@ -29,7 +27,7 @@ func Aikit2LLB(c *config.InferenceConfig) (llb.State, *specs.Image) {
 	base := getBaseImage(c)
 
 	state, merge = copyModels(c, base, state)
-	state, merge = addLocalAI(c, state, merge)
+	state, merge = addLocalAI(state, merge)
 
 	// install cuda if runtime is nvidia
 	if c.Runtime == utils.RuntimeNVIDIA {
@@ -162,21 +160,9 @@ func installCuda(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.S
 	return s, llb.Merge([]llb.State{merge, diff})
 }
 
-func addLocalAI(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.State, llb.State) {
+func addLocalAI(s llb.State, merge llb.State) (llb.State, llb.State) {
 	savedState := s
-	var localAIURL string
-	switch c.Runtime {
-	case utils.RuntimeNVIDIA:
-		localAIURL = fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%s/local-ai-cuda12-Linux-x86_64", localAIVersion)
-	case utils.RuntimeCPUAVX2, utils.RuntimeCPUAVX512, utils.RuntimeCPUAVX, "":
-		localAIURL = fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%s/local-ai-Linux-x86_64", localAIVersion)
-		// case utils.RuntimeCPUAVX2:
-		// 	localAIURL = fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%s/local-ai-avx2-Linux-x86_64", localAIVersion)
-		// case utils.RuntimeCPUAVX512:
-		// 	localAIURL = fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%s/local-ai-avx512-Linux-x86_64", localAIVersion)
-		// case utils.RuntimeCPUAVX, "":
-		// 	localAIURL = fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%s/local-ai-avx-Linux-x86_64", localAIVersion)
-	}
+	localAIURL := fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%s/local-ai-Linux-x86_64", localAIVersion)
 
 	var opts []llb.HTTPOption
 	opts = append(opts, llb.Filename("local-ai"))
@@ -192,5 +178,5 @@ func addLocalAI(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.St
 }
 
 func cloneLocalAI(s llb.State) llb.State {
-	return s.Run(utils.Shf("git clone --filter=blob:none --no-checkout %[1]s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python && git checkout %[2]s && rm -rf .git", localAIRepo, localAICommit)).Root()
+	return s.Run(utils.Shf("git clone --filter=blob:none --no-checkout %[1]s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python && git checkout %[2]s && rm -rf .git", localAIRepo, localAIVersion)).Root()
 }
