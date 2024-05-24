@@ -19,6 +19,6 @@ func installOpenCV(s llb.State, merge llb.State) llb.State {
 	// https://github.com/mudler/LocalAI/actions/runs/9227834555 (v2.16.0)
 	// temporary fix for stablediffusion
 	sdURL := "https://nightly.link/mudler/LocalAI/actions/runs/9227834555/stablediffusion.zip"
-	merge = merge.Run(utils.Shf("mkdir -p /tmp/localai/backend_data/backend-assets/grpc/ && curl -L %s -o stablediffusion.zip && unzip stablediffusion.zip -d /tmp/localai/backend_data/backend-assets/grpc && chmod +x stablediffusion", sdURL)).Root()
+	merge = merge.Run(utils.Shf("mkdir -p /tmp/localai/backend_data/backend-assets/grpc/ && curl --retry 10 --retry-all-errors -L %s -o stablediffusion.zip && unzip stablediffusion.zip -d /tmp/localai/backend_data/backend-assets/grpc && chmod +x stablediffusion", sdURL)).Root()
 	return merge
 }
