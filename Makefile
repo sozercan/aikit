@@ -1,3 +1,5 @@
+VERSION := v0.8.0
+
 REGISTRY ?= ghcr.io/sozercan
 KIND_VERSION ?= 0.22.0
 KUBERNETES_VERSION ?= 1.29.3
@@ -43,3 +45,7 @@ test-e2e-dependencies:
 	# used for kubernetes test
 	curl -sSL https://dl.k8s.io/release/v${KUBERNETES_VERSION}/bin/linux/amd64/kubectl -o ${GITHUB_WORKSPACE}/bin/kubectl && chmod +x ${GITHUB_WORKSPACE}/bin/kubectl
 	curl -sSL https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/kind-linux-amd64 -o ${GITHUB_WORKSPACE}/bin/kind && chmod +x ${GITHUB_WORKSPACE}/bin/kind
+
+.PHONY: release-manifest
+release-manifest:
+	@sed -i "s/version: $$(echo ${VERSION} | cut -c2-)/version: $$(echo ${NEWVERSION} | cut -c2-)/" ./charts/aikit/Chart.yaml

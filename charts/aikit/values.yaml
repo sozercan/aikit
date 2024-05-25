@@ -1,6 +1,3 @@
-models:
-  - name: "llama-3-8b-instruct"
-
 image:
   repository: ghcr.io/sozercan/llama3
   tag: "8b"
@@ -67,6 +64,9 @@ affinity: {}
 
 ############ Configuration for aikit WebUI ############
 ui:
+  models:
+  - llama-3-8b-instruct
+  defaultModel: llama-3-8b-instruct
   enabled: true
   replicaCount: 1
   type: "lobe-chat" # Supported values are "open-webui" and "lobe-chat"

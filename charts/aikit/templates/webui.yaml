@@ -40,14 +40,18 @@ spec:
               cpu: "1000m"
               memory: "1Gi"
           env:
+            - name: DEFAULT_AGENT_CONFIG
+              value: "model={{ .Values.ui.defaultModel }}"
+            - name: ENABLED_OLLAMA
+              value: "0"
             - name: OPENAI_API_KEY
-              value: foo
+              value: hunter2
             - name: OPENAI_PROXY_URL
               value: {{ (printf "http://%s" (include "aikit.fullname" .)) }}:{{ .Values.service.port }}
             - name: DATA_DIR
               value: "/data"
             - name: OPENAI_MODEL_LIST
-              value: "-all,+{{ .Values.modelName }}"
+              value: "{{- printf "-all,+%s" (include "aikit.modelList" .)}}"
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
