@@ -8,13 +8,17 @@ models:
     promptTemplates:
       - name: instruct
         template: |
-          <|start_header_id|>{{if eq .RoleName \"assistant\"}}assistant{{else if eq .RoleName \"system\"}}system{{else if eq .RoleName \"user\"}}user{{end}}<|end_header_id|>{{if .Content}}{{.Content}}{{end}}<|eot_id|>s
+          <|start_header_id|>{{if eq .RoleName \"assistant\"}}assistant{{else if eq .RoleName \"system\"}}system{{else if eq .RoleName \"user\"}}user{{end}}<|end_header_id|>{{if .Content}}{{.Content}}{{end}}<|eot_id|>
 config: |
   - name: llama-3-8b-instruct
     backend: llama
     parameters:
       model: Meta-Llama-3-8B-Instruct.Q4_K_M.gguf
     context_size: 8192
+    gpu_layers: 33
+    f16: true
+    batch: 512
+    mmap: true
     template:
       chat_message: \"instruct\"
     stopwords:

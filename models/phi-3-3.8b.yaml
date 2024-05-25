@@ -33,3 +33,7 @@ config: |
     - <|assistant|>
     - <|end|>
     - <|endoftext|>
+    gpu_layers: 33
+    f16: true
+    batch: 512
+    mmap: true

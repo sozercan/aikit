@@ -45,9 +45,7 @@ func emptyImage(c *config.InferenceConfig) *specs.Image {
 		"BUILD_TYPE=cublas",
 		"PCIDB_ENABLE_NETWORK_FETCH=1", // used to enable ghw pcidb to fetch device information
 	}
-	if c.Runtime == utils.RuntimeNVIDIA {
-		img.Config.Env = append(img.Config.Env, cudaEnv...)
-	}
+	img.Config.Env = append(img.Config.Env, cudaEnv...)
 
 	for b := range c.Backends {
 		switch c.Backends[b] {
