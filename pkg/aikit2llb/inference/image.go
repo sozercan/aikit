@@ -43,7 +43,6 @@ func emptyImage(c *config.InferenceConfig) *specs.Image {
 		"NVIDIA_VISIBLE_DEVICES=all",
 		"LD_LIBRARY_PATH=/usr/local/cuda/lib64",
 		"BUILD_TYPE=cublas",
-		"PCIDB_ENABLE_NETWORK_FETCH=1", // used to enable ghw pcidb to fetch device information
 	}
 	img.Config.Env = append(img.Config.Env, cudaEnv...)
 
