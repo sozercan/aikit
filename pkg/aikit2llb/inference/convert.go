@@ -16,8 +16,9 @@ import (
 const (
 	distrolessBase = "gcr.io/distroless/cc-debian12:latest"
 
-	localAIRepo    = "https://github.com/mudler/LocalAI"
+	localAIRepo    = "https://github.com/sozercan/LocalAI"
 	localAIVersion = "v2.16.0"
+	localAICommit  = "2058b921e0927d4e9982d2b84eaa37a31d8f82b1"
 	cudaVersion    = "12-3"
 )
 
@@ -174,5 +175,5 @@ func addLocalAI(s llb.State, merge llb.State) (llb.State, llb.State) {
 }
 
 func cloneLocalAI(s llb.State) llb.State {
-	return s.Run(utils.Shf("git clone --filter=blob:none --no-checkout %[1]s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python && git checkout %[2]s && rm -rf .git", localAIRepo, localAIVersion)).Root()
+	return s.Run(utils.Shf("git clone --filter=blob:none --no-checkout %[1]s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python && git checkout %[2]s && rm -rf .git", localAIRepo, localAICommit)).Root()
 }
