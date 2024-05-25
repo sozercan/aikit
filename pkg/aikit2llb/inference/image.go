@@ -57,8 +57,7 @@ func emptyImage(c *config.InferenceConfig) *specs.Image {
 			img.Config.Env = append(img.Config.Env, exllamaEnv...)
 		case utils.BackendMamba:
 			mambaEnv := []string{
-				"LOCALAI_BACKEND_ASSETS_PATH=/tmp/localai/",
-				"EXTERNAL_GRPC_BACKENDS=mamba:python/mamba/run.sh",
+				"EXTERNAL_GRPC_BACKENDS=exllama:/tmp/localai/backend/python/exllama/run.sh,exllama2:/tmp/localai/backend/python/exllama2/run.sh,mamba:/tmp/localai/backend/python/mamba/run.sh",
 				"CUDA_HOME=/usr/local/cuda",
 			}
 			img.Config.Env = append(img.Config.Env, mambaEnv...)
