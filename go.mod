@@ -31,7 +31,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
-	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 // indirect
+	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
 	github.com/in-toto/in-toto-golang v0.9.0 // indirect
 	github.com/klauspost/compress v1.17.6 // indirect
 	github.com/moby/docker-image-spec v1.3.1 // indirect
