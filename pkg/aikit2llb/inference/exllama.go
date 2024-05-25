@@ -8,6 +8,7 @@ import (
 
 func installExllama(c *config.InferenceConfig, s llb.State, merge llb.State) llb.State {
 	backend := utils.BackendExllama
+	// backendFile := "export BACKEND_FILE=/tmp/localai/backend/python/exllama/source/backend.py"
 	for b := range c.Backends {
 		if c.Backends[b] == utils.BackendExllamaV2 {
 			backend = utils.BackendExllamaV2

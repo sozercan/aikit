@@ -18,7 +18,7 @@ const (
 
 	localAIRepo    = "https://github.com/sozercan/LocalAI"
 	localAIVersion = "v2.16.0"
-	localAICommit  = "2058b921e0927d4e9982d2b84eaa37a31d8f82b1"
+	localAICommit  = "746e1b29142e1788f0212bcb16c4a4cce3923de6"
 	cudaVersion    = "12-3"
 )
 
