@@ -3,7 +3,7 @@ image:
   tag: "8b"
   pullPolicy: IfNotPresent
 
-replicaCount: 1 # Number of replicas, need storge class support of multiple read when pvc enabled and replica > 1
+replicaCount: 1
 
 imagePullSecrets: []
 nameOverride: ""
@@ -55,10 +55,6 @@ autoscaling:
   # targetMemoryUtilizationPercentage: 80
 
 nodeSelector: {}
-
-tolerations:
-  - key: kubernetes.azure.com/scalesetpriority
-    operator: Exists
 
 affinity: {}
 
