@@ -36,6 +36,20 @@ func Test_validateConfig(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "valid backend",
+			args: args{c: &config.InferenceConfig{
+				APIVersion: "v1alpha1",
+				Backends:   []string{"exllama"},
+				Models: []config.Model{
+					{
+						Name:   "test",
+						Source: "foo",
+					},
+				},
+			}},
+			wantErr: false,
+		},
+		{
 			name: "invalid backend",
 			args: args{c: &config.InferenceConfig{
 				APIVersion: "v1alpha1",
