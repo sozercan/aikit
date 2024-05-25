@@ -16,8 +16,8 @@ jobs:
         backend:
           - llama
           # - exllama
-          # - exllama2-gptq
-          # - exllama2-exl2
+          - exllama2-gptq
+          - exllama2-exl2
           # - mamba
     steps:
       - name: cleanup workspace
