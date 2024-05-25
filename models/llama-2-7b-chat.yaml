@@ -14,3 +14,7 @@ config: |
       top_p: 0.7
       model: llama-2-7b-chat.Q4_K_M.gguf
     context_size: 4096
+    gpu_layers: 35
+    f16: true
+    batch: 512
+    mmap: true

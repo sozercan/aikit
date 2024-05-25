@@ -21,13 +21,9 @@ jobs:
       matrix:
         model:
          - llama-2-7b-chat
-         - llama-2-7b-chat-cuda
          - llama-2-13b-chat
-         - llama-2-13b-chat-cuda
          - llama-3-8b-instruct
-         - llama-3-8b-instruct-cuda
          - phi-3-3.8b
-         - phi-3-3.8b-cuda
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
@@ -84,16 +80,9 @@ jobs:
           echo "MODEL_NAME=$(echo ${{ matrix.model }} | sed -E 's/([a-z]+)-([0-9]+x[0-9]+b)-.*/\1/' | sed -E 's/([a-z]+)-([0-9]+)-.*/\1\2/')" >> $GITHUB_ENV
           echo "MODEL_SIZE=$(echo ${{ matrix.model }} | sed -E 's/[a-z]+-([0-9]+x[0-9]+b|[0-9]+\.?[0-9]*b)-.*/\1/' | sed -E 's/[a-z]+-[0-9]+-([0-9]+\.?[0-9]*b).*/\1/')" >> $GITHUB_ENV
           echo "MODEL_TYPE=-$(echo ${{ matrix.model }} | sed -n -e 's/.*\(chat\).*/\1/p' -e 's/.*\(instruct\).*/\1/p')" >> $GITHUB_ENV
-          echo "MODEL_RUNTIME=-$(echo ${{ matrix.model }} | grep -Eo 'cuda')" >> $GITHUB_ENV
 
       - name: Build and push
         run: |
-          # since empty output includes a dash, we remove it completely if it's only a dash
-          if [ "${MODEL_RUNTIME}" == "-" ]; then
-            export MODEL_RUNTIME=""
-            echo "MODEL_RUNTIME=''" >> $GITHUB_ENV
-          fi
-
           if [ "${MODEL_TYPE}" == "-" ]; then
             export MODEL_TYPE=""
             echo "MODEL_TYPE=''" >> $GITHUB_ENV
@@ -106,14 +95,14 @@ jobs:
           fi
 
           docker buildx build . \
-            -t ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} \
-            -t ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE}${MODEL_TYPE}${MODEL_RUNTIME} \
+            -t ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE} \
+            -t ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE}${MODEL_TYPE} \
             -f models/${{ matrix.model }}.yaml \
             --push --progress plain \
             --sbom=true --provenance=true \
             --cache-from=type=gha,scope=${MODEL_NAME}-${MODEL_SIZE} \
             --cache-to=type=gha,scope=${MODEL_NAME}-${MODEL_SIZE},mode=max
-          echo "DIGEST=$(cosign triangulate ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} --type digest)" >> $GITHUB_ENV
+          echo "DIGEST=$(cosign triangulate ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE} --type digest)" >> $GITHUB_ENV
 
       - name: Sign the images with GitHub OIDC Token
         if: ${{ !inputs.staging }}

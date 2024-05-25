@@ -62,7 +62,6 @@ cat > aikit-inference.yaml << EOF
 #syntax=ghcr.io/sozercan/aikit:latest
 debug: true
 apiVersion: v1alpha1
-runtime: cuda
 models:
   - name: mistral-finetuned
     source: aikit-model-q4_k_m.gguf
