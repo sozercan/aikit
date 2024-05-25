@@ -19,7 +19,7 @@ func installExllama(c *config.InferenceConfig, s llb.State, merge llb.State) llb
 
 	s = cloneLocalAI(s)
 
-	s = s.Run(utils.Bashf("source $HOME/.cargo/env && export BUILD_TYPE=cublas && cd /tmp/localai/backend/python/%[1]s && make %[1]s", backend)).Root()
+	s = s.Run(utils.Bashf("export BUILD_TYPE=cublas && cd /tmp/localai/backend/python/%[1]s && make %[1]s", backend)).Root()
 
 	diff := llb.Diff(savedState, s)
 	return llb.Merge([]llb.State{merge, diff})
