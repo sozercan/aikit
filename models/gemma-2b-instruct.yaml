@@ -16,7 +16,7 @@ models:
           {{ .Input }}
           <start_of_turn>model
 config: |
-  - name: gemma-1.1-2b-instruct
+  - name: gemma1.1-2b-instruct
     backend: llama
     parameters:
       model: gemma-1.1-2b-it-Q4_K_M.gguf
