@@ -113,22 +113,22 @@ You can also deploy your models manually using `kubectl`. Here is an example:
 
 ```bash
 # create a deployment
-# for pre-made models, replace "my-model" with the image name
-kubectl create deployment my-llm-deployment --image=my-model
+# replace the image with your own if needed
+kubectl create deployment aikit-llama3 --image=ghcr.io/sozercan/llama3:8b
 
 # expose it as a service
-kubectl expose deployment my-llm-deployment --port=8080 --target-port=8080 --name=my-llm-service
+kubectl expose deployment aikit-llama3 --port=8080 --target-port=8080 --name=aikit
 
 # easy to scale up and down as needed
-kubectl scale deployment my-llm-deployment --replicas=3
+kubectl scale deployment aikit-llama3 --replicas=3
 
 # port-forward for testing locally
-kubectl port-forward service/my-llm-service 8080:8080 &
+kubectl port-forward service/aikit 8080:8080 &
 
 # send requests to your model
 curl http://localhost:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
-     "model": "llama-2-7b-chat",
+     "model": "llama-3-8b-instruct",
      "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
    }'
-{"created":1701236489,"object":"chat.completion","id":"dd1ff40b-31a7-4418-9e32-42151ab6875a","model":"llama-2-7b-chat","choices":[{"index":0,"finish_reason":"stop","message":{"role":"assistant","content":"\nKubernetes is a container orchestration system that automates the deployment, scaling, and management of containerized applications in a microservices architecture."}}],"usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0}}
+{"created":1701236489,"object":"chat.completion","id":"dd1ff40b-31a7-4418-9e32-42151ab6875a","model":"llama-3-8b-instruct","choices":[{"index":0,"finish_reason":"stop","message":{"role":"assistant","content":"\nKubernetes is a container orchestration system that automates the deployment, scaling, and management of containerized applications in a microservices architecture."}}],"usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0}}
 ```
