@@ -51,6 +51,7 @@ jobs:
             storage.googleapis.com:443
             deb.debian.org:80
             developer.download.nvidia.com:443
+            get.helm.sh:443
 
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
