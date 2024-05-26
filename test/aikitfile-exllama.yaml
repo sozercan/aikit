@@ -1,6 +1,7 @@
 #syntax=aikit:test
 apiVersion: v1alpha1
 debug: true
+runtime: cuda
 backends:
   - exllama
 models:

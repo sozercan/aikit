@@ -28,7 +28,11 @@ func Aikit2LLB(c *config.InferenceConfig) (llb.State, *specs.Image) {
 
 	state, merge = copyModels(c, base, state)
 	state, merge = addLocalAI(state, merge)
-	state, merge = installCuda(c, state, merge)
+
+	// install cuda if runtime is nvidia
+	if c.Runtime == utils.RuntimeNVIDIA {
+		state, merge = installCuda(c, state, merge)
+	}
 
 	// install opencv and friends if stable diffusion backend is being used
 	for b := range c.Backends {
