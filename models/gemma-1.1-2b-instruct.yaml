@@ -1,7 +1,7 @@
 #syntax=ghcr.io/sozercan/aikit:latest
 apiVersion: v1alpha1
 debug: true
-runtime: avx
+runtime: cuda
 models:
   - name: gemma-1.1-2b-instruct
     source: https://huggingface.co/lmstudio-community/gemma-1.1-2b-it-GGUF/resolve/main/gemma-1.1-2b-it-Q4_K_M.gguf
