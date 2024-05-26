@@ -24,6 +24,7 @@ jobs:
          - llama-2-13b-chat
          - llama-3-8b-instruct
          - phi-3-3.8b
+         - gemma-1.1-2b-instruct
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
