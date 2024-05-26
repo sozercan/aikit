@@ -22,3 +22,5 @@ go.work
 
 bin
 coverage.txt
+
+_output

@@ -17,7 +17,7 @@ models:
 ```
 
 :::tip
-This is the simplest way to get started to build an image. For full `aikitfile` specification, see [specs](docs/specs.md).
+This is the simplest way to get started to build an image. For full `aikitfile` inference specifications, see [Inference API Specifications](docs/specs-inference.md).
 :::
 
 First, create a buildx buildkit instance. Alternatively, if you are using Docker v24 with [containerd image store](https://docs.docker.com/storage/containerd/) enabled, you can skip this step.

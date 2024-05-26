@@ -21,16 +21,9 @@ jobs:
       matrix:
         model:
          - llama-2-7b-chat
-         - llama-2-7b-chat-cuda
          - llama-2-13b-chat
-         - llama-2-13b-chat-cuda
-         - orca-2-13b
-         - orca-2-13b-cuda
-         - phi-2-2.7b
-         - phi-2-2.7b-cuda
-        # due to github runner disk space limitations, these do not fit in to runners
-        #  - mixtral-7x8b-instruct
-        #  - mixtral-7x8b-instruct-cuda
+         - llama-3-8b-instruct
+         - phi-3-3.8b
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
@@ -45,7 +38,7 @@ jobs:
           swap-storage: true
 
       - name: Harden Runner
-        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
+        uses: step-security/harden-runner@a4aa98b93cab29d9b1101a6143fb8bce00e2eac4 # v2.7.1
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -66,17 +59,17 @@ jobs:
             developer.download.nvidia.com:443
             deb.debian.org:80
 
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
       - name: Install Cosign
-        uses: sigstore/cosign-installer@e1523de7571e31dbe865fd2e80c5c7c23ae71eb4 # v3.4.0
+        uses: sigstore/cosign-installer@59acb6260d9c0ba8f4a2f9d9b48431a222b68e20 # v3.5.0
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@f95db51fddba0c2d1ec667646a06c2ce06100226 # v3.0.0
+        uses: docker/setup-buildx-action@d70bba72b1f3fd22344832f00baa16ece964efeb # v3.3.0
       - uses: crazy-max/ghaction-github-runtime@b3a9207c0e1ef41f4cf215303c976869d0c2c1c4 # v3.0.0
 
       - name: Login to GHCR
-        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+        uses: docker/login-action@e92390c5fb421da1463c202d546fed0ec5c39f20 # v3.1.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -87,16 +80,9 @@ jobs:
           echo "MODEL_NAME=$(echo ${{ matrix.model }} | sed -E 's/([a-z]+)-([0-9]+x[0-9]+b)-.*/\1/' | sed -E 's/([a-z]+)-([0-9]+)-.*/\1\2/')" >> $GITHUB_ENV
           echo "MODEL_SIZE=$(echo ${{ matrix.model }} | sed -E 's/[a-z]+-([0-9]+x[0-9]+b|[0-9]+\.?[0-9]*b)-.*/\1/' | sed -E 's/[a-z]+-[0-9]+-([0-9]+\.?[0-9]*b).*/\1/')" >> $GITHUB_ENV
           echo "MODEL_TYPE=-$(echo ${{ matrix.model }} | sed -n -e 's/.*\(chat\).*/\1/p' -e 's/.*\(instruct\).*/\1/p')" >> $GITHUB_ENV
-          echo "MODEL_RUNTIME=-$(echo ${{ matrix.model }} | grep -Eo 'cuda')" >> $GITHUB_ENV
 
       - name: Build and push
         run: |
-          # since empty output includes a dash, we remove it completely if it's only a dash
-          if [ "${MODEL_RUNTIME}" == "-" ]; then
-            export MODEL_RUNTIME=""
-            echo "MODEL_RUNTIME=''" >> $GITHUB_ENV
-          fi
-
           if [ "${MODEL_TYPE}" == "-" ]; then
             export MODEL_TYPE=""
             echo "MODEL_TYPE=''" >> $GITHUB_ENV
@@ -109,20 +95,22 @@ jobs:
           fi
 
           docker buildx build . \
-            -t ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} \
-            -t ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE}${MODEL_TYPE}${MODEL_RUNTIME} \
+            -t ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE} \
+            -t ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE}${MODEL_TYPE} \
             -f models/${{ matrix.model }}.yaml \
             --push --progress plain \
             --sbom=true --provenance=true \
             --cache-from=type=gha,scope=${MODEL_NAME}-${MODEL_SIZE} \
             --cache-to=type=gha,scope=${MODEL_NAME}-${MODEL_SIZE},mode=max
-          echo "DIGEST=$(cosign triangulate ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE}${MODEL_RUNTIME} --type digest)" >> $GITHUB_ENV
+          echo "DIGEST=$(cosign triangulate ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE} --type digest)" >> $GITHUB_ENV
 
       - name: Sign the images with GitHub OIDC Token
+        if: ${{ !inputs.staging }}
         run: cosign sign --yes ${DIGEST}
 
       - name: Verify image signature
+        if: ${{ !inputs.staging }}
         run: |
           cosign verify ${DIGEST} \
             --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-            --certificate-identity https://github.com/sozercan/aikit/.github/workflows/update-models.yaml@refs/heads/main
+            --certificate-identity-regexp 'https://github\.com/sozercan/aikit/\.github/workflows/.+'

@@ -1,0 +1,24 @@
+#syntax=aikit:test
+apiVersion: v1alpha1
+baseModel: unsloth/llama-3-8b-bnb-4bit
+datasets:
+  - source: "yahma/alpaca-cleaned"
+    type: alpaca
+config:
+  unsloth:
+    packing: false
+    maxSeqLength: 2048
+    loadIn4bit: true
+    batchSize: 2
+    gradientAccumulationSteps: 4
+    warmupSteps: 10
+    maxSteps: 60
+    learningRate: 0.0002
+    loggingSteps: 1
+    optimizer: adamw_8bit
+    weightDecay: 0.01
+    lrSchedulerType: linear
+    seed: 42
+output:
+  quantize: q4_k_m
+  name: model

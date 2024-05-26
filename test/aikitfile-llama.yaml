@@ -2,15 +2,28 @@
 apiVersion: v1alpha1
 debug: true
 models:
-  - name: llama-2-7b-chat
-    source: https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q4_K_M.gguf
-    sha256: "08a5566d61d7cb6b420c3e4387a39e0078e1f2fe5f055f3a03887385304d4bfa"
+  - name: llama-3-8b-instruct
+    source: https://huggingface.co/QuantFactory/Meta-Llama-3-8B-Instruct-GGUF/resolve/main/Meta-Llama-3-8B-Instruct.Q4_K_M.gguf
+    sha256: "647a2b64cbcdbe670432d0502ebb2592b36dd364d51a9ef7a1387b7a4365781f"
+    promptTemplates:
+      - name: instruct
+        template: |
+          <|start_header_id|>{{if eq .RoleName \"assistant\"}}assistant{{else if eq .RoleName \"system\"}}system{{else if eq .RoleName \"user\"}}user{{end}}<|end_header_id|>{{if .Content}}{{.Content}}{{end}}<|eot_id|>
 config: |
-  - name: llama-2-7b-chat
+  - name: llama-3-8b-instruct
     backend: llama
     parameters:
-      top_k: 80
-      temperature: 0.2
-      top_p: 0.7
-      model: llama-2-7b-chat.Q4_K_M.gguf
-    context_size: 4096
+      model: Meta-Llama-3-8B-Instruct.Q4_K_M.gguf
+    context_size: 8192
+    gpu_layers: 33
+    f16: true
+    batch: 512
+    mmap: true
+    template:
+      chat_message: \"instruct\"
+    stopwords:
+    - <|start_header_id|>
+    - <|end_header_id|>
+    - <|eot_id|>
+    - <|reserved_special_token
+    system_prompt: \"Respond to the user in a friendly and helpful tone. Generate human-like text based on the input, and use markdown when appropriate. If the user asks for something outside of your capabilities, politely tell the user what you can and can't do. Keep the response concise and relevant to the user's request.\"

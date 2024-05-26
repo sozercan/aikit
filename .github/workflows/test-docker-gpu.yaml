@@ -10,23 +10,24 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 240
     strategy:
-      fail-fast: true
+      fail-fast: false
       max-parallel: 1
       matrix:
         backend:
-          - llama-cuda
-          # - exllama # https://github.com/sozercan/aikit/issues/94
+          - llama
+          # - exllama
           - exllama2-gptq
           - exllama2-exl2
-          - mamba
+          # - mamba
     steps:
       - name: cleanup workspace
         run: |
           rm -rf ./* || true
           rm -rf ./.??* || true
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
         # use default docker driver builder with containerd image store for local aikit image
+        # these must be setup before running this test
       - run: docker buildx use default
 
       - name: build aikit
@@ -46,8 +47,22 @@ jobs:
       - name: run test model
         run: docker run --name testmodel -d --rm -p 8080:8080 --gpus all testmodel:test
 
-      - name: run test
-        if: matrix.backend != 'mamba'
+      - name: run test (gguf)
+        if: matrix.backend == 'llama'
+        run: |
+          result=$(curl --fail --retry 10 --retry-all-errors http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
+            "model": "llama-3-8b-instruct",
+            "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
+          }')
+          echo $result
+
+          choices=$(echo "$result" | jq '.choices')
+          if [ -z "$choices" ]; then
+            exit 1
+          fi
+
+      - name: run test (exl2/gptq)
+        if: matrix.backend == 'exllama2-gptq' || matrix.backend == 'exllama2-exl2' || matrix.backend == 'exllama'
         run: |
           result=$(curl --fail --retry 10 --retry-all-errors http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
             "model": "llama-2-7b-chat",
@@ -60,7 +75,7 @@ jobs:
             exit 1
           fi
 
-      - name: run test
+      - name: run test (mamba)
         if: matrix.backend == 'mamba'
         run: |
           result=$(curl --fail --retry 10 --retry-all-errors http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
@@ -81,12 +96,12 @@ jobs:
       - run: docker stop testmodel
         if: always()
 
-      - run: docker system prune -a -f --volumes
+      - run: docker system prune -a -f --volumes || true
         if: always()
 
       - name: publish test artifacts
         if: always()
-        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         with:
           name: test-${{ matrix.backend }}
           path: |

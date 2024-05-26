@@ -32,7 +32,7 @@ jobs:
           swap-storage: true
 
       - name: Harden Runner
-        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
+        uses: step-security/harden-runner@a4aa98b93cab29d9b1101a6143fb8bce00e2eac4 # v2.7.1
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -49,11 +49,14 @@ jobs:
             proxy.golang.org:443
             registry-1.docker.io:443
             storage.googleapis.com:443
+            deb.debian.org:80
+            developer.download.nvidia.com:443
+            get.helm.sh:443
 
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
       # need containerd image store for testing local images
-      - uses: crazy-max/ghaction-setup-docker@d9be6cade441568ba10037bce5221b8f564981f1 # v3.0.0
+      - uses: crazy-max/ghaction-setup-docker@5bddaa4323ffd60efb2b5045b75b9637c12d4e50 # v3.2.0
         with:
           daemon-config: |
             {
@@ -101,7 +104,7 @@ jobs:
       - name: run test
         run: |
           result=$(curl --fail --retry 10 --retry-all-errors http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
-            "model": "llama-2-7b-chat",
+            "model": "llama-3-8b-instruct",
             "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
           }')
           echo $result
@@ -118,7 +121,7 @@ jobs:
 
       - name: publish logs
         if: always()
-        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         with:
           name: kind-logs
-          path: ${KIND_LOGS_PATH}
+          path: $KIND_LOGS_PATH
