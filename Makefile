@@ -1,8 +1,9 @@
 VERSION := v0.8.0
 
 REGISTRY ?= ghcr.io/sozercan
-KIND_VERSION ?= 0.22.0
-KUBERNETES_VERSION ?= 1.29.3
+KIND_VERSION ?= 0.23.0
+KUBERNETES_VERSION ?= 1.30.1
+HELM_VERSION ?= 3.15.1
 TAG ?= test
 OUTPUT_TYPE ?= type=docker
 TEST_IMAGE_NAME ?= testmodel
@@ -44,6 +45,7 @@ test-e2e-dependencies:
 
 	# used for kubernetes test
 	curl -sSL https://dl.k8s.io/release/v${KUBERNETES_VERSION}/bin/linux/amd64/kubectl -o ${GITHUB_WORKSPACE}/bin/kubectl && chmod +x ${GITHUB_WORKSPACE}/bin/kubectl
+	curl https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz | tar xz && mv linux-amd64/helm ${GITHUB_WORKSPACE}/bin/helm && chmod +x ${GITHUB_WORKSPACE}/bin/helm
 	curl -sSL https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/kind-linux-amd64 -o ${GITHUB_WORKSPACE}/bin/kind && chmod +x ${GITHUB_WORKSPACE}/bin/kind
 
 .PHONY: release-manifest
