@@ -2,7 +2,7 @@
 title: Kubernetes Deployment
 ---
 
-It is easy to get started to deploy your models to Kubernetes! You can deploy your models [manually](#manual-deployment) or use the provided [Helm chart](#helm-chart).
+It is easy to get started to deploy your models to Kubernetes! You can deploy your models with the [Helm chart](#helm-chart) or [manually](#manual-deployment).
 
 Make sure you have a Kubernetes cluster running and `kubectl` is configured to talk to it, and your model images are accessible from the cluster.
 
@@ -10,33 +10,11 @@ Make sure you have a Kubernetes cluster running and `kubectl` is configured to t
 You can use [kind](https://kind.sigs.k8s.io/) to create a local Kubernetes cluster for testing purposes.
 :::
 
-## Manual Deployment
-
-```bash
-# create a deployment
-# for pre-made models, replace "my-model" with the image name
-kubectl create deployment my-llm-deployment --image=my-model
-
-# expose it as a service
-kubectl expose deployment my-llm-deployment --port=8080 --target-port=8080 --name=my-llm-service
-
-# easy to scale up and down as needed
-kubectl scale deployment my-llm-deployment --replicas=3
-
-# port-forward for testing locally
-kubectl port-forward service/my-llm-service 8080:8080
-
-# send requests to your model
-curl http://localhost:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
-     "model": "llama-2-7b-chat",
-     "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
-   }'
-{"created":1701236489,"object":"chat.completion","id":"dd1ff40b-31a7-4418-9e32-42151ab6875a","model":"llama-2-7b-chat","choices":[{"index":0,"finish_reason":"stop","message":{"role":"assistant","content":"\nKubernetes is a container orchestration system that automates the deployment, scaling, and management of containerized applications in a microservices architecture."}}],"usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0}}
-```
-
 ## Helm Chart
 
-For more advanced deployments, you can use the Helm chart provided in the `charts` directory.
+For advanced deployments or customization options, you can use the [Helm chart](https://helm.sh/) provided in the `charts` directory.
+
+Please make sure you have Helm installed and configured. If you don't have Helm installed, you can follow the instructions [here](https://helm.sh/docs/intro/install/).
 
 Install the chart using the following command:
 
@@ -115,3 +93,30 @@ As mentioned in the notes, you can then port-forward and then navigate to the UR
 | `ui.persistentVolume.accessModes`            | Array   | `["ReadWriteOnce"]`                                                                   | Access modes for the Persistent Volume             |
 | `ui.persistentVolume.size`                   | String  | `10Gi`                                                                                | Size of the Persistent Volume                      |
 | `ui.persistentVolume.claimName`              | String  | `""`                                                                                  | Claim name for an existing Persistent Volume Claim |
+
+
+## Manual Deployment
+
+You can also deploy your models manually using `kubectl`. Here is an example:
+
+```bash
+# create a deployment
+# for pre-made models, replace "my-model" with the image name
+kubectl create deployment my-llm-deployment --image=my-model
+
+# expose it as a service
+kubectl expose deployment my-llm-deployment --port=8080 --target-port=8080 --name=my-llm-service
+
+# easy to scale up and down as needed
+kubectl scale deployment my-llm-deployment --replicas=3
+
+# port-forward for testing locally
+kubectl port-forward service/my-llm-service 8080:8080
+
+# send requests to your model
+curl http://localhost:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
+     "model": "llama-2-7b-chat",
+     "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
+   }'
+{"created":1701236489,"object":"chat.completion","id":"dd1ff40b-31a7-4418-9e32-42151ab6875a","model":"llama-2-7b-chat","choices":[{"index":0,"finish_reason":"stop","message":{"role":"assistant","content":"\nKubernetes is a container orchestration system that automates the deployment, scaling, and management of containerized applications in a microservices architecture."}}],"usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0}}
+```
