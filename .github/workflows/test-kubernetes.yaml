@@ -124,4 +124,4 @@ jobs:
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         with:
           name: kind-logs
-          path: ${KIND_LOGS_PATH}
+          path: $KIND_LOGS_PATH
