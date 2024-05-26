@@ -96,7 +96,7 @@ jobs:
 
       - name: deploy test model
         run: |
-          helm install charts/aikit --name-template aikit \
+          helm install charts/aikit --wait --name-template aikit \
             --set image.repository=testmodel:test \
             --set image.tag=test \
             --set image.pullPolicy=Never \
