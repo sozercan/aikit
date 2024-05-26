@@ -37,7 +37,19 @@ Get the application URL by running these commands:
   kubectl --namespace default port-forward service/aikit-webui 8080:80
 ```
 
-As mentioned in the notes, you can then port-forward and then navigate to the URL provided to access the WebUI.
+As mentioned in the notes, you can then port-forward and send requests to your model, or navigate to the URL provided to access the WebUI.
+
+```bash
+# port-forward for testing locally
+kubectl port-forward service/aikit 8080:8080 &
+
+ # send requests to your model
+curl http://localhost:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
+    "model": "llama-3-8b-instruct",
+    "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
+  }'
+{"created":1716695271,"object":"chat.completion","id":"809d031e-d78a-4e3a-9719-04683d9e29f9","model":"llama-3-8b-instruct","choices":[{"index":0,"finish_reason":"stop","message":{"role":"assistant","content":"Kubernetes is an open-source container orchestration system that automates the deployment, scaling, and management of applications and services in a cloud-native environment."}}],"usage":{"prompt_tokens":11,"completion_tokens":31,"total_tokens":42}}
+```
 
 ### Values
 
@@ -111,7 +123,7 @@ kubectl expose deployment my-llm-deployment --port=8080 --target-port=8080 --nam
 kubectl scale deployment my-llm-deployment --replicas=3
 
 # port-forward for testing locally
-kubectl port-forward service/my-llm-service 8080:8080
+kubectl port-forward service/my-llm-service 8080:8080 &
 
 # send requests to your model
 curl http://localhost:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
