@@ -50,4 +50,6 @@ test-e2e-dependencies:
 
 .PHONY: release-manifest
 release-manifest:
+	@sed -i "s/appVersion: $(VERSION)/appVersion: ${NEWVERSION}/" ./charts/aikit/Chart.yaml
 	@sed -i "s/version: $$(echo ${VERSION} | cut -c2-)/version: $$(echo ${NEWVERSION} | cut -c2-)/" ./charts/aikit/Chart.yaml
+	@sed -i -e 's/^VERSION := $(VERSION)/VERSION := ${NEWVERSION}/' ./Makefile
