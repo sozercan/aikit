@@ -1,6 +1,7 @@
 #syntax=aikit:test
 apiVersion: v1alpha1
 debug: true
+runtime: cuda
 models:
   - name: custom
     source: model-q4_k_m.gguf
