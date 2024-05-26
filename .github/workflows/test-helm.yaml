@@ -1,4 +1,4 @@
-name: kubernetes-test
+name: helm-test
 
 on:
   push:
@@ -53,7 +53,7 @@ jobs:
             developer.download.nvidia.com:443
             get.helm.sh:443
 
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b # v4.1.5
 
       # need containerd image store for testing local images
       - uses: crazy-max/ghaction-setup-docker@5bddaa4323ffd60efb2b5045b75b9637c12d4e50 # v3.2.0
@@ -96,10 +96,12 @@ jobs:
 
       - name: deploy test model
         run: |
-          kubectl create deployment test-model-deployment --image=testmodel:test --replicas 1
-          kubectl rollout status deployment test-model-deployment
-          kubectl expose deployment test-model-deployment --port=8080 --target-port=8080 --name=test-model-service
-          kubectl port-forward service/test-model-service 8080:8080 &
+          helm install charts/aikit --wait --debug --name-template aikit \
+            --set image.repository=testmodel \
+            --set image.tag=test \
+            --set image.pullPolicy=Never \
+            --set ui.enabled=false
+          kubectl port-forward service/aikit 8080:8080 &
 
       - name: run test
         run: |
