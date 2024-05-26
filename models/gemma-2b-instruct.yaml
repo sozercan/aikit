@@ -1,0 +1,34 @@
+#syntax=ghcr.io/sozercan/aikit:latest
+apiVersion: v1alpha1
+debug: true
+runtime: cuda
+models:
+  - name: gemma1.1-2b-instruct
+    source: https://huggingface.co/lmstudio-community/gemma-1.1-2b-it-GGUF/resolve/main/gemma-1.1-2b-it-Q4_K_M.gguf
+    sha256: cc2118e1d780fa33582738d8c99223d62c8734b06ef65076c01618d484d081d4
+    promptTemplates:
+      - name: chatMsg
+        template: |
+          <start_of_turn>user
+          {{if .Content }}{{ .Content }}{{ end }}<end_of_turn>
+      - name: chat
+        template: |
+          {{ .Input }}
+          <start_of_turn>model
+config: |
+  - name: gemma-1.1-2b-instruct
+    backend: llama
+    parameters:
+      model: gemma-1.1-2b-it-Q4_K_M.gguf
+    context_size: 8192
+    template:
+      chat_message: chatMsg
+      chat: chat
+    repeat_penalty: 1
+    stopwords:
+     - \"<start_of_turn>\"
+     - \"<end_of_turn>\"
+    gpu_layers: 35
+    f16: true
+    batch: 512
+    mmap: true
