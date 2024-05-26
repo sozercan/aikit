@@ -15,6 +15,10 @@ config: |
     parameters:
       model: Meta-Llama-3-70B-Instruct-Q4_K_M.gguf
     context_size: 8192
+    gpu_layers: 81
+    f16: true
+    batch: 512
+    mmap: true
     template:
       chat_message: \"instruct\"
     stopwords:

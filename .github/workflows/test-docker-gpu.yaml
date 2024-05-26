@@ -10,21 +10,21 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 240
     strategy:
-      fail-fast: true
+      fail-fast: false
       max-parallel: 1
       matrix:
         backend:
-          - llama-cuda
-          # - exllama # https://github.com/sozercan/aikit/issues/94
+          - llama
+          # - exllama
           - exllama2-gptq
           - exllama2-exl2
-          - mamba
+          # - mamba
     steps:
       - name: cleanup workspace
         run: |
           rm -rf ./* || true
           rm -rf ./.??* || true
-      - uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b # v4.1.5
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
         # use default docker driver builder with containerd image store for local aikit image
         # these must be setup before running this test
@@ -48,7 +48,7 @@ jobs:
         run: docker run --name testmodel -d --rm -p 8080:8080 --gpus all testmodel:test
 
       - name: run test (gguf)
-        if: matrix.backend == 'llama-cuda'
+        if: matrix.backend == 'llama'
         run: |
           result=$(curl --fail --retry 10 --retry-all-errors http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
             "model": "llama-3-8b-instruct",
@@ -62,7 +62,7 @@ jobs:
           fi
 
       - name: run test (exl2/gptq)
-        if: matrix.backend == 'exllama2-gptq' || matrix.backend == 'exllama2-exl2'
+        if: matrix.backend == 'exllama2-gptq' || matrix.backend == 'exllama2-exl2' || matrix.backend == 'exllama'
         run: |
           result=$(curl --fail --retry 10 --retry-all-errors http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
             "model": "llama-2-7b-chat",

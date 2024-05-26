@@ -21,7 +21,6 @@ func TestNewFromBytes(t *testing.T) {
 			name: "valid yaml",
 			args: args{b: []byte(`
 apiVersion: v1alpha1
-runtime: avx512
 backends:
 - exllama
 - stablediffusion
@@ -31,7 +30,6 @@ models:
 `)},
 			want: &InferenceConfig{
 				APIVersion: utils.APIv1alpha1,
-				Runtime:    utils.RuntimeCPUAVX512,
 				Backends: []string{
 					utils.BackendExllama,
 					utils.BackendStableDiffusion,

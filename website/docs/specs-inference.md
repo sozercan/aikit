@@ -7,7 +7,6 @@ title: Inference API Specifications
 ```yaml
 apiVersion: # required. only v1alpha1 is supported at the moment
 debug: # optional. if set to true, debug logs will be printed
-runtime: # optional. defaults to avx. can be "avx", "avx2", "avx512", "cuda"
 backends: # optional. list of additional backends. can be "stablediffusion", "exllama" or "exllama2"
 models: # required. list of models to build
   - name: # required. name of the model
@@ -25,7 +24,6 @@ Example:
 #syntax=ghcr.io/sozercan/aikit:latest
 apiVersion: v1alpha1
 debug: true
-runtime: cuda
 backends:
   - stablediffusion
 models:

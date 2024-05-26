@@ -1,7 +1,6 @@
 #syntax=aikit:test
 apiVersion: v1alpha1
 debug: true
-runtime: avx2
 models:
   - name: llama-3-8b-instruct
     source: https://huggingface.co/QuantFactory/Meta-Llama-3-8B-Instruct-GGUF/resolve/main/Meta-Llama-3-8B-Instruct.Q4_K_M.gguf
@@ -16,6 +15,10 @@ config: |
     parameters:
       model: Meta-Llama-3-8B-Instruct.Q4_K_M.gguf
     context_size: 8192
+    gpu_layers: 33
+    f16: true
+    batch: 512
+    mmap: true
     template:
       chat_message: \"instruct\"
     stopwords:
