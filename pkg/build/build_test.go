@@ -29,6 +29,14 @@ func Test_validateConfig(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "invalid runtime",
+			args: args{c: &config.InferenceConfig{
+				APIVersion: "v1",
+				Runtime:    "foo",
+			}},
+			wantErr: true,
+		},
+		{
 			name: "no models",
 			args: args{c: &config.InferenceConfig{
 				APIVersion: "v1alpha1",
@@ -39,6 +47,7 @@ func Test_validateConfig(t *testing.T) {
 			name: "valid backend",
 			args: args{c: &config.InferenceConfig{
 				APIVersion: "v1alpha1",
+				Runtime:    "cuda",
 				Backends:   []string{"exllama"},
 				Models: []config.Model{
 					{
@@ -64,9 +73,24 @@ func Test_validateConfig(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "valid backend but no cuda runtime",
+			args: args{c: &config.InferenceConfig{
+				APIVersion: "v1alpha1",
+				Backends:   []string{"exllama"},
+				Models: []config.Model{
+					{
+						Name:   "test",
+						Source: "foo",
+					},
+				},
+			}},
+			wantErr: true,
+		},
+		{
 			name: "invalid backend combination 1",
 			args: args{c: &config.InferenceConfig{
 				APIVersion: "v1alpha1",
+				Runtime:    "cuda",
 				Backends:   []string{"exllama", "exllama2"},
 				Models: []config.Model{
 					{
@@ -81,6 +105,7 @@ func Test_validateConfig(t *testing.T) {
 			name: "invalid backend combination 2",
 			args: args{c: &config.InferenceConfig{
 				APIVersion: "v1alpha1",
+				Runtime:    "cuda",
 				Backends:   []string{"exllama", "stablediffusion"},
 				Models: []config.Model{
 					{

@@ -44,7 +44,9 @@ func emptyImage(c *config.InferenceConfig) *specs.Image {
 		"LD_LIBRARY_PATH=/usr/local/cuda/lib64",
 		"BUILD_TYPE=cublas",
 	}
-	img.Config.Env = append(img.Config.Env, cudaEnv...)
+	if c.Runtime == utils.RuntimeNVIDIA {
+		img.Config.Env = append(img.Config.Env, cudaEnv...)
+	}
 
 	for b := range c.Backends {
 		switch c.Backends[b] {

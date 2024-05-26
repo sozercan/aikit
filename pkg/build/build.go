@@ -266,11 +266,20 @@ func validateInferenceConfig(c *config.InferenceConfig) error {
 		return errors.New("cannot specify both stablediffusion with exllama or exllama2 at this time")
 	}
 
+	if (slices.Contains(c.Backends, utils.BackendExllama) || slices.Contains(c.Backends, utils.BackendExllamaV2) || slices.Contains(c.Backends, utils.BackendMamba)) && c.Runtime != utils.RuntimeNVIDIA {
+		return errors.New("exllama and mamba only supports nvidia cuda runtime. please add 'runtime: cuda' to your aikitfile.yaml")
+	}
+
 	backends := []string{utils.BackendExllama, utils.BackendExllamaV2, utils.BackendStableDiffusion, utils.BackendMamba}
 	for _, b := range c.Backends {
 		if !slices.Contains(backends, b) {
 			return errors.Errorf("backend %s is not supported", b)
 		}
+	}
+
+	runtimes := []string{"", utils.RuntimeNVIDIA, utils.RuntimeCPUAVX, utils.RuntimeCPUAVX2, utils.RuntimeCPUAVX512}
+	if !slices.Contains(runtimes, c.Runtime) {
+		return errors.Errorf("runtime %s is not supported", c.Runtime)
 	}
 
 	return nil

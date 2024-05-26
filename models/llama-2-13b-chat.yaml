@@ -1,6 +1,7 @@
 #syntax=ghcr.io/sozercan/aikit:latest
 apiVersion: v1alpha1
 debug: true
+runtime: cuda
 models:
   - name: llama-2-13b-chat
     source: https://huggingface.co/TheBloke/Llama-2-13B-Chat-GGUF/resolve/main/llama-2-13b-chat.Q4_K_M.gguf

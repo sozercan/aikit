@@ -1,6 +1,7 @@
 #syntax=ghcr.io/sozercan/aikit:latest
 apiVersion: v1alpha1
 debug: true
+runtime: cuda
 models:
   - name: phi-3-3.8b
     source: https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi-3-mini-4k-instruct-q4.gguf
