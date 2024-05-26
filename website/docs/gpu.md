@@ -14,6 +14,10 @@ For Kubernetes, [NVIDIA GPU Operator](https://github.com/NVIDIA/gpu-operator) pr
 
 To get started with GPU-accelerated inferencing, make sure to set the following in your `aikitfile` and build your model.
 
+```yaml
+runtime: cuda         # use NVIDIA CUDA runtime
+```
+
 For `llama` backend, set the following in your `config`:
 
 ```yaml

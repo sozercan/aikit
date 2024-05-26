@@ -1,0 +1,19 @@
+{{- if .Values.ui.enabled }}
+{{- if .Values.ui.persistentVolume.enabled }}
+{{- if not .Values.ui.persistentVolume.claimName }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ (printf "%s-webui" (include "aikit.fullname" .)) }}
+  labels:
+    {{- include "aikit.labels" . | nindent 4 }}
+spec:
+  accessModes:
+{{ toYaml .Values.ui.persistentVolume.accessModes | indent 4 }}
+  storageClassName: "{{ .Values.ui.persistentVolume.storageClass }}"
+  resources:
+    requests:
+      storage: "{{ .Values.ui.persistentVolume.size }}"
+{{- end }}
+{{- end }}
+{{- end }}

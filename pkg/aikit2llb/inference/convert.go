@@ -28,7 +28,11 @@ func Aikit2LLB(c *config.InferenceConfig) (llb.State, *specs.Image) {
 
 	state, merge = copyModels(c, base, state)
 	state, merge = addLocalAI(state, merge)
-	state, merge = installCuda(c, state, merge)
+
+	// install cuda if runtime is nvidia
+	if c.Runtime == utils.RuntimeNVIDIA {
+		state, merge = installCuda(c, state, merge)
+	}
 
 	// install opencv and friends if stable diffusion backend is being used
 	for b := range c.Backends {
@@ -125,9 +129,10 @@ func installCuda(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.S
 	// running apt-get update twice due to nvidia repo
 	s = s.Run(utils.Sh("apt-get update && apt-get install --no-install-recommends -y ca-certificates && apt-get update"), llb.IgnoreCache).Root()
 
-	// install cuda libraries
+	// default llama.cpp backend is being used
 	if len(c.Backends) == 0 {
-		s = s.Run(utils.Shf("apt-get install -y --no-install-recommends libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean", cudaVersion)).Root()
+		// install cuda libraries and pciutils for gpu detection
+		s = s.Run(utils.Shf("apt-get install -y --no-install-recommends pciutils libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean", cudaVersion)).Root()
 		// using a distroless base image here
 		// convert debian package metadata status file to distroless status.d directory
 		// clean up apt directories
