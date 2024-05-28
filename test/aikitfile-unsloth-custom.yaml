@@ -19,7 +19,7 @@ config: |
     backend: llama
     parameters:
       top_k: 80
-      temperature: 0.8
+      temperature: 0.2
       top_p: 0.7
       model: model-q4_k_m.gguf
     context_size: 4096
@@ -29,3 +29,11 @@ config: |
     mmap:
     template:
       chat: instruct
+    stopwords:
+    - <|im_end|>
+    - <dummy32000>
+    - <|end_of_text|>
+    - <|start_header_id|>
+    - <|end_header_id|>
+    - <|eot_id|>
+    - <|reserved_special_token

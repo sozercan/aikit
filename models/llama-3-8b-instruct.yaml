@@ -23,6 +23,9 @@ config: |
     template:
       chat_message: \"instruct\"
     stopwords:
+    - <|im_end|>
+    - <dummy32000>
+    - <|end_of_text|>
     - <|start_header_id|>
     - <|end_header_id|>
     - <|eot_id|>
