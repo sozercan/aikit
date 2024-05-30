@@ -2,7 +2,7 @@
 title: llama.cpp (GGUF and GGML)
 ---
 
-[Llama.cpp](https://github.com/ggerganov/llama.cpp) is a port of Facebook's LLaMA model in C/C++.
+AIKit utilizes and depends on [llama.cpp](https://github.com/ggerganov/llama.cpp), which provides inference of Meta's LLaMA model (and others) in pure C/C++, for the `llama` backend.
 
 This is the default backend for `aikit`. No additional configuration is required.
 
