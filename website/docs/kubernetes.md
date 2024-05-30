@@ -19,7 +19,8 @@ Please make sure you have Helm installed and configured. If you don't have Helm 
 Install the chart using the following command:
 
 ```bash
-helm install aikit ./charts/aikit
+helm repo add aikit https://sozercan.github.io/aikit/charts
+helm install aikit/aikit --name-template=aikit
 ```
 
 Output will be similar to:
