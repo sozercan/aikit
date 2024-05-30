@@ -5,7 +5,7 @@ runtime: cuda
 models:
   - name: phi-3-3.8b
     source: https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi-3-mini-4k-instruct-q4.gguf
-    sha256: 4fed7364ee3e0c7cb4fe0880148bfdfcd1b630981efa0802a6b62ee52e7da97e
+    sha256: 8a83c7fb9049a9b2e92266fa7ad04933bb53aa1e85136b7b30f1b8000ff2edef
     promptTemplates:
       - name: chatMsg
         template: |
