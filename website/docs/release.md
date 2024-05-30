@@ -4,7 +4,9 @@ title: Release Process
 
 The release process is as follows:
 
-- Tag the `main` branch with a version number that's semver compliant (vMAJOR.MINOR.PATCH), and push the tag to GitHub.
+- Trigger the [release-pr action](https://github.com/sozercan/aikit/actions/workflows/release-pr.yaml) with the version to release to create a release PR. Merge the PR to the applicable `release-X.Y` branch.
+
+- Tag the `release-X.Y` branch with a version number that's semver compliant (vMAJOR.MINOR.PATCH), and push the tag to GitHub.
 
 ```bash
 git tag v0.1.0
