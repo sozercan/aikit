@@ -1,0 +1,31 @@
+#syntax=ghcr.io/sozercan/aikit:latest
+apiVersion: v1alpha1
+debug: true
+runtime: cuda
+models:
+  - name: codestral-0.1-22b
+    source: https://huggingface.co/lmstudio-community/Codestral-22B-v0.1-GGUF/resolve/main/Codestral-22B-v0.1-Q4_K_M.gguf
+    sha256: defc9e0a1bb42857558d43df4e7f0f3d0a29d06a953e498e967d763f45d10431
+    promptTemplates:
+      - name: instruct
+        template: |
+          [INST]{{ if .SystemPrompt }}{{ .SystemPrompt }}{{ end }} {{ .Input }}[/INST]
+config: |
+  - name: codestral-0.1-22b
+    backend: llama
+    parameters:
+      model: Codestral-22B-v0.1-Q4_K_M.gguf
+    context_size: 8192
+    template:
+      chat: instruct
+      completion: instruct
+    stopwords:
+     - \"[INST]\"
+     - \"[/INST]\"
+     - \"[PREFIX]\"
+     - \"[MIDDLE]\"
+     - \"[SUFFIX]\"
+    gpu_layers: 50
+    f16: true
+    batch: 512
+    mmap: true
