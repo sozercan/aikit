@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       staging:
-        description: 'push to staging registry'
+        description: 'push to test registry'
         required: false
         default: false
         type: boolean
