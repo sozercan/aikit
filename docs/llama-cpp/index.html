@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.1.0">
 <title data-rh="true">llama.cpp (GGUF and GGML) | AIKit</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://sozercan.github.io/aikit/docs/img/logo.png"><meta data-rh="true" name="twitter:image" content="https://sozercan.github.io/aikit/docs/img/logo.png"><meta data-rh="true" property="og:url" content="https://sozercan.github.io/aikit/docs/llama-cpp"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="llama.cpp (GGUF and GGML) | AIKit"><meta data-rh="true" name="description" content="AIKit utilizes and depends on llama.cpp, which provides inference of Meta&#x27;s LLaMA model (and others) in pure C/C++, for the llama backend."><meta data-rh="true" property="og:description" content="AIKit utilizes and depends on llama.cpp, which provides inference of Meta&#x27;s LLaMA model (and others) in pure C/C++, for the llama backend."><link data-rh="true" rel="icon" href="/aikit/docs/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://sozercan.github.io/aikit/docs/llama-cpp"><link data-rh="true" rel="alternate" href="https://sozercan.github.io/aikit/docs/llama-cpp" hreflang="en"><link data-rh="true" rel="alternate" href="https://sozercan.github.io/aikit/docs/llama-cpp" hreflang="x-default"><link rel="stylesheet" href="/aikit/docs/assets/css/styles.9df81945.css">
-<script src="/aikit/docs/assets/js/runtime~main.3cb540fa.js" defer="defer"></script>
+<script src="/aikit/docs/assets/js/runtime~main.4f9695fa.js" defer="defer"></script>
 <script src="/aikit/docs/assets/js/main.04d3578d.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -13,7 +13,7 @@
 <p>This backend:</p>
 <ul>
 <li>provides support for GGUF (recommended) and GGML models</li>
-<li>supports both CPU (AVX, AVX2 or AVX512) and CUDA runtimes</li>
+<li>supports both CPU (<code>avx2</code>, <code>avx</code> or <code>fallback</code>) and CUDA runtimes</li>
 </ul>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="example">Example<a href="#example" class="hash-link" aria-label="Direct link to Example" title="Direct link to Example">​</a></h2>
 <div class="theme-admonition theme-admonition-warning admonition_xJq3 alert alert--warning"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg></span>warning</div><div class="admonitionContent_BuS1"><p>Please make sure to change syntax to <code>#syntax=ghcr.io/sozercan/aikit:latest</code> in the examples below.</p></div></div>
