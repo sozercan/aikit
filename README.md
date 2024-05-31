@@ -28,7 +28,7 @@ AIKit offers two main capabilities:
 - 📦 Supports multiple models with a single image
 - 🖥️ [Supports GPU-accelerated inferencing with NVIDIA GPUs](#nvidia)
 - 🔐 [Signed images for `aikit` and pre-made models](https://sozercan.github.io/aikit/docs/cosign)
-- 🌈 Support for local, self-hosted or any remote container registries to store model images
+- 🌈 Supports air-gapped environments with self-hosted, local, or any remote container registries to store model images for inference on the edge.
 
 ## Quick Start
 

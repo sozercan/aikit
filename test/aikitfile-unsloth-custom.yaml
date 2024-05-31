@@ -26,6 +26,6 @@ config: |
     gpu_layers: 35
     f16: true
     batch: 512
-    mmap:
+    mmap: true
     template:
       chat: instruct
