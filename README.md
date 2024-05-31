@@ -67,8 +67,8 @@ If it doesn't include a specific model, you can always [create your own images](
 | 🦙 Llama 2       | Chat         | 13B        | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama2:13b`       | `llama-2-13b-chat`      | [Llama](https://ai.meta.com/llama/license/)                                         |
 | Ⓜ️ Mixtral       | Instruct     | 8x7B       | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/mixtral:8x7b`     | `mixtral-8x7b-instruct` | [Apache](https://choosealicense.com/licenses/apache-2.0/)                           |
 | 🅿️ Phi 3         | Instruct     | 3.8B       | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/phi3:3.8b`        | `phi-3-3.8b`            | [MIT](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct/resolve/main/LICENSE) |
-| 🔡 Gemma 1.1     | Instruct     | 2B         | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/gemma1.1:2b`      | `gemma-1.1-2b-instruct` | [Gemma](https://ai.google.dev/gemma/terms)                                          |
-| ⌨️ Codestral 0.1 | Code         | 22B        | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/codestral0.1:22b` | `codestral-0.1-22b`     | [MNLP](https://mistral.ai/licenses/MNPL-0.1.md)                                     |
+| 🔡 Gemma 1.1     | Instruct     | 2B         | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/gemma:2b`      | `gemma-2b-instruct` | [Gemma](https://ai.google.dev/gemma/terms)                                          |
+| ⌨️ Codestral 0.1 | Code         | 22B        | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/codestral:22b` | `codestral-22b`     | [MNLP](https://mistral.ai/licenses/MNPL-0.1.md)                                     |
 
 ### NVIDIA CUDA
 
@@ -80,8 +80,8 @@ If it doesn't include a specific model, you can always [create your own images](
 | 🦙 Llama 2       | Chat         | 13B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama2:13b`       | `llama-2-13b-chat`      | [Llama](https://ai.meta.com/llama/license/)                                         |
 | Ⓜ️ Mixtral       | Instruct     | 8x7B       | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/mixtral:8x7b`     | `mixtral-8x7b-instruct` | [Apache](https://choosealicense.com/licenses/apache-2.0/)                           |
 | 🅿️ Phi 3         | Instruct     | 3.8B       | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/phi3:3.8b`        | `phi-3-3.8b`            | [MIT](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct/resolve/main/LICENSE) |
-| 🔡 Gemma 1.1     | Instruct     | 2B         | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/gemma1.1:2b`      | `gemma-1.1-2b-instruct` | [Gemma](https://ai.google.dev/gemma/terms)                                          |
-| ⌨️ Codestral 0.1 | Code         | 22B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/codestral0.1:22b` | `codestral-0.1-22b`     | [MNLP](https://mistral.ai/licenses/MNPL-0.1.md)                                     |
+| 🔡 Gemma 1.1     | Instruct     | 2B         | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/gemma:2b`      | `gemma-2b-instruct` | [Gemma](https://ai.google.dev/gemma/terms)                                          |
+| ⌨️ Codestral 0.1 | Code         | 22B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/codestral:22b` | `codestral-22b`     | [MNLP](https://mistral.ai/licenses/MNPL-0.1.md)                                     |
 
 ## What's next?
 
