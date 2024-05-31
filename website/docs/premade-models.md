@@ -37,7 +37,7 @@ Please see [models folder](https://github.com/sozercan/aikit/tree/main/models) f
 
 If not being offloaded to GPU VRAM, minimum of 8GB of RAM is required for 7B models, 16GB of RAM to run 13B models, and 32GB of RAM to run 8x7B models.
 
-All pre-made models include CUDA v12 libraries. They are used with [NVIDIA GPU acceleration](#gpu-acceleration-support). If a supported NVIDIA GPU is not found in your system, AIKit will automatically fallback to CPU with the most optimized runtime (`avx2`, `avx`, or `fallback`).
+All pre-made models include CUDA v12 libraries. They are used with [NVIDIA GPU acceleration](gpu.md). If a supported NVIDIA GPU is not found in your system, AIKit will automatically fallback to CPU with the most optimized runtime (`avx2`, `avx`, or `fallback`).
 :::
 
 ## Deprecated Models

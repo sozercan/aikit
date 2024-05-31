@@ -17,7 +17,23 @@ curl http://localhost:8080/v1/chat/completions -H "Content-Type: application/jso
 
 Output should be similar to:
 
-`{"created":1713494426,"object":"chat.completion","id":"fce01ee0-7b5a-452d-8f98-b6cb406a1067","model":"llama-3-8b-instruct","choices":[{"index":0,"finish_reason":"stop","message":{"role":"assistant","content":"Kubernetes is an open-source container orchestration system that automates the deployment, scaling, and management of applications and services, allowing developers to focus on writing code rather than managing infrastructure."}}],"usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0}}`
+```jsonc
+{
+  // ...
+    "model": "llama-3-8b-instruct",
+    "choices": [
+        {
+            "index": 0,
+            "finish_reason": "stop",
+            "message": {
+                "role": "assistant",
+                "content": "Kubernetes is an open-source container orchestration system that automates the deployment, scaling, and management of applications and services, allowing developers to focus on writing code rather than managing infrastructure."
+            }
+        }
+    ],
+    // ...
+}
+```
 
 That's it! 🎉 API is OpenAI compatible so this is a drop-in replacement for any OpenAI API compatible client.
 
