@@ -24,8 +24,8 @@ jobs:
          - llama-2-13b-chat
          - llama-3-8b-instruct
          - phi-3-3.8b
-         - gemma-1.1-2b-instruct
-         - codestral-0.1-22b
+         - gemma-2b-instruct
+         - codestral-22b
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
