@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       staging:
-        description: 'push to staging registry'
+        description: 'push to test registry'
         required: false
         default: false
         type: boolean
@@ -24,8 +24,8 @@ jobs:
          - llama-2-13b-chat
          - llama-3-8b-instruct
          - phi-3-3.8b
-         - gemma-1.1-2b-instruct
-         - codestral-0.1-22b
+         - gemma-2b-instruct
+         - codestral-22b
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
@@ -79,8 +79,8 @@ jobs:
 
       - name: parse matrix
         run: |
-          echo "MODEL_NAME=$(echo ${{ matrix.model }} | sed -E 's/([a-z]+)-([0-9]+x[0-9]+b)-.*/\1/' | sed -E 's/([a-z]+)-([0-9]+)-.*/\1\2/')" >> $GITHUB_ENV
-          echo "MODEL_SIZE=$(echo ${{ matrix.model }} | sed -E 's/[a-z]+-([0-9]+x[0-9]+b|[0-9]+\.?[0-9]*b)-.*/\1/' | sed -E 's/[a-z]+-[0-9]+-([0-9]+\.?[0-9]*b).*/\1/')" >> $GITHUB_ENV
+          echo "MODEL_NAME=$(echo ${{ matrix.model }} | sed -E 's/^([a-z]+)-([0-9]+x[0-9]+b|[0-9]+\.?[0-9]*b)-.*/\1/' | sed -E 's/^([a-z]+)-([0-9]+)-.*/\1\2/' | sed -E 's/^([a-z]+)-([0-9]+\.?[0-9]*b)$/\1/')" >> $GITHUB_ENV
+          echo "MODEL_SIZE=$(echo ${{ matrix.model }} | sed -E 's/^[a-z]+-([0-9]+x[0-9]+b|[0-9]+\.?[0-9]*b)-.*/\1/' | sed -E 's/^[a-z]+-[0-9]+-([0-9]+\.?[0-9]*b).*/\1/' | sed -E 's/^[a-z]+-([0-9]+\.?[0-9]*b)$/\1/')" >> $GITHUB_ENV
           echo "MODEL_TYPE=-$(echo ${{ matrix.model }} | sed -n -e 's/.*\(chat\).*/\1/p' -e 's/.*\(instruct\).*/\1/p')" >> $GITHUB_ENV
 
       - name: Build and push
