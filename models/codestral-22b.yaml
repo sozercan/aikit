@@ -3,7 +3,7 @@ apiVersion: v1alpha1
 debug: true
 runtime: cuda
 models:
-  - name: codestral-0.1-22b
+  - name: codestral-22b
     source: https://huggingface.co/lmstudio-community/Codestral-22B-v0.1-GGUF/resolve/main/Codestral-22B-v0.1-Q4_K_M.gguf
     sha256: defc9e0a1bb42857558d43df4e7f0f3d0a29d06a953e498e967d763f45d10431
     promptTemplates:
@@ -11,7 +11,7 @@ models:
         template: |
           [INST]{{ if .SystemPrompt }}{{ .SystemPrompt }}{{ end }} {{ .Input }}[/INST]
 config: |
-  - name: codestral-0.1-22b
+  - name: codestral-22b
     backend: llama
     parameters:
       model: Codestral-22B-v0.1-Q4_K_M.gguf

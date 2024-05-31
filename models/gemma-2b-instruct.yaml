@@ -3,7 +3,7 @@ apiVersion: v1alpha1
 debug: true
 runtime: cuda
 models:
-  - name: gemma-1.1-2b-instruct
+  - name: gemma-2b-instruct
     source: https://huggingface.co/lmstudio-community/gemma-1.1-2b-it-GGUF/resolve/main/gemma-1.1-2b-it-Q4_K_M.gguf
     sha256: cc2118e1d780fa33582738d8c99223d62c8734b06ef65076c01618d484d081d4
     promptTemplates:
@@ -19,7 +19,7 @@ models:
         template: |
           {{ .Input }}
 config: |
-  - name: gemma-1.1-2b-instruct
+  - name: gemma-2b-instruct
     backend: llama
     parameters:
       model: gemma-1.1-2b-it-Q4_K_M.gguf
