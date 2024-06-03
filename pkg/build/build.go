@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"regexp"
 	"slices"
 	"strings"
 
@@ -13,7 +12,6 @@ import (
 	"github.com/moby/buildkit/exporter/containerimage/exptypes"
 	"github.com/moby/buildkit/frontend/dockerui"
 	"github.com/moby/buildkit/frontend/gateway/client"
-	"github.com/moby/buildkit/util/gitutil"
 	"github.com/pkg/errors"
 	"github.com/sozercan/aikit/pkg/aikit/config"
 	"github.com/sozercan/aikit/pkg/aikit2llb/finetune"
@@ -122,26 +120,27 @@ func getAikitfileConfig(ctx context.Context, c client.Client) (*config.Inference
 
 	context := opts[localNameContext]
 
-	var st llb.State
-	var err error
+	var st *llb.State
+	var ok bool
 	switch {
 	case strings.HasPrefix(context, "git"):
-		st, err = DetectGitContext(context, true)
-		if err != nil {
-			return nil, nil, err
+		st, ok = dockerui.DetectGitContext(context, true)
+		if !ok {
+			return nil, nil, errors.Errorf("invalid git context %s", context)
 		}
 	case strings.HasPrefix(context, "http") || strings.HasPrefix(context, "https"):
-		st, err = DetectGitContext(context, true)
-		if err != nil {
-			st = llb.HTTP(context, llb.WithCustomName("[context] "+context))
+		st, ok = dockerui.DetectGitContext(context, true)
+		if !ok {
+			st, filename, _ = dockerui.DetectHTTPContext(context)
 		}
 	default:
-		st = llb.Local(localNameDockerfile,
+		localSt := llb.Local(localNameDockerfile,
 			llb.IncludePatterns([]string{filename}),
 			llb.SessionID(c.BuildOpts().SessionID),
 			llb.SharedKeyHint(defaultAikitfileName),
 			dockerui.WithInternalName(name),
 		)
+		st = &localSt
 	}
 
 	def, err := st.Marshal(ctx)
@@ -336,32 +335,4 @@ func validateInferenceConfig(c *config.InferenceConfig) error {
 	}
 
 	return nil
-}
-
-func DetectGitContext(ref string, keepGit bool) (llb.State, error) {
-	g, err := gitutil.ParseGitRef(ref)
-	if err != nil {
-		return llb.State{}, err
-	}
-	commit := g.Commit
-	if g.SubDir != "" {
-		commit += ":" + g.SubDir
-	}
-	gitOpts := []llb.GitOption{dockerui.WithInternalName("load git source " + ref)}
-	if keepGit {
-		gitOpts = append(gitOpts, llb.KeepGitDir())
-	}
-
-	st := llb.Git(g.Remote, commit, gitOpts...)
-	return st, nil
-}
-
-func DetectHTTPContext(ref string) (llb.State, string, bool) {
-	filename := "context"
-	httpPrefix := regexp.MustCompile(`^https?://`)
-	if httpPrefix.MatchString(ref) {
-		st := llb.HTTP(ref, llb.Filename(filename), dockerui.WithInternalName("load remote build context"))
-		return st, filename, true
-	}
-	return llb.State{}, "", false
 }
