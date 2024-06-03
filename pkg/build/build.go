@@ -4,13 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"slices"
+	"strings"
 
 	"github.com/containerd/containerd/platforms"
 	"github.com/moby/buildkit/client/llb"
 	"github.com/moby/buildkit/exporter/containerimage/exptypes"
 	"github.com/moby/buildkit/frontend/dockerui"
 	"github.com/moby/buildkit/frontend/gateway/client"
+	"github.com/moby/buildkit/util/gitutil"
 	"github.com/pkg/errors"
 	"github.com/sozercan/aikit/pkg/aikit/config"
 	"github.com/sozercan/aikit/pkg/aikit2llb/finetune"
@@ -19,11 +22,13 @@ import (
 )
 
 const (
-	LocalNameDockerfile   = "dockerfile"
-	keyFilename           = "filename"
-	defaultDockerfileName = "aikitfile.yaml"
-	target                = "target"
-	output                = "output"
+	localNameContext     = "context"
+	localNameDockerfile  = "dockerfile"
+	localNameAikitfile   = "aikitfile.yaml"
+	defaultAikitfileName = "aikitfile.yaml"
+	keyFilename          = "filename"
+	keyTarget            = "target"
+	keyOutput            = "output"
 )
 
 func Build(ctx context.Context, c client.Client) (*client.Result, error) {
@@ -107,32 +112,48 @@ func getAikitfileConfig(ctx context.Context, c client.Client) (*config.Inference
 	opts := c.BuildOpts().Opts
 	filename := opts[keyFilename]
 	if filename == "" {
-		filename = defaultDockerfileName
+		filename = defaultAikitfileName
 	}
 
 	name := "load aikitfile"
-	if filename != "aikitfile" {
+	if filename != "aikitfile.yaml" {
 		name += " from " + filename
 	}
 
-	src := llb.Local(LocalNameDockerfile,
-		llb.IncludePatterns([]string{filename}),
-		llb.SessionID(c.BuildOpts().SessionID),
-		llb.SharedKeyHint(defaultDockerfileName),
-		dockerui.WithInternalName(name),
-	)
+	context := opts[localNameContext]
 
-	def, err := src.Marshal(ctx)
+	var st llb.State
+	var err error
+	switch {
+	case strings.HasPrefix(context, "git"):
+		st, err = DetectGitContext(context, true)
+		if err != nil {
+			return nil, nil, err
+		}
+	case strings.HasPrefix(context, "http") || strings.HasPrefix(context, "https"):
+		st, err = DetectGitContext(context, true)
+		if err != nil {
+			st = llb.HTTP(context, llb.WithCustomName("[context] "+context))
+		}
+	default:
+		st = llb.Local(localNameDockerfile,
+			llb.IncludePatterns([]string{filename}),
+			llb.SessionID(c.BuildOpts().SessionID),
+			llb.SharedKeyHint(defaultAikitfileName),
+			dockerui.WithInternalName(name),
+		)
+	}
+
+	def, err := st.Marshal(ctx)
 	if err != nil {
 		return nil, nil, errors.Wrapf(err, "failed to marshal local source")
 	}
 
-	var dtDockerfile []byte
 	res, err := c.Solve(ctx, client.SolveRequest{
 		Definition: def.ToPB(),
 	})
 	if err != nil {
-		return nil, nil, errors.Wrapf(err, "failed to resolve dockerfile")
+		return nil, nil, errors.Wrapf(err, "failed to resolve aikitfile")
 	}
 
 	ref, err := res.SingleRef()
@@ -140,30 +161,62 @@ func getAikitfileConfig(ctx context.Context, c client.Client) (*config.Inference
 		return nil, nil, err
 	}
 
-	dtDockerfile, err = ref.ReadFile(ctx, client.ReadRequest{
+	dtAikitfile, err := ref.ReadFile(ctx, client.ReadRequest{
 		Filename: filename,
 	})
 	if err != nil {
-		return nil, nil, errors.Wrapf(err, "failed to read dockerfile")
+		return nil, nil, errors.Wrapf(err, "failed to read aikitfile")
 	}
 
-	inferenceCfg, finetuneCfg, err := config.NewFromBytes(dtDockerfile)
+	inferenceCfg, finetuneCfg, err := config.NewFromBytes(dtAikitfile)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "getting config")
 	}
 	if finetuneCfg != nil {
-		target, ok := opts[target]
+		target, ok := opts[keyTarget]
 		if !ok {
 			target = utils.TargetUnsloth
 		}
 		finetuneCfg.Target = target
 
-		if opts[output] != "" {
+		if opts[keyOutput] != "" {
 			return nil, nil, errors.New("--output is required for finetune. please specify a directory to save the finetuned model")
 		}
 	}
 
+	// parse build args
+	if inferenceCfg != nil {
+		modelID := getBuildArg(opts, "MODEL_ID")
+		modelFile := getBuildArg(opts, "MODEL_FILE")
+		if modelID != "" && modelFile != "" {
+			if !strings.HasPrefix(modelID, "huggingface://") {
+				return nil, nil, errors.New("only huggingface models are supported at this time")
+			}
+			if !strings.HasSuffix(modelFile, ".gguf") {
+				return nil, nil, errors.New("only GGUF files are supported at this time")
+			}
+
+			inferenceCfg.Models[0].Name = modelFile
+			modelID = strings.TrimPrefix(modelID, "huggingface://")
+			inferenceCfg.Models[0].Source = "https://huggingface.co/" + modelID + "/resolve/main/" + modelFile
+			inferenceCfg.Config = fmt.Sprintf(`
+- name: %[1]s
+  backend: llama
+  parameters:
+    model: %[1]s`, modelFile)
+		}
+	}
+
 	return inferenceCfg, finetuneCfg, nil
+}
+
+func getBuildArg(opts map[string]string, k string) string {
+	if opts != nil {
+		if v, ok := opts["build-arg:"+k]; ok {
+			return v
+		}
+	}
+	return ""
 }
 
 func validateFinetuneConfig(c *config.FineTuneConfig) error {
@@ -283,4 +336,32 @@ func validateInferenceConfig(c *config.InferenceConfig) error {
 	}
 
 	return nil
+}
+
+func DetectGitContext(ref string, keepGit bool) (llb.State, error) {
+	g, err := gitutil.ParseGitRef(ref)
+	if err != nil {
+		return llb.State{}, err
+	}
+	commit := g.Commit
+	if g.SubDir != "" {
+		commit += ":" + g.SubDir
+	}
+	gitOpts := []llb.GitOption{dockerui.WithInternalName("load git source " + ref)}
+	if keepGit {
+		gitOpts = append(gitOpts, llb.KeepGitDir())
+	}
+
+	st := llb.Git(g.Remote, commit, gitOpts...)
+	return st, nil
+}
+
+func DetectHTTPContext(ref string) (llb.State, string, bool) {
+	filename := "context"
+	httpPrefix := regexp.MustCompile(`^https?://`)
+	if httpPrefix.MatchString(ref) {
+		st := llb.HTTP(ref, llb.Filename(filename), dockerui.WithInternalName("load remote build context"))
+		return st, filename, true
+	}
+	return llb.State{}, "", false
 }

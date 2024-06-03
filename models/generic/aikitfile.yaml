@@ -1,0 +1,11 @@
+#syntax=aikit:test
+apiVersion: v1alpha1
+debug: true
+models:
+  - name: $MODEL_FILE
+    source: https://huggingface.co/$MODEL_ID/resolve/main/$MODEL_FILE
+config: |
+  - name: $MODEL_FILE
+    backend: llama
+    parameters:
+      model: $MODEL_FILE
