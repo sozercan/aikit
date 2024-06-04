@@ -201,6 +201,7 @@ func getAikitfileConfig(ctx context.Context, c client.Client) (*config.Inference
 			modelFile := m[4]
 
 			inferenceCfg.Runtime = runtimeArg
+			inferenceCfg.Models = make([]config.Model, 1)
 			inferenceCfg.Models[0].Name = modelFile
 			inferenceCfg.Models[0].Source = "https://huggingface.co/" + modelID + "/resolve/main/" + modelFile
 			inferenceCfg.Config = fmt.Sprintf(`
