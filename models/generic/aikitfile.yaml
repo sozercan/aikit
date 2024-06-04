@@ -1,6 +1,3 @@
 #syntax=aikit:test
 apiVersion: v1alpha1
 debug: true
-models:
-  - name: ""
-    source: ""
