@@ -186,7 +186,8 @@ func getAikitfileConfig(ctx context.Context, c client.Client) (*config.Inference
 	// parse build args
 	if inferenceCfg != nil {
 		// expected format: "huggingface://foo/bar/baz.gguf"
-		modelArg := getBuildArg(opts, "MODEL")
+		modelArg := getBuildArg(opts, "model")
+		runtimeArg := getBuildArg(opts, "runtime")
 		if modelArg != "" {
 			if !strings.HasPrefix(modelArg, "huggingface://") {
 				return nil, nil, errors.New("only huggingface models are supported at this time")
@@ -199,6 +200,7 @@ func getAikitfileConfig(ctx context.Context, c client.Client) (*config.Inference
 			modelID := fmt.Sprintf("%s/%s", m[2], m[3])
 			modelFile := m[4]
 
+			inferenceCfg.Runtime = runtimeArg
 			inferenceCfg.Models[0].Name = modelFile
 			inferenceCfg.Models[0].Source = "https://huggingface.co/" + modelID + "/resolve/main/" + modelFile
 			inferenceCfg.Config = fmt.Sprintf(`
