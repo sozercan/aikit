@@ -6,6 +6,36 @@ title: Creating Model Images
 This section shows how to create a custom image with models of your choosing. If you want to use one of the pre-made models, skip to [running models](#running-models).
 :::
 
+## Easy Start
+
+You can easily build an image from [Hugging Face](https://huggingface.co) models with the following command:
+
+```bash
+docker build -t my-model --load \
+	--build-arg="model=huggingface://TheBloke/Llama-2-7B-Chat-GGUF/llama-2-7b-chat.Q4_K_M.gguf" \
+	"https://raw.githubusercontent.com/sozercan/aikit/main/models/aikitfile.yaml"
+```
+
+After building the image, you can proceed to [running models](#running-models) to start the server.
+
+### Build Arguments
+
+Below are the build arguments you can use to customize the image:
+
+#### `model`
+
+The `model` build argument is the model URL to download and use. You can use any Hugging Face model URL. Syntax is `huggingface://foo/bar/baz.gguf`. For example:
+
+`--build-arg="model=huggingface://TheBloke/Llama-2-7B-Chat-GGUF/llama-2-7b-chat.Q4_K_M.gguf"`
+
+#### `runtime`
+
+The `runtime` build argument adds the applicable runtimes to the image. By default, aikit will automatically choose the most optimized CPU runtime. You can use `cuda` to include NVIDIA CUDA runtime libraries. For example:
+
+`--build-arg="runtime=cuda"`.
+
+## Advanced Usage
+
 Create an `aikitfile.yaml` with the following structure:
 
 ```yaml
