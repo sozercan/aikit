@@ -64,7 +64,9 @@ const config = {
         title: 'AIKit',
         logo: {
           alt: 'AIKit Logo',
-          src: 'img/logo.png',
+          src: 'img/logo.svg',
+          width: 32,
+          height: 32,
         },
         items: [
           {
