@@ -6,25 +6,55 @@ title: Creating Model Images
 This section shows how to create a custom image with models of your choosing. If you want to use one of the pre-made models, skip to [running models](#running-models).
 :::
 
+First, create a buildx buildkit instance.
+
+```bash
+docker buildx create --use --name aikit-builder
+```
+
+## Easy Start
+
+You can easily build an image from [Hugging Face](https://huggingface.co) models with the following command:
+
+```bash
+docker buildx build -t my-model --load \
+	--build-arg="model=huggingface://TheBloke/Llama-2-7B-Chat-GGUF/llama-2-7b-chat.Q4_K_M.gguf" \
+	"https://raw.githubusercontent.com/sozercan/aikit/main/models/aikitfile.yaml"
+```
+
+After building the image, you can proceed to [running models](#running-models) to start the server.
+
+### Build Arguments
+
+Below are the build arguments you can use to customize the image:
+
+#### `model`
+
+The `model` build argument is the model URL to download and use. You can use any Hugging Face model URL. Syntax is `huggingface://foo/bar/baz.gguf`. For example:
+
+`--build-arg="model=huggingface://TheBloke/Llama-2-7B-Chat-GGUF/llama-2-7b-chat.Q4_K_M.gguf"`
+
+#### `runtime`
+
+The `runtime` build argument adds the applicable runtimes to the image. By default, aikit will automatically choose the most optimized CPU runtime. You can use `cuda` to include NVIDIA CUDA runtime libraries. For example:
+
+`--build-arg="runtime=cuda"`.
+
+## Advanced Usage
+
 Create an `aikitfile.yaml` with the following structure:
 
 ```yaml
 #syntax=ghcr.io/sozercan/aikit:latest
 apiVersion: v1alpha1
 models:
-  - name: llama-2-7b-chat
+  - name: llama-2-7b-chat.Q4_K_M.gguf
     source: https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q4_K_M.gguf
 ```
 
 :::tip
-This is the simplest way to get started to build an image. For full `aikitfile` inference specifications, see [Inference API Specifications](docs/specs-inference.md).
+For full `aikitfile` inference specifications, see [Inference API Specifications](docs/specs-inference.md).
 :::
-
-First, create a buildx buildkit instance. Alternatively, if you are using Docker v24 with [containerd image store](https://docs.docker.com/storage/containerd/) enabled, you can skip this step.
-
-```bash
-docker buildx create --use --name aikit-builder
-```
 
 Then build your image with:
 
@@ -53,7 +83,7 @@ You can then send requests to `localhost:8080` to run inference from your models
 
 ```bash
 curl http://localhost:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
-     "model": "llama-2-7b-chat",
+     "model": "llama-2-7b-chat.Q4_K_M.gguf",
      "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
    }'
 ```
