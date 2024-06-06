@@ -78,12 +78,16 @@ jobs:
 
       - name: build test model
         run: |
-          docker buildx build . -t testmodel:test \
+          # github head ref is only set for pull_request targets
+          # otherwise, get the github ref name to get the source branch
+          SOURCE_BRANCH="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
+
+          docker buildx build -t testmodel:test \
             --build-arg="model=huggingface://QuantFactory/Meta-Llama-3-8B-Instruct-GGUF/Meta-Llama-3-8B-Instruct.Q4_K_M.gguf" \
-            -f ../../models/aikitfile.yaml \
             --load --provenance=false --progress plain \
             --cache-from=type=gha,scope=testmodel \
-            --cache-to=type=gha,scope=testmodel,mode=max
+            --cache-to=type=gha,scope=testmodel,mode=max \
+            "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${SOURCE_BRANCH}/models/aikitfile.yaml"
 
       - name: list images
         run: docker images
