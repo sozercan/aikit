@@ -1,5 +1,8 @@
 name: release-pr
 on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.0' # run this workflow when a new minor version is published
   workflow_dispatch:
     inputs:
       release_version:
@@ -19,7 +22,22 @@ jobs:
         with:
           egress-policy: audit
 
+      - name: Set release version and target branch for main branch
+        if: github.event_name == 'push'
+        run: |
+          TAG="$(echo "${{ github.ref }}" | tr -d 'refs/tags/v')"
+          MAJOR_VERSION="$(echo "${TAG}" | cut -d '.' -f1)"
+          echo "MAJOR_VERSION=${MAJOR_VERSION}" >> ${GITHUB_ENV}
+          MINOR_VERSION="$(echo "${TAG}" | cut -d '.' -f2)"
+          echo "MINOR_VERSION=${MINOR_VERSION}" >> ${GITHUB_ENV}
+
+          echo "NEWVERSION=v${MAJOR_VERSION}.${MINOR_VERSION}" >> ${GITHUB_ENV}
+          # push is always being merged to the main branch
+          echo "TARGET_BRANCH=main" >> ${GITHUB_ENV}
+          echo "TAG=${TAG}" >> ${GITHUB_ENV}
+
       - name: Set release version and target branch from input
+        if: github.event_name == 'workflow_dispatch'
         run: |
           NEWVERSION="${{ github.event.inputs.release_version }}"
           echo "${NEWVERSION}" | grep -E '^v[0-9]+\.[0-9]+\.[0-9](-(beta|rc)\.[0-9]+)?$' || (echo "release_version should be in the format vX.Y.Z, vX.Y.Z-beta.A, or vX.Y.Z-rc.B" && exit 1)
@@ -32,9 +50,9 @@ jobs:
           # non-beta releases should always be merged to release branches
           echo "TARGET_BRANCH=release-${MAJOR_VERSION}.${MINOR_VERSION}" >> ${GITHUB_ENV}
 
-          # beta releases should always be merged to master
+          # beta releases should always be merged to main
           if [[ "${NEWVERSION}" =~ "beta" ]]; then
-            echo "TARGET_BRANCH=master" >> ${GITHUB_ENV}
+            echo "TARGET_BRANCH=main" >> ${GITHUB_ENV}
           fi
 
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29
