@@ -31,7 +31,7 @@ jobs:
           MINOR_VERSION="$(echo "${TAG}" | cut -d '.' -f2)"
           echo "MINOR_VERSION=${MINOR_VERSION}" >> ${GITHUB_ENV}
 
-          echo "NEWVERSION=v${MAJOR_VERSION}.${MINOR_VERSION}" >> ${GITHUB_ENV}
+          echo "NEWVERSION=v${MAJOR_VERSION}.${MINOR_VERSION}.0" >> ${GITHUB_ENV}
           # push is always being merged to the main branch
           echo "TARGET_BRANCH=main" >> ${GITHUB_ENV}
           echo "TAG=${TAG}" >> ${GITHUB_ENV}
