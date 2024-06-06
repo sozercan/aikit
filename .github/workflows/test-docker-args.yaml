@@ -1,0 +1,118 @@
+name: docker-test-args
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - 'website/**'
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - 'website/**'
+
+permissions: read-all
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+
+      - name: Harden Runner
+        uses: step-security/harden-runner@f086349bfa2bd1361f7909c78558e816508cdc10 # v2.8.0
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            auth.docker.io:443
+            *.huggingface.co:443
+            cdn.dl.k8s.io:443
+            dl.k8s.io:443
+            download.docker.com:443
+            gcr.io:443
+            github.com:443
+            huggingface.co:443
+            *.githubusercontent.com:443
+            production.cloudflare.docker.com:443
+            proxy.golang.org:443
+            registry-1.docker.io:443
+            storage.googleapis.com:443
+            *.blob.core.windows.net:443
+            *.azureedge.net:443
+            deb.debian.org:80
+            nightly.link:443
+            developer.download.nvidia.com:443
+
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+
+      # need containerd image store for testing local images
+      - uses: crazy-max/ghaction-setup-docker@5bddaa4323ffd60efb2b5045b75b9637c12d4e50 # v3.2.0
+        with:
+          daemon-config: |
+            {
+              "debug": true,
+              "features": {
+                "containerd-snapshotter": true
+              }
+            }
+      - uses: crazy-max/ghaction-github-runtime@b3a9207c0e1ef41f4cf215303c976869d0c2c1c4 # v3.0.0
+
+      - name: build aikit
+        run: |
+          docker buildx build . -t aikit:test \
+            --load --provenance=false --progress plain \
+            --cache-from=type=gha,scope=aikit \
+            --cache-to=type=gha,scope=aikit,mode=max
+
+      - name: build test model
+        run: |
+          docker buildx build . -t testmodel:test \
+            --build-arg="model=huggingface://QuantFactory/Meta-Llama-3-8B-Instruct-GGUF/Meta-Llama-3-8B-Instruct.Q4_K_M.gguf" \
+            -f ../../models/aikitfile.yaml \
+            --load --provenance=false --progress plain \
+            --cache-from=type=gha,scope=testmodel \
+            --cache-to=type=gha,scope=testmodel,mode=max
+
+      - name: list images
+        run: docker images
+
+      - name: run test model
+        run: docker run --name testmodel -d -p 8080:8080 testmodel:test
+
+      - name: run llama test
+        run: |
+          result=$(curl --fail --retry 10 --retry-all-errors http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
+            "model": "Meta-Llama-3-8B-Instruct.Q4_K_M.gguf",
+            "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
+          }')
+          echo $result
+
+          choices=$(echo "$result" | jq '.choices')
+          if [ -z "$choices" ]; then
+            exit 1
+          fi
+
+      - name: save logs
+        if: always()
+        run: docker logs testmodel > /tmp/docker.log
+
+      - name: publish test artifacts
+        if: always()
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+        with:
+          name: test
+          path: |
+            /tmp/*.log
+            /tmp/images/*.png

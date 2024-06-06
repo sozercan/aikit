@@ -17,7 +17,7 @@ docker buildx create --use --name aikit-builder
 You can easily build an image from [Hugging Face](https://huggingface.co) models with the following command:
 
 ```bash
-docker build -t my-model --load \
+docker buildx build -t my-model --load \
 	--build-arg="model=huggingface://TheBloke/Llama-2-7B-Chat-GGUF/llama-2-7b-chat.Q4_K_M.gguf" \
 	"https://raw.githubusercontent.com/sozercan/aikit/main/models/aikitfile.yaml"
 ```
