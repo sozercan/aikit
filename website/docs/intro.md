@@ -27,5 +27,5 @@ AIKit offers two main capabilities:
 - 🚢 [Kubernetes deployment ready](#kubernetes-deployment)
 - 📦 Supports multiple models with a single image
 - 🖥️ [Supports GPU-accelerated inferencing with NVIDIA GPUs](gpu.md)
-- 🔐 [Signed images for `aikit` and pre-made models](cosign.md)
+- 🔐 Ensure [supply chain security](security.md) with SBOMs, Provenance attestations, and signed images
 - 🌈 Support for non-proprietary and self-hosted container registries to store model images

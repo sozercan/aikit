@@ -35,7 +35,7 @@ const sidebars = {
         'vision',
         'gpu',
         'kubernetes',
-        'cosign',
+        'security',
       ],
     },
     {
