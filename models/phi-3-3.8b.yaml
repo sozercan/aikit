@@ -23,7 +23,6 @@ config: |
     backend: llama
     parameters:
       model: Phi-3-mini-4k-instruct-q4.gguf
-      n_keep: 4
     context_size: 4096
     template:
       chat_message: chatMsg
@@ -36,5 +35,4 @@ config: |
     - <|endoftext|>
     gpu_layers: 33
     f16: true
-    batch: 512
     mmap: true

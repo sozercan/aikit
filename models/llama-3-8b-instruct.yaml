@@ -49,7 +49,6 @@ config: |
     context_size: 8192
     gpu_layers: 33
     f16: true
-    batch: 512
     mmap: true
     template:
       chat_message: \"chatMsg\"

@@ -6,16 +6,28 @@ models:
   - name: llama-2-7b-chat
     source: https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q4_K_M.gguf
     sha256: "08a5566d61d7cb6b420c3e4387a39e0078e1f2fe5f055f3a03887385304d4bfa"
+    promptTemplates:
+      - name: chatMsg
+        template: |
+          {{if eq .RoleName \"assistant\"}}{{.Content}}{{else}}
+          [INST]
+          {{if .SystemPrompt}}{{.SystemPrompt}}{{else if eq .RoleName \"system\"}}<<SYS>>{{.Content}}<</SYS>>
+          {{else if .Content}}{{.Content}}{{end}}
+          [/INST]
+          {{end}}
 config: |
   - name: llama-2-7b-chat
     backend: llama
     parameters:
-      top_k: 80
-      temperature: 0.2
-      top_p: 0.7
       model: llama-2-7b-chat.Q4_K_M.gguf
     context_size: 4096
     gpu_layers: 35
     f16: true
-    batch: 512
     mmap: true
+    template:
+      chat_message: \"chatMsg\"
+    stopwords:
+     - \"[INST]\"
+     - \"[/INST]\"
+     - \"<<SYS>>\"
+     - \"<</SYS>>\"

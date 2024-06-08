@@ -10,12 +10,8 @@ config: |
   - name: mixtral-8x7b-instruct
     backend: llama
     parameters:
-      top_k: 80
-      temperature: 0.2
-      top_p: 0.7
       model: mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf
     context_size: 4096
     gpu_layers: 15
     f16: true
-    batch: 512
     mmap: true

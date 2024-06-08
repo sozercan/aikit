@@ -25,7 +25,6 @@ config: |
     context_size: 4096
     gpu_layers: 35
     f16: true
-    batch: 512
     mmap: true
     template:
       chat: instruct
