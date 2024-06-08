@@ -5,7 +5,7 @@ runtime: cuda
 models:
   - name: llama-3-8b-instruct
     source: https://huggingface.co/QuantFactory/Meta-Llama-3-8B-Instruct-GGUF/resolve/main/Meta-Llama-3-8B-Instruct.Q4_K_M.gguf
-    sha256: "647a2b64cbcdbe670432d0502ebb2592b36dd364d51a9ef7a1387b7a4365781f"
+    sha256: "c57380038ea85d8bec586ec2af9c91abc2f2b332d41d6cf180581d7bdffb93c1"
     promptTemplates:
       - name: instruct
         template: |
