@@ -4,8 +4,8 @@ debug: true
 runtime: cuda
 models:
   - name: llama-3-70b-instruct
-    source: https://huggingface.co/NousResearch/Meta-Llama-3-70B-Instruct-GGUF/resolve/main/Meta-Llama-3-70B-Instruct-Q4_K_M.gguf
-    sha256: "df98536015bfe4c8f3587604e46ac6bdd39875679f2e3e1f2e28ac20f3a78c2b"
+    source: https://huggingface.co/QuantFactory/Meta-Llama-3-70B-Instruct-GGUF/resolve/main/Meta-Llama-3-70B-Instruct.Q4_K_M.gguf
+    sha256: "123d5e8431dd528075ccf8e026248b84279db190d7ab744be3c69b256003c929"
     promptTemplates:
       - name: instruct
         template: |
@@ -14,7 +14,7 @@ config: |
   - name: llama-3-70b-instruct
     backend: llama
     parameters:
-      model: Meta-Llama-3-70B-Instruct-Q4_K_M.gguf
+      model: Meta-Llama-3-70B-Instruct.Q4_K_M.gguf
     context_size: 8192
     gpu_layers: 81
     f16: true
