@@ -5,7 +5,7 @@ runtime: cuda
 models:
   - name: codestral-22b
     source: https://huggingface.co/lmstudio-community/Codestral-22B-v0.1-GGUF/resolve/main/Codestral-22B-v0.1-Q4_K_M.gguf
-    sha256: defc9e0a1bb42857558d43df4e7f0f3d0a29d06a953e498e967d763f45d10431
+    sha256: 003e48ed892850b80994fcddca2bd6b833b092a4ef2db2853c33a3144245e06c
     promptTemplates:
       - name: instruct
         template: |
