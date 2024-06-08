@@ -7,9 +7,11 @@ import (
 
 func installOpenCV(s llb.State, merge llb.State) llb.State {
 	savedState := s
-	libPath := "/usr/lib/x86_64-linux-gnu"
-	// add symbolic opencv 4.5d links for stablediffusion on bookworm
-	s = s.Run(utils.Shf("apt-get update && mkdir -p /tmp/generated/images && apt-get install --no-install-recommends -y curl unzip ca-certificates libopencv-imgcodecs406 libgomp1 libdap27 libdapclient6v5 && apt-get clean && ln -s %[1]s/libopencv_core.so.4.6.0 %[1]s/libopencv_core.so.4.5d && ln -s %[1]s/libopencv_imgcodecs.so.4.6.0 %[1]s/libopencv_imgcodecs.so.4.5d", libPath), llb.IgnoreCache).Root()
+	// adding debian 11 (bullseye) repo due to opencv 4.5 requirement
+	s = s.Run(utils.Sh("echo 'deb http://deb.debian.org/debian bullseye main' | tee -a /etc/apt/sources.list")).Root()
+	// pinning libdap packages to bullseye version due to symbol error
+	libdapVersion := "3.20.7-6"
+	s = s.Run(utils.Shf("apt-get update && mkdir -p /tmp/generated/images && apt-get install --no-install-recommends -y curl unzip ca-certificates libopencv-imgcodecs4.5 libgomp1 libdap27=%[1]s libdapclient6v5=%[1]s && apt-get clean && ln -s /usr/lib/$(uname -m)-linux-gnu/libopencv_core.so.4.5 /usr/lib/$(uname -m)-linux-gnu/libopencv_core.so.4.5d && ln -s /usr/lib/$(uname -m)-linux-gnu/libopencv_core.so.4.5 /usr/lib/$(uname -m)-linux-gnu/libopencv_core.so.406 && ln -s /usr/lib/$(uname -m)-linux-gnu/libopencv_imgcodecs.so.4.5 /usr/lib/$(uname -m)-linux-gnu/libopencv_imgcodecs.so.4.5d", libdapVersion), llb.IgnoreCache).Root()
 	diff := llb.Diff(savedState, s)
 	merge = llb.Merge([]llb.State{merge, diff})
 
