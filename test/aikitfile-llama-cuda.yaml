@@ -7,9 +7,40 @@ models:
     source: https://huggingface.co/QuantFactory/Meta-Llama-3-8B-Instruct-GGUF/resolve/main/Meta-Llama-3-8B-Instruct.Q4_K_M.gguf
     sha256: "c57380038ea85d8bec586ec2af9c91abc2f2b332d41d6cf180581d7bdffb93c1"
     promptTemplates:
-      - name: instruct
+      - name: chatMsg
         template: |
-          <|start_header_id|>{{if eq .RoleName \"assistant\"}}assistant{{else if eq .RoleName \"system\"}}system{{else if eq .RoleName \"user\"}}user{{end}}<|end_header_id|>{{if .Content}}{{.Content}}{{end}}<|eot_id|>
+          <|start_header_id|>{{if eq .RoleName \"assistant\"}}assistant{{else if eq .RoleName \"system\"}}system{{else if eq .RoleName \"tool\"}}tool{{else if eq .RoleName \"user\"}}user{{end}}<|end_header_id|>
+
+          {{ if .FunctionCall -}}
+          Function call:
+          {{ else if eq .RoleName \"tool\" -}}
+          Function response:
+          {{ end -}}
+          {{ if .Content -}}
+          {{.Content -}}
+          {{ else if .FunctionCall -}}
+          {{ toJson .FunctionCall -}}
+          {{ end -}}
+          <|eot_id|>
+      - name: function
+        template: |
+          <|start_header_id|>system<|end_header_id|>
+
+          You are a function calling AI model. You are provided with function signatures within <tools></tools> XML tags. You may call one or more functions to assist with the user query. Don't make assumptions about what values to plug into functions. Here are the available tools:
+          <tools>
+          {{range .Functions}}
+          {'type': 'function', 'function': {'name': '{{.Name}}', 'description': '{{.Description}}', 'parameters': {{toJson .Parameters}} }}
+          {{end}}
+          </tools>
+          Use the following pydantic model json schema for each tool call you will make:
+          {'title': 'FunctionCall', 'type': 'object', 'properties': {'arguments': {'title': 'Arguments', 'type': 'object'}, 'name': {'title': 'Name', 'type': 'string'}}, 'required': ['arguments', 'name']}<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+          Function call:
+      - name: chat
+        template: |
+          <|begin_of_text|>{{.Input }}
+          <|start_header_id|>assistant<|end_header_id|>
+      - name: completion
+          {{.Input}}
 config: |
   - name: llama-3-8b-instruct
     backend: llama
@@ -18,13 +49,14 @@ config: |
     context_size: 8192
     gpu_layers: 33
     f16: true
-    batch: 512
     mmap: true
     template:
-      chat_message: \"instruct\"
+      chat_message: \"chatMsg\"
+      function: \"function\"
+      chat: \"chat\"
+      completion: \"completion\"
     stopwords:
-    - <|start_header_id|>
-    - <|end_header_id|>
-    - <|eot_id|>
-    - <|reserved_special_token
-    system_prompt: \"Respond to the user in a friendly and helpful tone. Generate human-like text based on the input, and use markdown when appropriate. If the user asks for something outside of your capabilities, politely tell the user what you can and can't do. Keep the response concise and relevant to the user's request.\"
+      - <|im_end|>
+      - <dummy32000>
+      - \"<|eot_id|>\"
+      - <|end_of_text|>
