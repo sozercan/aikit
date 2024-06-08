@@ -9,8 +9,10 @@ models:
     promptTemplates:
       - name: chatMsg
         template: |
-          <start_of_turn>user
-          {{if .Content }}{{ .Content }}{{ end }}<end_of_turn>
+          <start_of_turn>{{if eq .RoleName \"assistant\" }}model{{else}}{{ .RoleName }}{{end}}
+          {{ if .Content -}}
+          {{.Content -}}
+          {{ end -}}<end_of_turn>
       - name: chat
         template: |
           {{ .Input }}
@@ -32,8 +34,7 @@ config: |
     stopwords:
      - \"<start_of_turn>\"
      - \"<end_of_turn>\"
-     - \"<eos>\"
+     - \"<|im_end|>\"
     gpu_layers: 35
     f16: true
-    batch: 512
     mmap: true

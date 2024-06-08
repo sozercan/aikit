@@ -27,5 +27,4 @@ config: |
      - \"[SUFFIX]\"
     gpu_layers: 50
     f16: true
-    batch: 512
     mmap: true
