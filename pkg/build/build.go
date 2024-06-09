@@ -8,15 +8,20 @@ import (
 	"strings"
 
 	"github.com/containerd/containerd/platforms"
+	controlapi "github.com/moby/buildkit/api/services/control"
 	"github.com/moby/buildkit/client/llb"
 	"github.com/moby/buildkit/exporter/containerimage/exptypes"
+	d2llb "github.com/moby/buildkit/frontend/dockerfile/dockerfile2llb"
 	"github.com/moby/buildkit/frontend/dockerui"
 	"github.com/moby/buildkit/frontend/gateway/client"
+	specs "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/pkg/errors"
 	"github.com/sozercan/aikit/pkg/aikit/config"
 	"github.com/sozercan/aikit/pkg/aikit2llb/finetune"
 	"github.com/sozercan/aikit/pkg/aikit2llb/inference"
 	"github.com/sozercan/aikit/pkg/utils"
+	"golang.org/x/sync/errgroup"
+	"slices"
 )
 
 const (
@@ -24,9 +29,12 @@ const (
 	localNameDockerfile  = "dockerfile"
 	localNameAikitfile   = "aikitfile.yaml"
 	defaultAikitfileName = "aikitfile.yaml"
-	keyFilename          = "filename"
-	keyTarget            = "target"
-	keyOutput            = "output"
+
+	keyFilename       = "filename"
+	keyTarget         = "target"
+	keyOutput         = "output"
+	keyTargetPlatform = "platform"
+	keyCacheImports   = "cache-imports"
 )
 
 func Build(ctx context.Context, c client.Client) (*client.Result, error) {
@@ -77,33 +85,163 @@ func buildInference(ctx context.Context, c client.Client, cfg *config.InferenceC
 		return nil, errors.Wrap(err, "validating aikitfile")
 	}
 
-	st, img := inference.Aikit2LLB(cfg)
+	buildOpts := c.BuildOpts()
+	opts := buildOpts.Opts
 
-	def, err := st.Marshal(ctx)
+	// Parse cache imports
+	cacheImports, err := parseCacheOptions(opts)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to marshal local source")
+		return nil, errors.Wrap(err, "failed to parse cache import options")
 	}
-	res, err := c.Solve(ctx, client.SolveRequest{
-		Definition: def.ToPB(),
-	})
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to resolve dockerfile")
+
+	// Default the build platform to the buildkit host's os/arch
+	defaultBuildPlatform := platforms.DefaultSpec()
+
+	// But prefer the first worker's platform
+	if workers := c.BuildOpts().Workers; len(workers) > 0 && len(workers[0].Platforms) > 0 {
+		defaultBuildPlatform = workers[0].Platforms[0]
 	}
-	ref, err := res.SingleRef()
+
+	buildPlatforms := []specs.Platform{defaultBuildPlatform}
+
+	targetPlatforms := []*specs.Platform{nil}
+	if platform, exists := opts[keyTargetPlatform]; exists && platform != "" {
+		targetPlatforms, err = parsePlatforms(platform)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to parse target platforms %s", platform)
+		}
+	} else if platform == "" {
+		targetPlatforms = []*specs.Platform{&defaultBuildPlatform}
+	}
+
+	isMultiPlatform := len(targetPlatforms) > 1
+	exportPlatforms := &exptypes.Platforms{
+		Platforms: make([]exptypes.Platform, len(targetPlatforms)),
+	}
+	finalResult := client.NewResult()
+
+	eg, ctx := errgroup.WithContext(ctx)
+
+	// Solve for all target platforms in parallel
+	for i, tp := range targetPlatforms {
+		func(i int, platform *specs.Platform) {
+			eg.Go(func() (err error) {
+				result, err := buildImage(ctx, c, cfg, &d2llb.ConvertOpt{
+					MetaResolver:   c,
+					TargetPlatform: platform,
+					Config: dockerui.Config{
+						BuildPlatforms:         buildPlatforms,
+						MultiPlatformRequested: isMultiPlatform,
+						CacheImports:           cacheImports,
+					},
+				}, cacheImports)
+				if err != nil {
+					return errors.Wrap(err, "failed to build image")
+				}
+
+				result.AddToClientResult(finalResult)
+				exportPlatforms.Platforms[i] = result.ExportPlatform
+
+				return nil
+			})
+		}(i, tp)
+	}
+
+	if err := eg.Wait(); err != nil {
+		return nil, err
+	}
+
+	if isMultiPlatform {
+		dt, err := json.Marshal(exportPlatforms)
+		if err != nil {
+			return nil, err
+		}
+		finalResult.AddMeta(exptypes.ExporterPlatformsKey, dt)
+	}
+
+	return finalResult, nil
+}
+
+// Represents the result of a single image build.
+type buildResult struct {
+	// Reference to built image
+	Reference client.Reference
+
+	// Image configuration
+	ImageConfig []byte
+
+	// Target platform
+	Platform *specs.Platform
+
+	// Whether this is a result for a multi-platform build
+	MultiPlatform bool
+
+	// Exportable platform information (platform and platform ID)
+	ExportPlatform exptypes.Platform
+}
+
+// AddToClientResult adds the build result to a client result.
+func (br *buildResult) AddToClientResult(cr *client.Result) {
+	if br.MultiPlatform {
+		cr.AddMeta(
+			fmt.Sprintf("%s/%s", exptypes.ExporterImageConfigKey, br.ExportPlatform.ID),
+			br.ImageConfig,
+		)
+		cr.AddRef(br.ExportPlatform.ID, br.Reference)
+	} else {
+		cr.AddMeta(exptypes.ExporterImageConfigKey, br.ImageConfig)
+		cr.SetRef(br.Reference)
+	}
+}
+
+// buildImage builds an image from the given aikitfile config.
+func buildImage(ctx context.Context, c client.Client, cfg *config.InferenceConfig, convertOpts *d2llb.ConvertOpt, cacheImports []client.CacheOptionsEntry) (*buildResult, error) {
+	result := buildResult{
+		Platform:      convertOpts.TargetPlatform,
+		MultiPlatform: convertOpts.MultiPlatformRequested,
+	}
+
+	state, image, err := inference.Aikit2LLB(cfg, convertOpts.TargetPlatform)
 	if err != nil {
 		return nil, err
 	}
 
-	config, err := json.Marshal(img)
+	result.ImageConfig, err = json.Marshal(image)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to marshal image config")
 	}
-	k := platforms.Format(platforms.DefaultSpec())
 
-	res.AddMeta(fmt.Sprintf("%s/%s", exptypes.ExporterImageConfigKey, k), config)
-	res.SetRef(ref)
+	def, err := state.Marshal(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to marshal definition")
+	}
 
-	return res, nil
+	res, err := c.Solve(ctx, client.SolveRequest{
+		Definition:   def.ToPB(),
+		CacheImports: cacheImports,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to solve")
+	}
+
+	result.Reference, err = res.SingleRef()
+	if err != nil {
+		return nil, err
+	}
+
+	// Add platform-specific export info for the result that can later be used
+	// in multi-platform results
+	result.ExportPlatform = exptypes.Platform{
+		Platform: platforms.DefaultSpec(),
+	}
+
+	if result.Platform != nil {
+		result.ExportPlatform.Platform = *result.Platform
+	}
+
+	result.ExportPlatform.ID = platforms.Format(result.ExportPlatform.Platform)
+
+	return &result, nil
 }
 
 func getAikitfileConfig(ctx context.Context, c client.Client) (*config.InferenceConfig, *config.FineTuneConfig, error) {
@@ -215,6 +353,7 @@ func getAikitfileConfig(ctx context.Context, c client.Client) (*config.Inference
 	return inferenceCfg, finetuneCfg, nil
 }
 
+// getBuildArg returns the value of the build arg with the given key.
 func getBuildArg(opts map[string]string, k string) string {
 	if opts != nil {
 		if v, ok := opts["build-arg:"+k]; ok {
@@ -224,6 +363,7 @@ func getBuildArg(opts map[string]string, k string) string {
 	return ""
 }
 
+// validateFinetuneConfig validates the finetune config.
 func validateFinetuneConfig(c *config.FineTuneConfig) error {
 	supportedFineTuneTargets := []string{utils.TargetUnsloth}
 
@@ -256,6 +396,7 @@ func validateFinetuneConfig(c *config.FineTuneConfig) error {
 	return nil
 }
 
+// defaultsUnslothConfig sets default values for the unsloth config.
 func defaultsUnslothConfig(c *config.FineTuneConfig) *config.FineTuneConfig {
 	if c.Config.Unsloth.MaxSeqLength == 0 {
 		c.Config.Unsloth.MaxSeqLength = 2048
@@ -293,6 +434,7 @@ func defaultsUnslothConfig(c *config.FineTuneConfig) *config.FineTuneConfig {
 	return c
 }
 
+// defaultsFineTune sets default values for the fine-tune config.
 func defaultsFineTune(c *config.FineTuneConfig) *config.FineTuneConfig {
 	if c.Output.Quantize == "" {
 		c.Output.Quantize = "q4_k_m"
@@ -303,6 +445,7 @@ func defaultsFineTune(c *config.FineTuneConfig) *config.FineTuneConfig {
 	return c
 }
 
+// validateInferenceConfig validates the inference config.
 func validateInferenceConfig(c *config.InferenceConfig) error {
 	if c.APIVersion == "" {
 		return errors.New("apiVersion is not defined")
@@ -341,4 +484,33 @@ func validateInferenceConfig(c *config.InferenceConfig) error {
 	}
 
 	return nil
+}
+
+// parsePlatforms parses a comma-separated list of platforms.
+func parsePlatforms(v string) ([]*specs.Platform, error) {
+	var pp []*specs.Platform
+	for _, v := range strings.Split(v, ",") {
+		p, err := platforms.Parse(v)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to parse target platform %s", v)
+		}
+		p = platforms.Normalize(p)
+		pp = append(pp, &p)
+	}
+	return pp, nil
+}
+
+// parseCacheOptions handles given cache imports.
+func parseCacheOptions(opts map[string]string) ([]client.CacheOptionsEntry, error) {
+	var cacheImports []client.CacheOptionsEntry
+	if cacheImportsStr := opts[keyCacheImports]; cacheImportsStr != "" {
+		var cacheImportsUM []controlapi.CacheOptionsEntry
+		if err := json.Unmarshal([]byte(cacheImportsStr), &cacheImportsUM); err != nil {
+			return nil, errors.Wrapf(err, "failed to unmarshal %s (%q)", keyCacheImports, cacheImportsStr)
+		}
+		for _, um := range cacheImportsUM {
+			cacheImports = append(cacheImports, client.CacheOptionsEntry{Type: um.Type, Attrs: um.Attrs})
+		}
+	}
+	return cacheImports, nil
 }
