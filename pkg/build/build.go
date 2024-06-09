@@ -21,7 +21,6 @@ import (
 	"github.com/sozercan/aikit/pkg/aikit2llb/inference"
 	"github.com/sozercan/aikit/pkg/utils"
 	"golang.org/x/sync/errgroup"
-	"slices"
 )
 
 const (
