@@ -98,15 +98,17 @@ func copyModels(c *config.InferenceConfig, base llb.State, s llb.State) (llb.Sta
 		} else {
 			// download from oci artifacts
 			if strings.Contains(model.Source, "oci://") {
-				artifact := strings.TrimPrefix(model.Source, "oci://")
-				if strings.HasPrefix(artifact, "registry.ollama.ai") {
+				artifactURL := strings.TrimPrefix(model.Source, "oci://")
+				if strings.HasPrefix(artifactURL, "registry.ollama.ai") {
 					// remove the tag so we can append the digest
-					artifactWithoutTag := strings.Split(artifact, ":")[0]
+					artifactURLWithoutTag := strings.Split(artifactURL, ":")[0]
+					// extract name of the model from registry.ollama.ai/namespace/name
+					modelName := strings.Split(artifactURLWithoutTag, "/")[2]
 					// model is stored with media type application/vnd.ollama.image.model
-					s = s.Run(utils.Shf("crane blob %[1]s@$(crane manifest %[2]s | jq -r '.layers[] | select(.mediaType == 'application/vnd.ollama.image.model').digest') > model", artifactWithoutTag, artifact)).Root()
+					s = s.Run(utils.Shf("crane blob %[1]s@$(crane manifest %[2]s | jq -r '.layers[] | select(.mediaType == 'application/vnd.ollama.image.model').digest') > %[3]s", artifactURLWithoutTag, artifactURL, modelName)).Root()
 				} else {
 					// generic oci artifact
-					s = s.Run(utils.Shf("crane blob %[1]s > model", artifact)).Root()
+					s = s.Run(utils.Shf("crane blob %[1]s > model", artifactURL)).Root()
 				}
 			} else {
 				// copy from local path
