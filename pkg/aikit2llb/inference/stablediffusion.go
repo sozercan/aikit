@@ -28,7 +28,7 @@ func installOpenCV(s llb.State, merge llb.State, platform specs.Platform) llb.St
 	merge = llb.Merge([]llb.State{merge, diff})
 
 	// TODO: update this URL when the binary is available in github
-	sdURL := fmt.Sprintf("https://sertacstoragevs.blob.core.windows.net/localai/%s/stablediffusion", localAIVersion)
+	sdURL := fmt.Sprintf("https://sertaccdnvs.azureedge.net/localai/%s/stablediffusion", localAIVersion)
 	var opts []llb.HTTPOption
 	opts = append(opts, llb.Filename("stablediffusion"), llb.Chmod(0o755))
 	var copyOpts []llb.CopyOption
