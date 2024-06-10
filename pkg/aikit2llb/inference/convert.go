@@ -181,7 +181,7 @@ func addLocalAI(s llb.State, merge llb.State, platform specs.Platform) (llb.Stat
 		return s, merge, fmt.Errorf("unsupported architecture %s", platform.Architecture)
 	}
 	// TODO: update this URL when the binary is available in github
-	localAIURL := fmt.Sprintf("https://sertacstoragevs.blob.core.windows.net/localai/%[1]s/%[2]s", localAIVersion, binaryName)
+	localAIURL := fmt.Sprintf("https://sertaccdnvs.azureedge.net/localai/%[1]s/%[2]s", localAIVersion, binaryName)
 
 	savedState := s
 
