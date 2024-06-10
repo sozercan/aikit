@@ -107,7 +107,7 @@ func copyModels(c *config.InferenceConfig, base llb.State, s llb.State, platform
 					CreateDestPath: true,
 				})
 				modelPath := fmt.Sprintf("/models/%s", modelName)
-				s = toolingImage.File(
+				s = s.File(
 					llb.Copy(toolingImage, modelName, modelPath, copyOpts...),
 					llb.WithCustomName("Copying "+artifactURL+" to "+modelPath), //nolint: goconst
 				)
