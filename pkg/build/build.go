@@ -63,6 +63,15 @@ func buildFineTune(ctx context.Context, c client.Client, cfg *config.FineTuneCon
 	}
 	cfg = defaultsFineTune(cfg)
 
+	buildOpts := c.BuildOpts()
+	opts := buildOpts.Opts
+
+	// Parse cache imports
+	cacheImports, err := parseCacheOptions(opts)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to parse cache import options")
+	}
+
 	st := finetune.Aikit2LLB(cfg)
 
 	def, err := st.Marshal(ctx)
@@ -70,10 +79,11 @@ func buildFineTune(ctx context.Context, c client.Client, cfg *config.FineTuneCon
 		return nil, errors.Wrapf(err, "failed to marshal local source")
 	}
 	res, err := c.Solve(ctx, client.SolveRequest{
-		Definition: def.ToPB(),
+		Definition:   def.ToPB(),
+		CacheImports: cacheImports,
 	})
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to resolve dockerfile")
+		return nil, errors.Wrap(err, "failed to solve")
 	}
 	return res, nil
 }
