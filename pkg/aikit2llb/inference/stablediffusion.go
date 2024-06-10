@@ -1,6 +1,8 @@
 package inference
 
 import (
+	"fmt"
+
 	"github.com/moby/buildkit/client/llb"
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/sozercan/aikit/pkg/utils"
@@ -25,9 +27,18 @@ func installOpenCV(s llb.State, merge llb.State, platform specs.Platform) llb.St
 	diff := llb.Diff(savedState, s)
 	merge = llb.Merge([]llb.State{merge, diff})
 
-	// https://github.com/mudler/LocalAI/actions/runs/9227834555 (v2.16.0)
-	// temporary fix for stablediffusion
-	sdURL := "https://nightly.link/mudler/LocalAI/actions/runs/9227834555/stablediffusion.zip"
-	merge = merge.Run(utils.Shf("mkdir -p /tmp/localai/backend_data/backend-assets/grpc/ && curl --retry 10 --retry-all-errors -L %s -o stablediffusion.zip && unzip stablediffusion.zip -d /tmp/localai/backend_data/backend-assets/grpc && chmod +x /tmp/localai/backend_data/backend-assets/grpc/stablediffusion", sdURL)).Root()
+	// TODO: update this URL when the binary is available in github
+	sdURL := fmt.Sprintf("https://sertacstoragevs.blob.core.windows.net/localai/%s/stablediffusion", localAIVersion)
+	var opts []llb.HTTPOption
+	opts = append(opts, llb.Filename("stablediffusion"), llb.Chmod(0o755))
+	var copyOpts []llb.CopyOption
+	copyOpts = append(copyOpts, &llb.CopyInfo{
+		CreateDestPath: true,
+	})
+	sd := llb.HTTP(sdURL, opts...)
+	merge = merge.File(
+		llb.Copy(sd, "stablediffusion", "/tmp/localai/backend_data/backend-assets/grpc/stablediffusion", copyOpts...),
+		llb.WithCustomName("Copying stable diffusion backend"), //nolint: goconst
+	)
 	return merge
 }
