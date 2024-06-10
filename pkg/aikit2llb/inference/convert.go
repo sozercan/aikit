@@ -71,52 +71,29 @@ func copyModels(c *config.InferenceConfig, base llb.State, s llb.State, platform
 		// check if model source is a URL or a local path
 		_, err := url.ParseRequestURI(model.Source)
 		if err == nil {
-			var opts []llb.HTTPOption
-			opts = append(opts, llb.Filename(utils.FileNameFromURL(model.Source)))
-			if model.SHA256 != "" {
-				digest := digest.NewDigestFromEncoded(digest.SHA256, model.SHA256)
-				opts = append(opts, llb.Checksum(digest))
-			}
-
-			m := llb.HTTP(model.Source, opts...)
-
-			var modelPath string
-			if strings.Contains(model.Name, "/") {
-				modelPath = "/models/" + path.Dir(model.Name) + "/" + utils.FileNameFromURL(model.Source)
-			} else {
-				modelPath = "/models/" + utils.FileNameFromURL(model.Source)
-			}
-
-			var copyOpts []llb.CopyOption
-			copyOpts = append(copyOpts, &llb.CopyInfo{
-				CreateDestPath: true,
-			})
-			s = s.File(
-				llb.Copy(m, utils.FileNameFromURL(model.Source), modelPath, copyOpts...),
-				llb.WithCustomName("Copying "+utils.FileNameFromURL(model.Source)+" to "+modelPath), //nolint: goconst
-			)
-		} else {
 			// download from oci artifacts
 			if strings.Contains(model.Source, "oci://") {
-				craneBase := "docker.io/chainguard/crane:latest"
-				base := llb.Image(craneBase, llb.Platform(platform))
+				craneBase := "docker.io/alpine/crane:latest"
+				toolingImage := llb.Image(craneBase, llb.Platform(platform))
 
 				artifactURL := strings.TrimPrefix(model.Source, "oci://")
 				if strings.HasPrefix(artifactURL, "registry.ollama.ai") {
 					// remove the tag so we can append the digest
 					artifactURLWithoutTag := strings.Split(artifactURL, ":")[0]
 					// extract name of the model from registry.ollama.ai/namespace/name
-					modelName := strings.Split(artifactURLWithoutTag, "/")[2]
+					modelName := strings.Split(artifactURLWithoutTag, "/")[2] + ".gguf"
 					// model is stored with media type application/vnd.ollama.image.model
-					m := base.Run(utils.Shf("crane blob %[1]s@$(crane manifest %[2]s | jq -r '.layers[] | select(.mediaType == 'application/vnd.ollama.image.model').digest') > %[3]s", artifactURLWithoutTag, artifactURL, modelName)).Root()
+					craneCmd := fmt.Sprintf("crane blob %[1]s@$(crane manifest %[2]s | jq -r '.layers[] | select(.mediaType == \"application/vnd.ollama.image.model\").digest') > %[3]s", artifactURLWithoutTag, artifactURL, modelName)
+					toolingImage = toolingImage.Run(utils.Sh("apk add jq")).Root()
+					toolingImage = toolingImage.Run(utils.Sh(craneCmd)).Root()
 
 					var copyOpts []llb.CopyOption
 					copyOpts = append(copyOpts, &llb.CopyInfo{
 						CreateDestPath: true,
 					})
 					modelPath := fmt.Sprintf("/models/%s", modelName)
-					s = m.File(
-						llb.Copy(m, modelName, modelPath, copyOpts...),
+					s = toolingImage.File(
+						llb.Copy(toolingImage, modelName, modelPath, copyOpts...),
 						llb.WithCustomName("Copying "+artifactURL+" to "+modelPath), //nolint: goconst
 					)
 				} else {
@@ -124,16 +101,42 @@ func copyModels(c *config.InferenceConfig, base llb.State, s llb.State, platform
 					s = s.Run(utils.Shf("crane blob %[1]s > model", artifactURL)).Root()
 				}
 			} else {
-				// copy from local path
+				// http download
+				var opts []llb.HTTPOption
+				opts = append(opts, llb.Filename(utils.FileNameFromURL(model.Source)))
+				if model.SHA256 != "" {
+					digest := digest.NewDigestFromEncoded(digest.SHA256, model.SHA256)
+					opts = append(opts, llb.Checksum(digest))
+				}
+
+				m := llb.HTTP(model.Source, opts...)
+
+				var modelPath string
+				if strings.Contains(model.Name, "/") {
+					modelPath = "/models/" + path.Dir(model.Name) + "/" + utils.FileNameFromURL(model.Source)
+				} else {
+					modelPath = "/models/" + utils.FileNameFromURL(model.Source)
+				}
+
 				var copyOpts []llb.CopyOption
 				copyOpts = append(copyOpts, &llb.CopyInfo{
 					CreateDestPath: true,
 				})
 				s = s.File(
-					llb.Copy(llb.Local("context"), model.Source, "/models/", copyOpts...),
-					llb.WithCustomName("Copying "+utils.FileNameFromURL(model.Source)+" to "+"/models"), //nolint: goconst
+					llb.Copy(m, utils.FileNameFromURL(model.Source), modelPath, copyOpts...),
+					llb.WithCustomName("Copying "+utils.FileNameFromURL(model.Source)+" to "+modelPath), //nolint: goconst
 				)
 			}
+		} else {
+			// copy from local path
+			var copyOpts []llb.CopyOption
+			copyOpts = append(copyOpts, &llb.CopyInfo{
+				CreateDestPath: true,
+			})
+			s = s.File(
+				llb.Copy(llb.Local("context"), model.Source, "/models/", copyOpts...),
+				llb.WithCustomName("Copying "+utils.FileNameFromURL(model.Source)+" to "+"/models"), //nolint: goconst
+			)
 		}
 
 		// create prompt templates if defined

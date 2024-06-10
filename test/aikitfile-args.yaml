@@ -1,3 +1,6 @@
 #syntax=aikit:test
 apiVersion: v1alpha1
 debug: true
+models:
+  - name: llama3
+    source: oci://registry.ollama.ai/library/llama3:8b
