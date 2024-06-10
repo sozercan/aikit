@@ -101,7 +101,8 @@ jobs:
             -t ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE}${MODEL_TYPE} \
             -f models/${{ matrix.model }}.yaml \
             --push --progress plain \
-            --sbom=true --provenance=true
+            --sbom=true --provenance=true \
+            --platform linux/amd64,linux/arm64
           echo "DIGEST=$(cosign triangulate ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE} --type digest)" >> $GITHUB_ENV
 
       - name: Sign the images with GitHub OIDC Token

@@ -19,4 +19,8 @@ const (
 
 	DebianSlim = "docker.io/library/debian:12-slim"
 	CudaDevel  = "nvcr.io/nvidia/cuda:12.3.2-devel-ubuntu22.04"
+
+	PlatformLinux = "linux"
+	PlatformAMD64 = "amd64"
+	PlatformARM64 = "arm64"
 )

@@ -26,6 +26,12 @@ jobs:
         backend:
           - llama
           - stablediffusion
+        arch:
+          - amd64
+          - arm64
+        exclude:
+        - backend: stablediffusion
+          arch: arm64
     steps:
       - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:
@@ -74,27 +80,31 @@ jobs:
               }
             }
       - uses: crazy-max/ghaction-github-runtime@b3a9207c0e1ef41f4cf215303c976869d0c2c1c4 # v3.0.0
+      - uses: docker/setup-qemu-action@68827325e0b33c7199eb31dd4e31fbe9023e06e3 # v3.0.0
+        if: ${{ matrix.arch == 'arm64' }}
 
       - name: build aikit
         run: |
           docker buildx build . -t aikit:test \
             --load --provenance=false --progress plain \
-            --cache-from=type=gha,scope=aikit \
-            --cache-to=type=gha,scope=aikit,mode=max
+            --cache-from=type=gha,scope=aikit-${{ matrix.arch }} \
+            --cache-to=type=gha,scope=aikit-${{ matrix.arch }},mode=max \
+            --platform linux/${{ matrix.arch }}
 
       - name: build test model
         run: |
           docker buildx build . -t testmodel:test \
             -f test/aikitfile-${{ matrix.backend }}.yaml \
             --load --provenance=false --progress plain \
-            --cache-from=type=gha,scope=testmodel \
-            --cache-to=type=gha,scope=testmodel,mode=max
+            --cache-from=type=gha,scope=testmodel-${{ matrix.arch }} \
+            --cache-to=type=gha,scope=testmodel-${{ matrix.arch }},mode=max \
+            --platform linux/${{ matrix.arch }}
 
       - name: list images
         run: docker images
 
       - name: run test model
-        run: docker run --name testmodel -d -p 8080:8080 testmodel:test
+        run: docker run --name testmodel -d -p 8080:8080 --platform "linux/${{ matrix.arch }}" testmodel:test
 
       - name: run llama test
         if: matrix.backend == 'llama'
@@ -136,7 +146,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         with:
-          name: test-${{ matrix.backend }}
+          name: test-${{ matrix.arch }}-${{ matrix.backend }}
           path: |
             /tmp/*.log
             /tmp/images/*.png

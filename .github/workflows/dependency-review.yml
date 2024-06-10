@@ -25,6 +25,8 @@ jobs:
             api.github.com:443
             github.com:443
             *.githubusercontent.com:443
+            api.securityscorecards.dev:443
+            api.deps.dev:443
 
       - name: 'Checkout Repository'
         uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6

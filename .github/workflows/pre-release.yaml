@@ -71,6 +71,7 @@ jobs:
           provenance: true
           build-args: |
             LDFLAGS=${{ env.LDFLAGS }}
+          platforms: linux/amd64,linux/arm64
         env:
           LDFLAGS: ${{ env.LDFLAGS }}
 
