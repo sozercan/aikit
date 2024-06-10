@@ -336,12 +336,13 @@ func getAikitfileConfig(ctx context.Context, c client.Client) (*config.Inference
 		modelArg := getBuildArg(opts, "model")
 		runtimeArg := getBuildArg(opts, "runtime")
 		if modelArg != "" {
-			// if !strings.HasPrefix(modelArg, "huggingface://") {
-			// 	return nil, nil, errors.New("only huggingface models are supported at this time")
-			// }
-			// if !strings.HasSuffix(modelArg, ".gguf") {
-			// 	return nil, nil, errors.New("only GGUF files are supported at this time")
-			// }
+			if !strings.HasPrefix(modelArg, "huggingface://") {
+				return nil, nil, errors.New("only huggingface models are supported at this time")
+			}
+			if !strings.HasSuffix(modelArg, ".gguf") {
+				return nil, nil, errors.New("only GGUF files are supported at this time")
+			}
+
 			if strings.HasPrefix(modelArg, "huggingface://") {
 				m := strings.Split(modelArg, "/")
 

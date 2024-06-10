@@ -26,11 +26,14 @@ jobs:
         backend:
           - llama
           - stablediffusion
+          - oci # this is not a backend, but a different way to specify the model
         arch:
           - amd64
           - arm64
         exclude:
         - backend: stablediffusion
+          arch: arm64
+        - backend: oci
           arch: arm64
     steps:
       - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
