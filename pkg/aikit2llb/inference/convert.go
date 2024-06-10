@@ -96,14 +96,29 @@ func copyModels(c *config.InferenceConfig, base llb.State, s llb.State) (llb.Sta
 				llb.WithCustomName("Copying "+utils.FileNameFromURL(model.Source)+" to "+modelPath), //nolint: goconst
 			)
 		} else {
-			var copyOpts []llb.CopyOption
-			copyOpts = append(copyOpts, &llb.CopyInfo{
-				CreateDestPath: true,
-			})
-			s = s.File(
-				llb.Copy(llb.Local("context"), model.Source, "/models/", copyOpts...),
-				llb.WithCustomName("Copying "+utils.FileNameFromURL(model.Source)+" to "+"/models"), //nolint: goconst
-			)
+			// download from oci artifacts
+			if strings.Contains(model.Source, "oci://") {
+				artifact := strings.TrimPrefix(model.Source, "oci://")
+				if strings.HasPrefix(artifact, "registry.ollama.ai") {
+					// remove the tag so we can append the digest
+					artifactWithoutTag := strings.Split(artifact, ":")[0]
+					// model is stored with media type application/vnd.ollama.image.model
+					s = s.Run(utils.Shf("crane blob %[1]s@$(crane manifest %[2]s | jq -r '.layers[] | select(.mediaType == 'application/vnd.ollama.image.model').digest') > model", artifactWithoutTag, artifact)).Root()
+				} else {
+					// generic oci artifact
+					s = s.Run(utils.Shf("crane blob %[1]s > model", artifact)).Root()
+				}
+			} else {
+				// copy from local path
+				var copyOpts []llb.CopyOption
+				copyOpts = append(copyOpts, &llb.CopyInfo{
+					CreateDestPath: true,
+				})
+				s = s.File(
+					llb.Copy(llb.Local("context"), model.Source, "/models/", copyOpts...),
+					llb.WithCustomName("Copying "+utils.FileNameFromURL(model.Source)+" to "+"/models"), //nolint: goconst
+				)
+			}
 		}
 
 		// create prompt templates if defined
