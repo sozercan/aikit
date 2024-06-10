@@ -133,7 +133,7 @@ func buildInference(ctx context.Context, c client.Client, cfg *config.InferenceC
 						MultiPlatformRequested: isMultiPlatform,
 						CacheImports:           cacheImports,
 					},
-				}, cacheImports)
+				})
 				if err != nil {
 					return errors.Wrap(err, "failed to build image")
 				}
@@ -194,7 +194,7 @@ func (br *buildResult) AddToClientResult(cr *client.Result) {
 }
 
 // buildImage builds an image from the given aikitfile config.
-func buildImage(ctx context.Context, c client.Client, cfg *config.InferenceConfig, convertOpts *d2llb.ConvertOpt, cacheImports []client.CacheOptionsEntry) (*buildResult, error) {
+func buildImage(ctx context.Context, c client.Client, cfg *config.InferenceConfig, convertOpts *d2llb.ConvertOpt) (*buildResult, error) {
 	result := buildResult{
 		Platform:      convertOpts.TargetPlatform,
 		MultiPlatform: convertOpts.MultiPlatformRequested,
@@ -217,7 +217,7 @@ func buildImage(ctx context.Context, c client.Client, cfg *config.InferenceConfi
 
 	res, err := c.Solve(ctx, client.SolveRequest{
 		Definition:   def.ToPB(),
-		CacheImports: cacheImports,
+		CacheImports: convertOpts.CacheImports,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to solve")

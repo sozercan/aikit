@@ -143,7 +143,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         with:
-          name: test-${{ matrix.backend }}
+          name: test-${{ matrix.arch }}-${{ matrix.backend }}
           path: |
             /tmp/*.log
             /tmp/images/*.png

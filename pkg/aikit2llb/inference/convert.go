@@ -172,19 +172,16 @@ func installCuda(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.S
 
 // addLocalAI adds the LocalAI binary to the image.
 func addLocalAI(s llb.State, merge llb.State, platform specs.Platform) (llb.State, llb.State, error) {
-	var binaryName string
-	var localAIURL string
-	switch platform.Architecture {
-	case utils.PlatformAMD64:
-		binaryName = "local-ai-Linux-x86_64"
-		localAIURL = fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%[1]s/%[2]s", localAIVersion, binaryName)
-	case utils.PlatformARM64:
-		// TODO: update this URL when the binary is available
-		binaryName = "local-ai-Linux-arm64"
-		localAIURL = fmt.Sprintf("http://sertac-vm:8889/%s", binaryName)
-	default:
+	binaryNames := map[string]string{
+		utils.PlatformAMD64: "local-ai-Linux-x86_64",
+		utils.PlatformARM64: "local-ai-Linux-arm64",
+	}
+	binaryName, exists := binaryNames[platform.Architecture]
+	if !exists {
 		return s, merge, fmt.Errorf("unsupported architecture %s", platform.Architecture)
 	}
+	// TODO: update this URL when the binary is available in github
+	localAIURL := fmt.Sprintf("https://sertacstoragevs.blob.core.windows.net/localai/%[1]s/%[2]s", localAIVersion, binaryName)
 
 	savedState := s
 

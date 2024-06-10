@@ -12,8 +12,6 @@ import (
 )
 
 const (
-	// https://github.com/unslothai/unsloth/pull/366
-	// https://github.com/unslothai/unsloth/issues/356
 	unslothCommitSHA = "2e1cb3888b2b6c9ea3bca56e808d0604b715f23a"
 	nvidiaMknod      = "mknod --mode 666 /dev/nvidiactl c 195 255 && mknod --mode 666 /dev/nvidia-uvm c 235 0 && mknod --mode 666 /dev/nvidia-uvm-tools c 235 1 && mknod --mode 666 /dev/nvidia0 c 195 0 && nvidia-smi"
 	sourceVenv       = ". .venv/bin/activate"
