@@ -23,19 +23,33 @@ helm repo add aikit https://sozercan.github.io/aikit/charts
 helm install aikit/aikit --name-template=aikit
 ```
 
+:::tip
+By default, the chart will deploy the `llama-3-8b-instruct` model. You can customize the deployment by providing a [pre-built image](premade-models.md) or your own model image or other options. You can find the available options in the [values](#values) section.
+:::
+
 Output will be similar to:
 
 ```bash
 NAME: aikit
-LAST DEPLOYED: Wed May 15 05:32:39 2024
+LAST DEPLOYED: Sat Jun  8 07:53:13 2024
 NAMESPACE: default
 STATUS: deployed
 REVISION: 1
 TEST SUITE: None
 NOTES:
-Get the application URL by running these commands:
-  echo "Visit http://127.0.0.1:8080 to access aikit WebUI."
-  kubectl --namespace default port-forward service/aikit-webui 8080:80
+Access AIKit WebUI or API by running the following commands:
+
+- Port forward the service to your local machine:
+
+  kubectl --namespace default port-forward service/aikit 8080:8080 &
+
+- Visit http://127.0.0.1:8080/chat to access the WebUI
+
+- Access the OpenAI API compatible endpoint with:
+
+  # replace this with the model name you want to use
+  export MODEL_NAME="llama-3-8b-instruct"
+  curl http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d "{\"model\": \"${MODEL_NAME}\", \"messages\": [{\"role\": \"user\", \"content\": \"what is the meaning of life?\"}]}"
 ```
 
 As mentioned in the notes, you can then port-forward and send requests to your model, or navigate to the URL provided to access the WebUI.
@@ -83,29 +97,6 @@ curl http://localhost:8080/v1/chat/completions -H "Content-Type: application/jso
 | `autoscaling.targetCPUUtilizationPercentage` | Integer | `80`                                                                                  | Target CPU utilization percentage for autoscaling  |
 | `nodeSelector`                               | Object  | `{}`                                                                                  | Node selector                                      |
 | `affinity`                                   | Object  | `{}`                                                                                  | Affinity settings                                  |
-| `ui.enabled`                                 | Boolean | `true`                                                                                | If the UI is enabled                               |
-| `ui.models`                                  | Array   | `[llama-3-8b-instruct]`                                                               | List of models                                     |
-| `ui.defaultModel`                            | String  | `llama-3-8b-instruct`                                                                 | Default model                                      |
-| `ui.replicaCount`                            | Integer | `1`                                                                                   | Number of UI replicas                              |
-| `ui.type`                                    | String  | `lobe-chat`                                                                           | Type of UI                                         |
-| `ui.image.repository`                        | String  | `lobehub/lobe-chat`                                                                   | The UI image repository                            |
-| `ui.image.pullPolicy`                        | String  | `IfNotPresent`                                                                        | The UI image pull policy                           |
-| `ui.image.tag`                               | String  | `v0.161.19`                                                                           | The UI image tag                                   |
-| `ui.service.type`                            | String  | `ClusterIP`                                                                           | UI service type                                    |
-| `ui.service.port`                            | Integer | `80`                                                                                  | UI service port                                    |
-| `ui.nodeSelector`                            | Object  | `{}`                                                                                  | UI node selector                                   |
-| `ui.tolerations`                             | Array   | `[]`                                                                                  | UI tolerations                                     |
-| `ui.affinity`                                | Object  | `{}`                                                                                  | UI affinity settings                               |
-| `ui.ingress.enabled`                         | Boolean | `false`                                                                               | If UI ingress is enabled                           |
-| `ui.ingress.className`                       | String  | `""`                                                                                  | Ingress class name                                 |
-| `ui.ingress.annotations`                     | Object  | `{}`                                                                                  | Ingress annotations                                |
-| `ui.ingress.hosts`                           | Array   | `[{host: chart-example.local, paths: [{path: /, pathType: ImplementationSpecific}]}]` | Ingress hosts and paths                            |
-| `ui.ingress.tls`                             | Array   | `[]`                                                                                  | Ingress TLS settings                               |
-| `ui.persistentVolume.enabled`                | Boolean | `false`                                                                               | If Persistent Volume is enabled for UI             |
-| `ui.persistentVolume.storageClass`           | String  | `default`                                                                             | Storage class for the Persistent Volume            |
-| `ui.persistentVolume.accessModes`            | Array   | `["ReadWriteOnce"]`                                                                   | Access modes for the Persistent Volume             |
-| `ui.persistentVolume.size`                   | String  | `10Gi`                                                                                | Size of the Persistent Volume                      |
-| `ui.persistentVolume.claimName`              | String  | `""`                                                                                  | Claim name for an existing Persistent Volume Claim |
 
 
 ## Manual Deployment

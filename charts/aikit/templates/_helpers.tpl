@@ -51,14 +51,6 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-Selector labels
-*/}}
-{{- define "aikit.selectorLabelsUI" -}}
-app.kubernetes.io/name: {{ (printf "%s-webui" (include "aikit.name" .)) }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end }}
-
-{{/*
 Create the name of the service account to use
 */}}
 {{- define "aikit.serviceAccountName" -}}
@@ -68,18 +60,3 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
-
-{{/*
-Create the model list
-*/}}
-{{- define "aikit.modelList" -}}
-{{- $modelList := default list}}
-{{- if .Values.ui.models}}
-{{- $modelList = concat $modelList .Values.ui.models }}
-{{- end}}
-{{- if .Values.ui.defaultModel}}
-{{- $modelList = append $modelList .Values.ui.defaultModel }}
-{{- end}}
-{{- $modelList = $modelList | uniq}}
-{{- default (join ",+" $modelList) -}}
-{{- end -}}
