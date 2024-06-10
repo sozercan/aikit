@@ -27,7 +27,7 @@ func Aikit2LLB(c *config.InferenceConfig, platform *specs.Platform) (llb.State, 
 	state := llb.Image(utils.DebianSlim, llb.Platform(*platform))
 	base := getBaseImage(c, platform)
 
-	state, merge = copyModels(c, base, state)
+	state, merge = copyModels(c, base, state, *platform)
 
 	var err error
 	state, merge, err = addLocalAI(state, merge, *platform)
@@ -65,7 +65,7 @@ func getBaseImage(c *config.InferenceConfig, platform *specs.Platform) llb.State
 }
 
 // copyModels copies models to the image.
-func copyModels(c *config.InferenceConfig, base llb.State, s llb.State) (llb.State, llb.State) {
+func copyModels(c *config.InferenceConfig, base llb.State, s llb.State, platform specs.Platform) (llb.State, llb.State) {
 	savedState := s
 	for _, model := range c.Models {
 		// check if model source is a URL or a local path
@@ -98,6 +98,9 @@ func copyModels(c *config.InferenceConfig, base llb.State, s llb.State) (llb.Sta
 		} else {
 			// download from oci artifacts
 			if strings.Contains(model.Source, "oci://") {
+				craneBase := "docker.io/chainguard/crane:latest"
+				base := llb.Image(craneBase, llb.Platform(platform))
+
 				artifactURL := strings.TrimPrefix(model.Source, "oci://")
 				if strings.HasPrefix(artifactURL, "registry.ollama.ai") {
 					// remove the tag so we can append the digest
@@ -105,7 +108,17 @@ func copyModels(c *config.InferenceConfig, base llb.State, s llb.State) (llb.Sta
 					// extract name of the model from registry.ollama.ai/namespace/name
 					modelName := strings.Split(artifactURLWithoutTag, "/")[2]
 					// model is stored with media type application/vnd.ollama.image.model
-					s = s.Run(utils.Shf("crane blob %[1]s@$(crane manifest %[2]s | jq -r '.layers[] | select(.mediaType == 'application/vnd.ollama.image.model').digest') > %[3]s", artifactURLWithoutTag, artifactURL, modelName)).Root()
+					m := base.Run(utils.Shf("crane blob %[1]s@$(crane manifest %[2]s | jq -r '.layers[] | select(.mediaType == 'application/vnd.ollama.image.model').digest') > %[3]s", artifactURLWithoutTag, artifactURL, modelName)).Root()
+
+					var copyOpts []llb.CopyOption
+					copyOpts = append(copyOpts, &llb.CopyInfo{
+						CreateDestPath: true,
+					})
+					modelPath := fmt.Sprintf("/models/%s", modelName)
+					s = m.File(
+						llb.Copy(m, modelName, modelPath, copyOpts...),
+						llb.WithCustomName("Copying "+artifactURL+" to "+modelPath), //nolint: goconst
+					)
 				} else {
 					// generic oci artifact
 					s = s.Run(utils.Shf("crane blob %[1]s > model", artifactURL)).Root()
