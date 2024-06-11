@@ -12,26 +12,27 @@ import (
 	"github.com/sozercan/aikit/pkg/utils"
 )
 
+const orasImage = "ghcr.io/oras-project/oras:v1.2.0"
+
 // handleOCI handles OCI artifact downloading and processing.
 func handleOCI(source string, s llb.State, platform specs.Platform) llb.State {
-	const craneBase = "docker.io/alpine/crane:0.19.1"
-	toolingImage := llb.Image(craneBase, llb.Platform(platform))
+	toolingImage := llb.Image(orasImage, llb.Platform(platform))
 
 	artifactURL := strings.TrimPrefix(source, "oci://")
 	const ollamaRegistryURL = "registry.ollama.ai"
-	var craneCmd, modelName string
+	var orasCmd, modelName string
 
 	if strings.HasPrefix(artifactURL, ollamaRegistryURL) {
 		// Handle specific registry case
-		modelName, craneCmd = handleOllamaRegistry(artifactURL)
+		modelName, orasCmd = handleOllamaRegistry(artifactURL)
 	} else {
 		// Handle generic OCI artifact
 		modelName = extractModelName(artifactURL)
-		craneCmd = fmt.Sprintf("crane blob %[1]s > /models/%[2]s", artifactURL, modelName)
+		orasCmd = fmt.Sprintf("oras blob fetch %[1]s --output /models/%[2]s", artifactURL, modelName)
 	}
 
-	// Install jq and execute the crane command
-	toolingImage = toolingImage.Run(utils.Shf("apk add jq && %s", craneCmd)).Root()
+	// Install jq and execute the oras command
+	toolingImage = toolingImage.Run(utils.Shf("apk add jq && %s", orasCmd)).Root()
 
 	modelPath := fmt.Sprintf("/models/%s", modelName)
 
@@ -46,9 +47,8 @@ func handleOCI(source string, s llb.State, platform specs.Platform) llb.State {
 func handleOllamaRegistry(artifactURL string) (string, string) {
 	artifactURLWithoutTag := strings.Split(artifactURL, ":")[0]
 	modelName := strings.Split(artifactURLWithoutTag, "/")[2] + ".gguf"
-	craneCmd := fmt.Sprintf("crane blob %[1]s@$(crane manifest %[2]s | jq -r '.layers[] | select(.mediaType == \"application/vnd.ollama.image.model\").digest') > %[3]s",
-		artifactURLWithoutTag, artifactURL, modelName)
-	return modelName, craneCmd
+	orasCmd := fmt.Sprintf("oras blob fetch %[1]s@$(oras manifest fetch %[2]s | jq -r '.layers[] | select(.mediaType == \"application/vnd.ollama.image.model\").digest') --output %[3]s", artifactURLWithoutTag, artifactURL, modelName)
+	return modelName, orasCmd
 }
 
 // handleHTTP handles HTTP(S) downloads.
