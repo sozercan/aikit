@@ -21,7 +21,7 @@ securityContext:
   capabilities:
     drop:
     - ALL
-  readOnlyRootFilesystem: true
+  readOnlyRootFilesystem: false
   runAsGroup: 999
   runAsNonRoot: true
   runAsUser: 1000
@@ -69,6 +69,15 @@ postInstall:
   affinity: {}
   tolerations: []
   nodeSelector: {kubernetes.io/os: linux}
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - ALL
+    readOnlyRootFilesystem: true
+    runAsGroup: 999
+    runAsNonRoot: true
+    runAsUser: 1000
   labelNamespace:
     enabled: true
     image:

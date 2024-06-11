@@ -16,15 +16,8 @@ metadata:
 spec:
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      labels:
-        {{- include "aikit.labels" . | nindent 8 }}
-        {{- with .Values.podLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+        {{- toYaml .Values.podAnnotations | trim | nindent 8 }}
     spec:
       restartPolicy: OnFailure
       {{- if .Values.postInstall.labelNamespace.priorityClassName }}
