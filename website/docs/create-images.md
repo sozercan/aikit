@@ -40,6 +40,23 @@ The `runtime` build argument adds the applicable runtimes to the image. By defau
 
 `--build-arg="runtime=cuda"`.
 
+### Multi-Platform Support
+
+AIKit supports AMD64 and ARM64 multi-platform images. To build a multi-platform image, you can simply add `--platform linux/amd64,linux/arm64` to the build command. For example:
+
+```bash
+docker buildx build -t my-model --load \
+    --platform linux/amd64,linux/arm64 \
+    --build-arg="model=huggingface://TheBloke/Llama-2-7B-Chat-GGUF/llama-2-7b-chat.Q4_K_M.gguf" \
+    "https://raw.githubusercontent.com/sozercan/aikit/main/models/aikitfile.yaml"
+```
+
+[Pre-made models](https://sozercan.github.io/aikit/docs/premade-models) are offered with multi-platform support. Docker runtime will automatically choose the correct platform to run the image. For more information, please see [multi-platform images documentation](https://docs.docker.com/build/building/multi-platform/).
+
+:::note
+Please note that ARM64 support only applies to the `llama.cpp` backend with CPU inference. NVIDIA CUDA is not supported on ARM64 at this time.
+:::
+
 ## Advanced Usage
 
 Create an `aikitfile.yaml` with the following structure:
