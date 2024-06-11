@@ -32,8 +32,7 @@ service:
 
 resources:
   limits:
-    cpu: 4
-    memory: 4Gi
+    memory: 8Gi
     # nvidia.com/gpu: "1"
   requests:
     cpu: 100m
