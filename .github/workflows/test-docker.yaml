@@ -152,9 +152,15 @@ jobs:
             /tmp/*.log
             /tmp/images/*.png
 
-  test-oci:
+  test-protocol:
     runs-on: ubuntu-latest
     timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      matrix:
+        protocol:
+          - oci
+          - hf
     steps:
       - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:
@@ -217,7 +223,7 @@ jobs:
       - name: build test model
         run: |
           docker buildx build . -t testmodel:test \
-            -f test/aikitfile-oci.yaml \
+            -f test/aikitfile-${{ matrix.protocol }}.yaml \
             --load --provenance=false --progress plain \
             --cache-from=type=gha,scope=testmodel \
             --cache-to=type=gha,scope=testmodel,mode=max
@@ -243,13 +249,13 @@ jobs:
 
       - name: save logs
         if: always()
-        run: docker logs testmodel > /tmp/docker-oci.log
+        run: docker logs testmodel > /tmp/docker-${{ matrix.protocol }}.log
 
       - name: publish test artifacts
         if: always()
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         with:
-          name: test-oci
+          name: test-${{ matrix.protocol }}
           path: |
             /tmp/*.log
             /tmp/images/*.png
