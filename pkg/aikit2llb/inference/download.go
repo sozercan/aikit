@@ -72,30 +72,6 @@ func handleHTTP(source, name, sha256 string, s llb.State) llb.State {
 	return s
 }
 
-// // convertHuggingFaceURL converts huggingface:// URLs to https:// URLs with optional branch support.
-// func convertHuggingFaceURL(source string) (string, string) {
-// 	baseURL := "https://huggingface.co/"
-// 	modelPath := strings.TrimPrefix(source, "huggingface://")
-
-// 	// Split the model path to check for branch specification
-// 	parts := strings.Split(modelPath, "/")
-// 	modelID := parts[0] + "/" + parts[1] // e.g., TheBloke/Llama-2-7B-Chat-GGUF
-
-// 	// Determine the branch (default to 'main' if not specified)
-// 	var branch, modelFile string
-// 	if len(parts) > 3 {
-// 		branch = parts[2]
-// 		modelFile = parts[3]
-// 	} else {
-// 		branch = "main"
-// 		modelFile = parts[2]
-// 	}
-
-// 	// Construct the full URL
-// 	fullURL := fmt.Sprintf("%s%s/resolve/%s/%s", baseURL, modelID, branch, modelFile)
-// 	return fullURL, modelFile
-// }
-
 // parseHuggingFaceURL converts a huggingface:// URL to https:// URL with optional branch support.
 func ParseHuggingFaceURL(source string) (string, string, error) {
 	baseURL := "https://huggingface.co/"
