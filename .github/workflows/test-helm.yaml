@@ -98,11 +98,12 @@ jobs:
 
       - name: deploy test model
         run: |
-          helm install charts/aikit --wait --debug --name-template aikit \
+          helm install charts/aikit --wait --debug \
+            --name-template aikit --namespace aikit --create-namespace \
             --set image.repository=testmodel \
             --set image.tag=test \
             --set image.pullPolicy=Never
-          kubectl port-forward service/aikit 8080:8080 &
+          kubectl port-forward -n aikit service/aikit 8080:8080 &
 
       - name: run test
         run: |

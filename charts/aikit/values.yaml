@@ -21,7 +21,7 @@ securityContext:
   capabilities:
     drop:
     - ALL
-  readOnlyRootFilesystem: false
+  readOnlyRootFilesystem: false # aikit extracts backends during runtime
   runAsGroup: 999
   runAsNonRoot: true
   runAsUser: 1000
