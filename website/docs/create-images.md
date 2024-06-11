@@ -12,14 +12,44 @@ First, create a buildx buildkit instance.
 docker buildx create --use --name aikit-builder
 ```
 
-## Easy Start
+## Quick Start
 
-You can easily build an image from [Hugging Face](https://huggingface.co) models with the following command:
+You can easily build an image using the following ways:
+
+## Hugging Face
+
+You can use [Hugging Face](https://huggingface.co) models directly by providing the model URL. For example:
 
 ```bash
 docker buildx build -t my-model --load \
 	--build-arg="model=huggingface://TheBloke/Llama-2-7B-Chat-GGUF/llama-2-7b-chat.Q4_K_M.gguf" \
 	"https://raw.githubusercontent.com/sozercan/aikit/main/models/aikitfile.yaml"
+```
+
+:::tip
+Syntax for Hugging Face source is `huggingface://{organization}/{repository}/{branch}/{file}`.
+
+If the branch is `main`, it can be omitted (`huggingface://{organization}/{repository}/{file}`).
+:::
+
+### HTTP(S)
+
+You can use HTTP(S) URLs to download models. For example:
+
+```bash
+docker buildx build -t my-model --load \
+    --build-arg="model=https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q4_K_M.gguf" \
+    "https://raw.githubusercontent.com/sozercan/aikit/main/models/aikitfile.yaml"
+```
+
+### OCI Artifacts
+
+You can use OCI artifacts to download models. For example:
+
+```bash
+docker buildx build -t my-model --load \
+    --build-arg="model=oci://registry.ollama.ai/library/llama3:8b" \
+    "https://raw.githubusercontent.com/sozercan/aikit/main/models/aikitfile.yaml"
 ```
 
 After building the image, you can proceed to [running models](#running-models) to start the server.
@@ -30,7 +60,7 @@ Below are the build arguments you can use to customize the image:
 
 #### `model`
 
-The `model` build argument is the model URL to download and use. You can use any Hugging Face model URL. Syntax is `huggingface://foo/bar/baz.gguf`. For example:
+The `model` build argument is the model URL to download and use. You can use any Hugging Face (`huggingface://`), HTTP(S) (`http://` or `https://`), or OCI (`oci://`). For example:
 
 `--build-arg="model=huggingface://TheBloke/Llama-2-7B-Chat-GGUF/llama-2-7b-chat.Q4_K_M.gguf"`
 
@@ -39,6 +69,23 @@ The `model` build argument is the model URL to download and use. You can use any
 The `runtime` build argument adds the applicable runtimes to the image. By default, aikit will automatically choose the most optimized CPU runtime. You can use `cuda` to include NVIDIA CUDA runtime libraries. For example:
 
 `--build-arg="runtime=cuda"`.
+
+### Multi-Platform Support
+
+AIKit supports AMD64 and ARM64 multi-platform images. To build a multi-platform image, you can simply add `--platform linux/amd64,linux/arm64` to the build command. For example:
+
+```bash
+docker buildx build -t my-model --load \
+    --platform linux/amd64,linux/arm64 \
+    --build-arg="model=huggingface://TheBloke/Llama-2-7B-Chat-GGUF/llama-2-7b-chat.Q4_K_M.gguf" \
+    "https://raw.githubusercontent.com/sozercan/aikit/main/models/aikitfile.yaml"
+```
+
+[Pre-made models](https://sozercan.github.io/aikit/docs/premade-models) are offered with multi-platform support. Docker runtime will automatically choose the correct platform to run the image. For more information, please see [multi-platform images documentation](https://docs.docker.com/build/building/multi-platform/).
+
+:::note
+Please note that ARM64 support only applies to the `llama.cpp` backend with CPU inference. NVIDIA CUDA is not supported on ARM64 at this time.
+:::
 
 ## Advanced Usage
 

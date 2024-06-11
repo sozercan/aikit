@@ -3,11 +3,9 @@ package inference
 import (
 	"fmt"
 	"net/url"
-	"path"
 	"strings"
 
 	"github.com/moby/buildkit/client/llb"
-	"github.com/opencontainers/go-digest"
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/sozercan/aikit/pkg/aikit/config"
 	"github.com/sozercan/aikit/pkg/utils"
@@ -27,9 +25,12 @@ func Aikit2LLB(c *config.InferenceConfig, platform *specs.Platform) (llb.State, 
 	state := llb.Image(utils.DebianSlim, llb.Platform(*platform))
 	base := getBaseImage(c, platform)
 
-	state, merge = copyModels(c, base, state)
-
 	var err error
+	state, merge, err = copyModels(c, base, state, *platform)
+	if err != nil {
+		return state, nil, err
+	}
+
 	state, merge, err = addLocalAI(state, merge, *platform)
 	if err != nil {
 		return state, nil, err
@@ -65,45 +66,27 @@ func getBaseImage(c *config.InferenceConfig, platform *specs.Platform) llb.State
 }
 
 // copyModels copies models to the image.
-func copyModels(c *config.InferenceConfig, base llb.State, s llb.State) (llb.State, llb.State) {
+func copyModels(c *config.InferenceConfig, base llb.State, s llb.State, platform specs.Platform) (llb.State, llb.State, error) {
 	savedState := s
 	for _, model := range c.Models {
-		// check if model source is a URL or a local path
-		_, err := url.ParseRequestURI(model.Source)
-		if err == nil {
-			var opts []llb.HTTPOption
-			opts = append(opts, llb.Filename(utils.FileNameFromURL(model.Source)))
-			if model.SHA256 != "" {
-				digest := digest.NewDigestFromEncoded(digest.SHA256, model.SHA256)
-				opts = append(opts, llb.Checksum(digest))
+		// Check if the model source is a URL
+		if _, err := url.ParseRequestURI(model.Source); err == nil {
+			switch {
+			case strings.HasPrefix(model.Source, "oci://"):
+				s = handleOCI(model.Source, s, platform)
+			case strings.HasPrefix(model.Source, "http://"), strings.HasPrefix(model.Source, "https://"):
+				s = handleHTTP(model.Source, model.Name, model.SHA256, s)
+			case strings.HasPrefix(model.Source, "huggingface://"):
+				s, err = handleHuggingFace(model.Source, s)
+				if err != nil {
+					return llb.State{}, llb.State{}, err
+				}
+			default:
+				return llb.State{}, llb.State{}, fmt.Errorf("unsupported URL scheme: %s", model.Source)
 			}
-
-			m := llb.HTTP(model.Source, opts...)
-
-			var modelPath string
-			if strings.Contains(model.Name, "/") {
-				modelPath = "/models/" + path.Dir(model.Name) + "/" + utils.FileNameFromURL(model.Source)
-			} else {
-				modelPath = "/models/" + utils.FileNameFromURL(model.Source)
-			}
-
-			var copyOpts []llb.CopyOption
-			copyOpts = append(copyOpts, &llb.CopyInfo{
-				CreateDestPath: true,
-			})
-			s = s.File(
-				llb.Copy(m, utils.FileNameFromURL(model.Source), modelPath, copyOpts...),
-				llb.WithCustomName("Copying "+utils.FileNameFromURL(model.Source)+" to "+modelPath), //nolint: goconst
-			)
 		} else {
-			var copyOpts []llb.CopyOption
-			copyOpts = append(copyOpts, &llb.CopyInfo{
-				CreateDestPath: true,
-			})
-			s = s.File(
-				llb.Copy(llb.Local("context"), model.Source, "/models/", copyOpts...),
-				llb.WithCustomName("Copying "+utils.FileNameFromURL(model.Source)+" to "+"/models"), //nolint: goconst
-			)
+			// Handle local paths
+			s = handleLocal(model.Source, s)
 		}
 
 		// create prompt templates if defined
@@ -121,7 +104,7 @@ func copyModels(c *config.InferenceConfig, base llb.State, s llb.State) (llb.Sta
 
 	diff := llb.Diff(savedState, s)
 	merge := llb.Merge([]llb.State{base, diff})
-	return s, merge
+	return s, merge, nil
 }
 
 // installCuda installs cuda libraries and dependencies.
