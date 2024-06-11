@@ -26,7 +26,7 @@ helm install aikit/aikit --name-template=aikit
 :::tip
 By default, the chart will deploy the `llama-3-8b-instruct` model. You can customize the deployment by providing a [pre-built image](premade-models.md) or your own model image or other options. You can find the available options in the [values](#values) section.
 
-Chart will enforce `restricted` [pod security admission](https://kubernetes.io/docs/concepts/security/pod-security-admission/) for enhanced security by default.
+Chart will enforce [`restricted`](https://kubernetes.io/docs/concepts/security/pod-security-standards/) [pod security admission](https://kubernetes.io/docs/concepts/security/pod-security-admission/) for enhanced security and hardening best practices on the namespace level.
 :::
 
 Output will be similar to:
