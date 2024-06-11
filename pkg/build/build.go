@@ -330,33 +330,9 @@ func getAikitfileConfig(ctx context.Context, c client.Client) (*config.Inference
 		}
 	}
 
-	// parse build args
-	if inferenceCfg != nil {
-		// expected format: "huggingface://foo/bar/baz.gguf"
-		modelArg := getBuildArg(opts, "model")
-		runtimeArg := getBuildArg(opts, "runtime")
-		if modelArg != "" {
-			if !strings.HasPrefix(modelArg, "huggingface://") {
-				return nil, nil, errors.New("only huggingface models are supported at this time")
-			}
-			if !strings.HasSuffix(modelArg, ".gguf") {
-				return nil, nil, errors.New("only GGUF files are supported at this time")
-			}
-			m := strings.Split(modelArg, "/")
-
-			modelID := fmt.Sprintf("%s/%s", m[2], m[3])
-			modelFile := m[4]
-
-			inferenceCfg.Runtime = runtimeArg
-			inferenceCfg.Models = make([]config.Model, 1)
-			inferenceCfg.Models[0].Name = modelFile
-			inferenceCfg.Models[0].Source = "https://huggingface.co/" + modelID + "/resolve/main/" + modelFile
-			inferenceCfg.Config = fmt.Sprintf(`
-- name: %[1]s
-  backend: llama
-  parameters:
-    model: %[1]s`, modelFile)
-		}
+	err = parseBuildArgs(opts, inferenceCfg)
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "parsing build args")
 	}
 
 	return inferenceCfg, finetuneCfg, nil
