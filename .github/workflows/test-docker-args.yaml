@@ -25,7 +25,8 @@ jobs:
       matrix:
         protocol:
           - oci
-          - hf
+          - huggingface
+          - https
     steps:
       - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:
@@ -87,8 +88,11 @@ jobs:
           if [ "${{ matrix.protocol }}" = "oci" ]; then
             echo "MODEL_URL=oci://registry.ollama.ai/library/llama3:8b" >> $GITHUB_ENV
             echo "MODEL_NAME=llama3.gguf" >> $GITHUB_ENV
-          else
+          else if [ "${{ matrix.protocol }}" = "huggingface" ]; then
             echo "MODEL_URL=huggingface://QuantFactory/Meta-Llama-3-8B-Instruct-GGUF/Meta-Llama-3-8B-Instruct.Q4_K_M.gguf" >> $GITHUB_ENV
+            echo "MODEL_NAME=Meta-Llama-3-8B-Instruct.Q4_K_M.gguf" >> $GITHUB_ENV
+          else if [ "${{ matrix.protocol }}" = "https" ]; then
+            echo "MODEL_URL=https://huggingface.co/QuantFactory/Meta-Llama-3-8B-Instruct-GGUF/resolve/main/Meta-Llama-3-8B-Instruct.Q4_K_M.gguf" >> $GITHUB_ENV
             echo "MODEL_NAME=Meta-Llama-3-8B-Instruct.Q4_K_M.gguf" >> $GITHUB_ENV
           fi
 
@@ -113,10 +117,7 @@ jobs:
 
       - name: run llama test
         run: |
-          result=$(curl --fail --retry 10 --retry-all-errors http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
-            "model": "${MODEL_NAME}",
-            "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
-          }')
+          result=$(curl --fail --retry 10 --retry-all-errors http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d "{\"model\": \"${MODEL_NAME}\", \"messages\": [{\"role\": \"user\", \"content\": \"what is the meaning of life?\"}]}"
           echo $result
 
           choices=$(echo "$result" | jq '.choices')
