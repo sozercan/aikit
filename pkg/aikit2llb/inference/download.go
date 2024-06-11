@@ -1,6 +1,7 @@
 package inference
 
 import (
+	"errors"
 	"fmt"
 	"path"
 	"strings"
@@ -71,34 +72,68 @@ func handleHTTP(source, name, sha256 string, s llb.State) llb.State {
 	return s
 }
 
-// convertHuggingFaceURL converts huggingface:// URLs to https:// URLs with optional branch support.
-func convertHuggingFaceURL(source string) (string, string) {
+// // convertHuggingFaceURL converts huggingface:// URLs to https:// URLs with optional branch support.
+// func convertHuggingFaceURL(source string) (string, string) {
+// 	baseURL := "https://huggingface.co/"
+// 	modelPath := strings.TrimPrefix(source, "huggingface://")
+
+// 	// Split the model path to check for branch specification
+// 	parts := strings.Split(modelPath, "/")
+// 	modelID := parts[0] + "/" + parts[1] // e.g., TheBloke/Llama-2-7B-Chat-GGUF
+
+// 	// Determine the branch (default to 'main' if not specified)
+// 	var branch, modelFile string
+// 	if len(parts) > 3 {
+// 		branch = parts[2]
+// 		modelFile = parts[3]
+// 	} else {
+// 		branch = "main"
+// 		modelFile = parts[2]
+// 	}
+
+// 	// Construct the full URL
+// 	fullURL := fmt.Sprintf("%s%s/resolve/%s/%s", baseURL, modelID, branch, modelFile)
+// 	return fullURL, modelFile
+// }
+
+// parseHuggingFaceURL converts a huggingface:// URL to https:// URL with optional branch support.
+func ParseHuggingFaceURL(source string) (string, string, error) {
 	baseURL := "https://huggingface.co/"
 	modelPath := strings.TrimPrefix(source, "huggingface://")
 
 	// Split the model path to check for branch specification
 	parts := strings.Split(modelPath, "/")
-	modelID := parts[0] + "/" + parts[1] // e.g., TheBloke/Llama-2-7B-Chat-GGUF
 
-	// Determine the branch (default to 'main' if not specified)
+	if len(parts) < 3 {
+		return "", "", errors.New("invalid Hugging Face URL format")
+	}
+
+	namespace := parts[0]
+	model := parts[1]
 	var branch, modelFile string
-	if len(parts) > 3 {
+
+	if len(parts) == 4 {
+		// URL includes branch: "huggingface://{namespace}/{model}/{branch}/{file}"
 		branch = parts[2]
 		modelFile = parts[3]
 	} else {
+		// URL does not include branch, default to main: "huggingface://{namespace}/{model}/{file}"
 		branch = "main"
 		modelFile = parts[2]
 	}
 
 	// Construct the full URL
-	fullURL := fmt.Sprintf("%s%s/resolve/%s/%s", baseURL, modelID, branch, modelFile)
-	return fullURL, modelFile
+	fullURL := fmt.Sprintf("%s%s/%s/resolve/%s/%s", baseURL, namespace, model, branch, modelFile)
+	return fullURL, modelFile, nil
 }
 
 // handleHuggingFace handles Hugging Face model downloads with branch support.
-func handleHuggingFace(source string, s llb.State) llb.State {
+func handleHuggingFace(source string, s llb.State) (llb.State, error) {
 	// Translate the Hugging Face URL, extracting the branch if provided
-	hfURL, modelName := convertHuggingFaceURL(source)
+	hfURL, modelName, err := ParseHuggingFaceURL(source)
+	if err != nil {
+		return llb.State{}, err
+	}
 
 	// Perform the HTTP download
 	opts := []llb.HTTPOption{llb.Filename(modelName)}
@@ -112,7 +147,7 @@ func handleHuggingFace(source string, s llb.State) llb.State {
 		llb.Copy(m, modelName, modelPath, createCopyOptions()...),
 		llb.WithCustomName("Copying "+modelName+" from Hugging Face to "+modelPath),
 	)
-	return s
+	return s, nil
 }
 
 // handleLocal handles copying from local paths.

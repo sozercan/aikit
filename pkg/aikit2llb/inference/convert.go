@@ -77,7 +77,10 @@ func copyModels(c *config.InferenceConfig, base llb.State, s llb.State, platform
 			case strings.HasPrefix(model.Source, "http://"), strings.HasPrefix(model.Source, "https://"):
 				s = handleHTTP(model.Source, model.Name, model.SHA256, s)
 			case strings.HasPrefix(model.Source, "huggingface://"):
-				s = handleHuggingFace(model.Source, s)
+				s, err = handleHuggingFace(model.Source, s)
+				if err != nil {
+					return llb.State{}, llb.State{}, err
+				}
 			default:
 				return llb.State{}, llb.State{}, fmt.Errorf("unsupported URL scheme: %s", model.Source)
 			}

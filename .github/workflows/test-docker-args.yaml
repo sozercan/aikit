@@ -20,6 +20,12 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      matrix:
+        protocol:
+          - oci
+          - hf
     steps:
       - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:
@@ -34,7 +40,7 @@ jobs:
       - name: Harden Runner
         uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
         with:
-          egress-policy: block
+          egress-policy: audit
           allowed-endpoints: >
             auth.docker.io:443
             *.huggingface.co:443
@@ -76,6 +82,16 @@ jobs:
             --cache-from=type=gha,scope=aikit \
             --cache-to=type=gha,scope=aikit,mode=max
 
+      - name: set url
+        run: |
+          if [ "${{ matrix.protocol }}" = "oci" ]; then
+            echo "MODEL_URL=oci://registry.ollama.ai/library/llama3:8b" >> $GITHUB_ENV
+            echo "MODEL_NAME=llama3" >> $GITHUB_ENV
+          else
+            echo "MODEL_URL=huggingface://QuantFactory/Meta-Llama-3-8B-Instruct-GGUF/Meta-Llama-3-8B-Instruct.Q4_K_M.gguf" >> $GITHUB_ENV
+            echo "MODEL_NAME=Meta-Llama-3-8B-Instruct.Q4_K_M.gguf" >> $GITHUB_ENV
+          fi
+
       - name: build test model
         run: |
           # github head ref is only set for pull_request targets
@@ -83,7 +99,7 @@ jobs:
           SOURCE_BRANCH="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
 
           docker buildx build -t testmodel:test \
-            --build-arg="model=huggingface://QuantFactory/Meta-Llama-3-8B-Instruct-GGUF/Meta-Llama-3-8B-Instruct.Q4_K_M.gguf" \
+            --build-arg="model=$MODEL_URL" \
             --load --provenance=false --progress plain \
             --cache-from=type=gha,scope=testmodel \
             --cache-to=type=gha,scope=testmodel,mode=max \
@@ -98,7 +114,7 @@ jobs:
       - name: run llama test
         run: |
           result=$(curl --fail --retry 10 --retry-all-errors http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
-            "model": "Meta-Llama-3-8B-Instruct.Q4_K_M.gguf",
+            "model": "${MODEL_NAME}",
             "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
           }')
           echo $result
@@ -110,13 +126,12 @@ jobs:
 
       - name: save logs
         if: always()
-        run: docker logs testmodel > /tmp/docker.log
+        run: docker logs testmodel > /tmp/docker-${{ matrix.protocol }}.log
 
       - name: publish test artifacts
         if: always()
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         with:
-          name: test
+          name: test-${{ matrix.protocol }}
           path: |
             /tmp/*.log
-            /tmp/images/*.png
