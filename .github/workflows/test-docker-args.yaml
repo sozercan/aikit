@@ -117,7 +117,11 @@ jobs:
 
       - name: run llama test
         run: |
-          result=$(curl --fail --retry 10 --retry-all-errors http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d "{\"model\": \"${MODEL_NAME}\", \"messages\": [{\"role\": \"user\", \"content\": \"what is the meaning of life?\"}]}"
+          set -e
+          result=$(curl --fail --retry 10 --retry-all-errors \
+            http://127.0.0.1:8080/v1/chat/completions \
+            -H "Content-Type: application/json" \
+            -d "{\"model\": \"${MODEL_NAME}\", \"messages\": [{\"role\": \"user\", \"content\": \"explain kubernetes in a sentence\"}]}")
           echo $result
 
           choices=$(echo "$result" | jq '.choices')
