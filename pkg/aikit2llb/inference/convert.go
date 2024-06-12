@@ -16,7 +16,7 @@ const (
 
 	localAIRepo    = "https://github.com/mudler/LocalAI"
 	localAIVersion = "v2.16.0"
-	cudaVersion    = "12-3"
+	cudaVersion    = "12-5"
 )
 
 // Aikit2LLB converts an InferenceConfig to an LLB state.
