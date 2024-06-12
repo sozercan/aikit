@@ -12,17 +12,19 @@ podAnnotations: {}
 podLabels: {}
 
 podSecurityContext:
-  {}
-  # fsGroup: 2000
+  fsGroup: 999
+  supplementalGroups:
+    - 999
 
 securityContext:
-  {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false # aikit extracts backends during runtime
+  runAsGroup: 999
+  runAsNonRoot: true
+  runAsUser: 1000
 
 service:
   type: ClusterIP
@@ -30,8 +32,7 @@ service:
 
 resources:
   limits:
-    cpu: 4
-    memory: 4Gi
+    memory: 8Gi
     # nvidia.com/gpu: "1"
   requests:
     cpu: 100m
@@ -57,3 +58,38 @@ autoscaling:
 nodeSelector: {}
 
 affinity: {}
+
+rbac:
+  create: true
+
+enableRuntimeDefaultSeccompProfile: true
+postInstall:
+  resources: {}
+  affinity: {}
+  tolerations: []
+  nodeSelector: {kubernetes.io/os: linux}
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - ALL
+    readOnlyRootFilesystem: true
+    runAsGroup: 999
+    runAsNonRoot: true
+    runAsUser: 1000
+  labelNamespace:
+    enabled: true
+    image:
+      repository: registry.k8s.io/kubectl
+      tag: v1.30.1
+      pullPolicy: IfNotPresent
+      pullSecrets: []
+    podSecurity: ["pod-security.kubernetes.io/audit=restricted",
+      "pod-security.kubernetes.io/audit-version=latest",
+      "pod-security.kubernetes.io/warn=restricted",
+      "pod-security.kubernetes.io/warn-version=latest",
+      "pod-security.kubernetes.io/enforce=restricted",
+      "pod-security.kubernetes.io/enforce-version=v1.30"]
+    extraAnnotations: {}
+    extraRules: []
+    priorityClassName: ""

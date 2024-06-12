@@ -3,6 +3,7 @@ package inference
 import (
 	"errors"
 	"fmt"
+	"io/fs"
 	"path"
 	"strings"
 
@@ -145,9 +146,11 @@ func extractModelName(artifactURL string) string {
 
 // createCopyOptions returns the common llb.CopyOption used in file operations.
 func createCopyOptions() []llb.CopyOption {
+	mode := fs.FileMode(0o444)
 	return []llb.CopyOption{
 		&llb.CopyInfo{
 			CreateDestPath: true,
+			Mode:           &mode,
 		},
 	}
 }

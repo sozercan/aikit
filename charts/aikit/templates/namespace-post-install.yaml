@@ -1,0 +1,122 @@
+{{- if .Values.postInstall.labelNamespace.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: aikit-update-namespace-label
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "aikit.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
+    {{- if .Values.postInstall.labelNamespace.extraAnnotations }}
+    {{- toYaml .Values.postInstall.labelNamespace.extraAnnotations | trim | nindent 4 }}
+    {{- end }}
+spec:
+  template:
+    metadata:
+      annotations:
+        {{- toYaml .Values.podAnnotations | trim | nindent 8 }}
+    spec:
+      restartPolicy: OnFailure
+      {{- if .Values.postInstall.labelNamespace.priorityClassName }}
+      priorityClassName: {{ .Values.postInstall.labelNamespace.priorityClassName }}
+      {{- end }}
+      {{- if .Values.postInstall.labelNamespace.image.pullSecrets }}
+      imagePullSecrets:
+      {{- .Values.postInstall.labelNamespace.image.pullSecrets | toYaml | nindent 12 }}
+      {{- end }}
+      serviceAccount: aikit-update-namespace-label
+      containers:
+        - name: kubectl-label
+          image: "{{ .Values.postInstall.labelNamespace.image.repository }}:{{ .Values.postInstall.labelNamespace.image.tag }}"
+          imagePullPolicy: {{ .Values.postInstall.labelNamespace.image.pullPolicy }}
+          args:
+            - label
+            - ns
+            - {{ .Release.Namespace }}
+            {{- range .Values.postInstall.labelNamespace.podSecurity }}
+            - {{ . }}
+            {{- end }}
+            - --overwrite
+          resources:
+            {{- toYaml .Values.postInstall.resources | nindent 12 }}
+          securityContext:
+            {{- if .Values.enableRuntimeDefaultSeccompProfile }}
+            seccompProfile:
+              type: RuntimeDefault
+            {{- end }}
+            {{- toYaml .Values.postInstall.securityContext | nindent 12 }}
+      {{- with .Values.postInstall }}
+      nodeSelector:
+        {{- toYaml .nodeSelector | nindent 8 }}
+      affinity:
+        {{- toYaml .affinity | nindent 8 }}
+      tolerations:
+        {{- toYaml .tolerations | nindent 8 }}
+      {{- end }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: aikit-update-namespace-label
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "aikit.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
+---
+{{- if .Values.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: aikit-update-namespace-label
+  labels:
+    {{- include "aikit.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+    verbs:
+      - get
+      - update
+      - patch
+    resourceNames:
+      - {{ .Release.Namespace }}
+      {{- range .Values.postInstall.labelNamespace.extraNamespaces }}
+      - {{ . }}
+      {{- end }}
+{{- with .Values.postInstall.labelNamespace.extraRules }}
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- end }}
+---
+{{- if .Values.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: aikit-update-namespace-label
+  labels:
+    {{- include "aikit.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: aikit-update-namespace-label
+subjects:
+  - kind: ServiceAccount
+    name: aikit-update-namespace-label
+    namespace: {{ .Release.Namespace | quote }}
+{{- end }}
+{{- end }}
