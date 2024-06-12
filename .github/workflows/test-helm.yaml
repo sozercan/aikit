@@ -32,7 +32,7 @@ jobs:
           swap-storage: true
 
       - name: Harden Runner
-        uses: step-security/harden-runner@f086349bfa2bd1361f7909c78558e816508cdc10 # v2.8.0
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -52,6 +52,12 @@ jobs:
             deb.debian.org:80
             developer.download.nvidia.com:443
             get.helm.sh:443
+            *.blob.core.windows.net:443
+            *.azureedge.net:443
+            registry.k8s.io:443
+            *.pkg.dev:443
+            *.amazonaws.com:443
+            dl-cdn.alpinelinux.org:443
 
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
@@ -96,12 +102,12 @@ jobs:
 
       - name: deploy test model
         run: |
-          helm install charts/aikit --wait --debug --name-template aikit \
+          helm install charts/aikit --wait --debug \
+            --name-template aikit --namespace aikit --create-namespace \
             --set image.repository=testmodel \
             --set image.tag=test \
-            --set image.pullPolicy=Never \
-            --set ui.enabled=false
-          kubectl port-forward service/aikit 8080:8080 &
+            --set image.pullPolicy=Never
+          kubectl port-forward -n aikit service/aikit 8080:8080 &
 
       - name: run test
         run: |

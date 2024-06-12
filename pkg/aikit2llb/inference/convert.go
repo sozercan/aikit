@@ -3,11 +3,9 @@ package inference
 import (
 	"fmt"
 	"net/url"
-	"path"
 	"strings"
 
 	"github.com/moby/buildkit/client/llb"
-	"github.com/opencontainers/go-digest"
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/sozercan/aikit/pkg/aikit/config"
 	"github.com/sozercan/aikit/pkg/utils"
@@ -21,81 +19,74 @@ const (
 	cudaVersion    = "12-5"
 )
 
-func Aikit2LLB(c *config.InferenceConfig) (llb.State, *specs.Image) {
+// Aikit2LLB converts an InferenceConfig to an LLB state.
+func Aikit2LLB(c *config.InferenceConfig, platform *specs.Platform) (llb.State, *specs.Image, error) {
 	var merge llb.State
-	state := llb.Image(utils.DebianSlim)
-	base := getBaseImage(c)
+	state := llb.Image(utils.DebianSlim, llb.Platform(*platform))
+	base := getBaseImage(c, platform)
 
-	state, merge = copyModels(c, base, state)
-	state, merge = addLocalAI(state, merge)
+	var err error
+	state, merge, err = copyModels(c, base, state, *platform)
+	if err != nil {
+		return state, nil, err
+	}
 
-	// install cuda if runtime is nvidia
-	if c.Runtime == utils.RuntimeNVIDIA {
+	state, merge, err = addLocalAI(state, merge, *platform)
+	if err != nil {
+		return state, nil, err
+	}
+
+	// install cuda if runtime is nvidia and architecture is amd64
+	if c.Runtime == utils.RuntimeNVIDIA && platform.Architecture == utils.PlatformAMD64 {
 		state, merge = installCuda(c, state, merge)
 	}
 
-	// install opencv and friends if stable diffusion backend is being used
+	// install backend dependencies
 	for b := range c.Backends {
 		switch c.Backends[b] {
 		case utils.BackendExllama, utils.BackendExllamaV2:
 			merge = installExllama(c, state, merge)
 		case utils.BackendStableDiffusion:
-			merge = installOpenCV(state, merge)
+			merge = installOpenCV(state, merge, *platform)
 		case utils.BackendMamba:
 			merge = installMamba(state, merge)
 		}
 	}
 
-	imageCfg := NewImageConfig(c)
-	return merge, imageCfg
+	imageCfg := NewImageConfig(c, platform)
+	return merge, imageCfg, nil
 }
 
-func getBaseImage(c *config.InferenceConfig) llb.State {
+// getBaseImage returns the base image given the InferenceConfig and platform.
+func getBaseImage(c *config.InferenceConfig, platform *specs.Platform) llb.State {
 	if len(c.Backends) > 0 {
-		return llb.Image(utils.DebianSlim)
+		return llb.Image(utils.DebianSlim, llb.Platform(*platform))
 	}
-	return llb.Image(distrolessBase)
+	return llb.Image(distrolessBase, llb.Platform(*platform))
 }
 
-func copyModels(c *config.InferenceConfig, base llb.State, s llb.State) (llb.State, llb.State) {
+// copyModels copies models to the image.
+func copyModels(c *config.InferenceConfig, base llb.State, s llb.State, platform specs.Platform) (llb.State, llb.State, error) {
 	savedState := s
 	for _, model := range c.Models {
-		// check if model source is a URL or a local path
-		_, err := url.ParseRequestURI(model.Source)
-		if err == nil {
-			var opts []llb.HTTPOption
-			opts = append(opts, llb.Filename(utils.FileNameFromURL(model.Source)))
-			if model.SHA256 != "" {
-				digest := digest.NewDigestFromEncoded(digest.SHA256, model.SHA256)
-				opts = append(opts, llb.Checksum(digest))
+		// Check if the model source is a URL
+		if _, err := url.ParseRequestURI(model.Source); err == nil {
+			switch {
+			case strings.HasPrefix(model.Source, "oci://"):
+				s = handleOCI(model.Source, s, platform)
+			case strings.HasPrefix(model.Source, "http://"), strings.HasPrefix(model.Source, "https://"):
+				s = handleHTTP(model.Source, model.Name, model.SHA256, s)
+			case strings.HasPrefix(model.Source, "huggingface://"):
+				s, err = handleHuggingFace(model.Source, s)
+				if err != nil {
+					return llb.State{}, llb.State{}, err
+				}
+			default:
+				return llb.State{}, llb.State{}, fmt.Errorf("unsupported URL scheme: %s", model.Source)
 			}
-
-			m := llb.HTTP(model.Source, opts...)
-
-			var modelPath string
-			if strings.Contains(model.Name, "/") {
-				modelPath = "/models/" + path.Dir(model.Name) + "/" + utils.FileNameFromURL(model.Source)
-			} else {
-				modelPath = "/models/" + utils.FileNameFromURL(model.Source)
-			}
-
-			var copyOpts []llb.CopyOption
-			copyOpts = append(copyOpts, &llb.CopyInfo{
-				CreateDestPath: true,
-			})
-			s = s.File(
-				llb.Copy(m, utils.FileNameFromURL(model.Source), modelPath, copyOpts...),
-				llb.WithCustomName("Copying "+utils.FileNameFromURL(model.Source)+" to "+modelPath), //nolint: goconst
-			)
 		} else {
-			var copyOpts []llb.CopyOption
-			copyOpts = append(copyOpts, &llb.CopyInfo{
-				CreateDestPath: true,
-			})
-			s = s.File(
-				llb.Copy(llb.Local("context"), model.Source, "/models/", copyOpts...),
-				llb.WithCustomName("Copying "+utils.FileNameFromURL(model.Source)+" to "+"/models"), //nolint: goconst
-			)
+			// Handle local paths
+			s = handleLocal(model.Source, s)
 		}
 
 		// create prompt templates if defined
@@ -113,9 +104,10 @@ func copyModels(c *config.InferenceConfig, base llb.State, s llb.State) (llb.Sta
 
 	diff := llb.Diff(savedState, s)
 	merge := llb.Merge([]llb.State{base, diff})
-	return s, merge
+	return s, merge, nil
 }
 
+// installCuda installs cuda libraries and dependencies.
 func installCuda(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.State, llb.State) {
 	cudaKeyringURL := "https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/cuda-keyring_1.1-1_all.deb"
 	cudaKeyring := llb.HTTP(cudaKeyringURL)
@@ -161,13 +153,23 @@ func installCuda(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.S
 	return s, llb.Merge([]llb.State{merge, diff})
 }
 
-func addLocalAI(s llb.State, merge llb.State) (llb.State, llb.State) {
+// addLocalAI adds the LocalAI binary to the image.
+func addLocalAI(s llb.State, merge llb.State, platform specs.Platform) (llb.State, llb.State, error) {
+	binaryNames := map[string]string{
+		utils.PlatformAMD64: "local-ai-Linux-x86_64",
+		utils.PlatformARM64: "local-ai-Linux-arm64",
+	}
+	binaryName, exists := binaryNames[platform.Architecture]
+	if !exists {
+		return s, merge, fmt.Errorf("unsupported architecture %s", platform.Architecture)
+	}
+	// TODO: update this URL when the binary is available in github
+	localAIURL := fmt.Sprintf("https://sertaccdnvs.azureedge.net/localai/%[1]s/%[2]s", localAIVersion, binaryName)
+
 	savedState := s
-	localAIURL := fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%s/local-ai-Linux-x86_64", localAIVersion)
 
 	var opts []llb.HTTPOption
-	opts = append(opts, llb.Filename("local-ai"))
-	opts = append(opts, llb.Chmod(0o755))
+	opts = append(opts, llb.Filename("local-ai"), llb.Chmod(0o755))
 	localAI := llb.HTTP(localAIURL, opts...)
 	s = s.File(
 		llb.Copy(localAI, "local-ai", "/usr/bin/local-ai"),
@@ -175,9 +177,10 @@ func addLocalAI(s llb.State, merge llb.State) (llb.State, llb.State) {
 	)
 
 	diff := llb.Diff(savedState, s)
-	return s, llb.Merge([]llb.State{merge, diff})
+	return s, llb.Merge([]llb.State{merge, diff}), nil
 }
 
+// cloneLocalAI clones the LocalAI repository to the image used for python backends.
 func cloneLocalAI(s llb.State) llb.State {
 	return s.Run(utils.Shf("git clone --filter=blob:none --no-checkout %[1]s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python && git checkout %[2]s && rm -rf .git", localAIRepo, localAIVersion)).Root()
 }

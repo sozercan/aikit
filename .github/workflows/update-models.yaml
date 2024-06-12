@@ -40,7 +40,7 @@ jobs:
           swap-storage: true
 
       - name: Harden Runner
-        uses: step-security/harden-runner@f086349bfa2bd1361f7909c78558e816508cdc10 # v2.8.0
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -101,7 +101,8 @@ jobs:
             -t ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE}${MODEL_TYPE} \
             -f models/${{ matrix.model }}.yaml \
             --push --progress plain \
-            --sbom=true --provenance=true
+            --sbom=true --provenance=true \
+            --platform linux/amd64,linux/arm64
           echo "DIGEST=$(cosign triangulate ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE} --type digest)" >> $GITHUB_ENV
 
       - name: Sign the images with GitHub OIDC Token

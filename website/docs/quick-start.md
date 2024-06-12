@@ -8,6 +8,14 @@ You can get started with AIKit quickly on your local machine without a GPU!
 docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama3:8b
 ```
 
+After running this, navigate to [http://localhost:8080/chat](http://localhost:8080/chat) to access the WebUI.
+
+## API
+
+AIKit provides an OpenAI API compatible endpoint, so you can use any OpenAI API compatible client to send requests to open LLMs!
+
+For example:
+
 ```bash
 curl http://localhost:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
     "model": "llama-3-8b-instruct",
@@ -39,7 +47,7 @@ That's it! 🎉 API is OpenAI compatible so this is a drop-in replacement for an
 
 ## What's next?
 
-👉 If you are interested in other pre-made models (such as Mistral or Mixtral), please refer to [Pre-made models](./premade-models.md).
+👉 If you are interested in other pre-made models (such as Gemma, Mixtral or Phi), please refer to [Pre-made models](./premade-models.md).
 
 👉  If you are interested in learning more about how to create your own custom model images, please refer to [Creating Model Images](./create-images.md).
 

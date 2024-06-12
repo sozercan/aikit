@@ -19,7 +19,8 @@ lint:
 
 .PHONY: build-aikit
 build-aikit:
-	docker buildx build . -t ${REGISTRY}/aikit:${TAG} --output=${OUTPUT_TYPE} --build-arg LDFLAGS=${LDFLAGS}
+	docker buildx build . -t ${REGISTRY}/aikit:${TAG} --output=${OUTPUT_TYPE} --build-arg LDFLAGS=${LDFLAGS} \
+		--progress=plain
 
 .PHONY: build-test-model
 build-test-model:

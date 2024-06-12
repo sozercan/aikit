@@ -26,6 +26,6 @@ AIKit offers two main capabilities:
 - 🦙 Support for GGUF ([`llama`](https://github.com/ggerganov/llama.cpp)), GPTQ ([`exllama`](https://github.com/turboderp/exllama) or [`exllama2`](https://github.com/turboderp/exllamav2)), EXL2 ([`exllama2`](https://github.com/turboderp/exllamav2)), and GGML ([`llama-ggml`](https://github.com/ggerganov/llama.cpp)) and [Mamba](https://github.com/state-spaces/mamba) models
 - 🚢 [Kubernetes deployment ready](#kubernetes-deployment)
 - 📦 Supports multiple models with a single image
-- 🖥️ [Supports GPU-accelerated inferencing with NVIDIA GPUs](gpu.md)
+- 🖥️ Supports [AMD64 and ARM64](create-images.md#multi-platform-support) CPUs and [GPU-accelerated inferencing with NVIDIA GPUs](gpu.md)
 - 🔐 Ensure [supply chain security](security.md) with SBOMs, Provenance attestations, and signed images
 - 🌈 Support for non-proprietary and self-hosted container registries to store model images

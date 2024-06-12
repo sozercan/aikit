@@ -7,8 +7,8 @@ import (
 	"github.com/sozercan/aikit/pkg/utils"
 )
 
-func NewImageConfig(c *config.InferenceConfig) *specs.Image {
-	img := emptyImage(c)
+func NewImageConfig(c *config.InferenceConfig, platform *specs.Platform) *specs.Image {
+	img := emptyImage(c, platform)
 	cmd := []string{}
 	if c.Debug {
 		cmd = append(cmd, "--debug")
@@ -22,22 +22,22 @@ func NewImageConfig(c *config.InferenceConfig) *specs.Image {
 	return img
 }
 
-func emptyImage(c *config.InferenceConfig) *specs.Image {
+func emptyImage(c *config.InferenceConfig, platform *specs.Platform) *specs.Image {
 	img := &specs.Image{
 		Platform: specs.Platform{
-			Architecture: "amd64",
-			OS:           "linux",
+			Architecture: platform.Architecture,
+			OS:           utils.PlatformLinux,
 		},
 	}
 	img.RootFS.Type = "layers"
 	img.Config.WorkingDir = "/"
 
 	img.Config.Env = []string{
-		"PATH=" + system.DefaultPathEnv("linux"),
+		"PATH=" + system.DefaultPathEnv(utils.PlatformLinux),
 	}
 
 	cudaEnv := []string{
-		"PATH=" + system.DefaultPathEnv("linux") + ":/usr/local/cuda/bin",
+		"PATH=" + system.DefaultPathEnv(utils.PlatformLinux) + ":/usr/local/cuda/bin",
 		"NVIDIA_REQUIRE_CUDA=cuda>=12.0",
 		"NVIDIA_DRIVER_CAPABILITIES=compute,utility",
 		"NVIDIA_VISIBLE_DEVICES=all",
