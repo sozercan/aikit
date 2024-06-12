@@ -146,7 +146,7 @@ func extractModelName(artifactURL string) string {
 
 // createCopyOptions returns the common llb.CopyOption used in file operations.
 func createCopyOptions() []llb.CopyOption {
-	mode := fs.FileMode(0o644)
+	mode := fs.FileMode(0o444)
 	return []llb.CopyOption{
 		&llb.CopyInfo{
 			CreateDestPath: true,
