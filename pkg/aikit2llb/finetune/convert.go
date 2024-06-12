@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	unslothCommitSHA = "2e1cb3888b2b6c9ea3bca56e808d0604b715f23a"
+	unslothCommitSHA = "27fa021a7bb959a53667dd4e7cdb9598c207aa0d" // June-2024
 	nvidiaMknod      = "mknod --mode 666 /dev/nvidiactl c 195 255 && mknod --mode 666 /dev/nvidia-uvm c 235 0 && mknod --mode 666 /dev/nvidia-uvm-tools c 235 1 && mknod --mode 666 /dev/nvidia0 c 195 0 && nvidia-smi"
 	sourceVenv       = ". .venv/bin/activate"
 )
