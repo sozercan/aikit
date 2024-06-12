@@ -107,7 +107,9 @@ jobs:
             --load --provenance=false --progress plain \
             --cache-from=type=gha,scope=testmodel \
             --cache-to=type=gha,scope=testmodel,mode=max \
-            "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${SOURCE_BRANCH}/test/aikitfile-args.yaml"
+            "https://raw.githubusercontent.com/${REPO}/${SOURCE_BRANCH}/test/aikitfile-args.yaml"
+        env:
+          REPO: ${{ github.event.pull_request.head.repo.full_name }}
 
       - name: list images
         run: docker images
