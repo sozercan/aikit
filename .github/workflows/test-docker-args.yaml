@@ -87,7 +87,7 @@ jobs:
         run: |
           if [ "${{ matrix.protocol }}" = "oci" ]; then
             echo "MODEL_URL=oci://registry.ollama.ai/library/llama3:8b" >> $GITHUB_ENV
-            echo "MODEL_NAME=llama3.gguf" >> $GITHUB_ENV
+            echo "MODEL_NAME=llama3" >> $GITHUB_ENV
           elif [ "${{ matrix.protocol }}" = "huggingface" ]; then
             echo "MODEL_URL=huggingface://QuantFactory/Meta-Llama-3-8B-Instruct-GGUF/Meta-Llama-3-8B-Instruct.Q4_K_M.gguf" >> $GITHUB_ENV
             echo "MODEL_NAME=Meta-Llama-3-8B-Instruct.Q4_K_M.gguf" >> $GITHUB_ENV

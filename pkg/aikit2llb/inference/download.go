@@ -33,7 +33,7 @@ func handleOCI(source string, s llb.State, platform specs.Platform) llb.State {
 	}
 
 	// Install jq and execute the oras command
-	toolingImage = toolingImage.Run(utils.Shf("apk add jq && %s", orasCmd)).Root()
+	toolingImage = toolingImage.Run(utils.Shf("apk add jq curl && %s", orasCmd)).Root()
 
 	modelPath := fmt.Sprintf("/models/%s", modelName)
 
@@ -47,8 +47,9 @@ func handleOCI(source string, s llb.State, platform specs.Platform) llb.State {
 // handleOllamaRegistry handles the Ollama registry specific download.
 func handleOllamaRegistry(artifactURL string) (string, string) {
 	artifactURLWithoutTag := strings.Split(artifactURL, ":")[0]
-	modelName := strings.Split(artifactURLWithoutTag, "/")[2] + ".gguf"
-	orasCmd := fmt.Sprintf("oras blob fetch %[1]s@$(oras manifest fetch %[2]s | jq -r '.layers[] | select(.mediaType == \"application/vnd.ollama.image.model\").digest') --output %[3]s", artifactURLWithoutTag, artifactURL, modelName)
+	tag := strings.Split(artifactURL, ":")[1]
+	modelName := strings.Split(artifactURLWithoutTag, "/")[2]
+	orasCmd := fmt.Sprintf("oras blob fetch %[1]s@$(curl https://registry.ollama.ai/v2/library/%[2]s/manifests/%[3]s | jq -r '.layers[] | select(.mediaType == \"application/vnd.ollama.image.model\").digest') --output %[2]s", artifactURLWithoutTag, modelName, tag)
 	return modelName, orasCmd
 }
 
