@@ -43,7 +43,7 @@ config: |
   - name: llama-3-8b-instruct
     backend: llama
     parameters:
-      model: llama3.gguf
+      model: llama3
     context_size: 8192
     template:
       chat_message: \"chatMsg\"
