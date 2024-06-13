@@ -22,6 +22,7 @@ jobs:
         model:
          - llama-3-70b-instruct
          - mixtral-8x7b-instruct
+         - codestral-22b
     runs-on: self-hosted
     timeout-minutes: 360
     steps:
