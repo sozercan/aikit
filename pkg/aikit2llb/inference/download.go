@@ -47,7 +47,7 @@ func handleOCI(source string, s llb.State, platform specs.Platform) llb.State {
 // handleOllamaRegistry handles the Ollama registry specific download.
 func handleOllamaRegistry(artifactURL string) (string, string) {
 	artifactURLWithoutTag := strings.Split(artifactURL, ":")[0]
-	modelName := strings.Split(artifactURLWithoutTag, "/")[2] + ".gguf"
+	modelName := strings.Split(artifactURLWithoutTag, "/")[2]
 	orasCmd := fmt.Sprintf("oras blob fetch %[1]s@$(oras manifest fetch %[2]s | jq -r '.layers[] | select(.mediaType == \"application/vnd.ollama.image.model\").digest') --output %[3]s", artifactURLWithoutTag, artifactURL, modelName)
 	return modelName, orasCmd
 }
