@@ -40,10 +40,7 @@ func parseBuildArgs(opts map[string]string, inferenceCfg *config.InferenceConfig
 
 		case strings.HasPrefix(modelArg, "oci://"):
 			// Handle OCI URLs
-			modelName, err = parseOCIURL(modelArg)
-			if err != nil {
-				return err
-			}
+			modelName = parseOCIURL(modelArg)
 			modelSource = modelArg
 
 		default:
@@ -76,7 +73,7 @@ func generateInferenceConfig(modelName string) string {
 }
 
 // parseOCIURL extracts model name for OCI-based models.
-func parseOCIURL(source string) (string, error) {
+func parseOCIURL(source string) string {
 	const ollamaRegistryURL = "registry.ollama.ai"
 	artifactURL := strings.TrimPrefix(source, "oci://")
 	var modelName string
@@ -84,7 +81,7 @@ func parseOCIURL(source string) (string, error) {
 	if strings.HasPrefix(artifactURL, ollamaRegistryURL) {
 		// Special handling for Ollama registry
 		artifactURLWithoutTag := strings.Split(artifactURL, ":")[0]
-		modelName = strings.Split(artifactURLWithoutTag, "/")[2] + ".gguf"
+		modelName = strings.Split(artifactURLWithoutTag, "/")[2]
 	} else {
 		// Generic OCI artifact
 		modelName = path.Base(artifactURL)
@@ -92,5 +89,5 @@ func parseOCIURL(source string) (string, error) {
 		modelName = strings.Split(modelName, "@")[0]
 	}
 
-	return modelName, nil
+	return modelName
 }

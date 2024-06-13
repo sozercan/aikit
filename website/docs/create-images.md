@@ -26,6 +26,8 @@ docker buildx build -t my-model --load \
 	"https://raw.githubusercontent.com/sozercan/aikit/main/models/aikitfile.yaml"
 ```
 
+Resulting model name will be the file name. In this case, `llama-2-7b-chat.Q4_K_M.gguf`.
+
 :::tip
 Syntax for Hugging Face source is `huggingface://{organization}/{repository}/{branch}/{file}`.
 
@@ -42,6 +44,8 @@ docker buildx build -t my-model --load \
     "https://raw.githubusercontent.com/sozercan/aikit/main/models/aikitfile.yaml"
 ```
 
+Resulting model name will be the file name. In this case, `llama-2-7b-chat.Q4_K_M.gguf`.
+
 ### OCI Artifacts
 
 You can use OCI artifacts to download models. For example:
@@ -51,6 +55,8 @@ docker buildx build -t my-model --load \
     --build-arg="model=oci://registry.ollama.ai/library/llama3:8b" \
     "https://raw.githubusercontent.com/sozercan/aikit/main/models/aikitfile.yaml"
 ```
+
+Resulting model name will be the image name. In this case, `llama3`.
 
 After building the image, you can proceed to [running models](#running-models) to start the server.
 
