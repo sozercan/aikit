@@ -59,7 +59,7 @@ jobs:
             *.amazonaws.com:443
             dl-cdn.alpinelinux.org:443
 
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
       # need containerd image store for testing local images
       - uses: crazy-max/ghaction-setup-docker@78318f8be53384b971671f27d81f5e72526c102d # v3.3.0
