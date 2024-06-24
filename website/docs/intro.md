@@ -3,7 +3,7 @@ title: Introduction
 slug: /
 ---
 
-AIKit is a one-stop shop to quickly get started to host, deploy, build and fine-tune large language models (LLMs).
+AIKit is a comprehensive platform to quickly get started to host, deploy, build and fine-tune large language models (LLMs).
 
 AIKit offers two main capabilities:
 

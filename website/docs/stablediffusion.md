@@ -19,3 +19,7 @@ Please make sure to change syntax to `#syntax=ghcr.io/sozercan/aikit:latest` in 
 :::
 
 https://github.com/sozercan/aikit/blob/main/test/aikitfile-stablediffusion.yaml
+
+## Demo
+
+https://www.youtube.com/watch?v=gh7b-rt70Ug
