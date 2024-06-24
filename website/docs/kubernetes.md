@@ -12,6 +12,8 @@ You can use [kind](https://kind.sigs.k8s.io/) to create a local Kubernetes clust
 
 ## Helm Chart
 
+🎬 Demo: https://www.youtube.com/watch?v=ws5AUtLkuuc
+
 For advanced deployments or customization options, you can use the [Helm chart](https://helm.sh/) provided in the `charts` directory.
 
 Please make sure you have Helm installed and configured. If you don't have Helm installed, you can follow the instructions [here](https://helm.sh/docs/intro/install/).
