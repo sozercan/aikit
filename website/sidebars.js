@@ -64,6 +64,7 @@ const sidebars = {
       label: 'Contributing',
       collapsed: false,
       items: [
+        'architecture',
         'release',
       ],
     },
