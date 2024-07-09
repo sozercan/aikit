@@ -2,14 +2,38 @@
 title: Demos
 ---
 
-## Fine Tuning Mistral 7b with OpenHermes dataset and building a model image for inference
-
-https://www.youtube.com/watch?v=FZuVb-9i-94
-
-## Building an image with a Llama 2 model
-
-[![Building an image with a Llama 2 model](https://asciinema.org/a/J9bitkONKPvedSfU1RkrmVEhD.svg 'Building an image with a Llama 2 model')](https://asciinema.org/a/J9bitkONKPvedSfU1RkrmVEhD)
+Below are various demos to help you get started with AIKit.
 
 ## Inference
 
-[![Inference](https://asciinema.org/a/DYh5bCQMNPSis1whhsfPeMOoM.svg 'Inference')](https://asciinema.org/a/DYh5bCQMNPSis1whhsfPeMOoM)
+### Running inference with CUDA
+
+https://www.youtube.com/watch?v=yFh_Zfk34PE
+
+### Running inference (on ARM64)
+
+https://www.youtube.com/watch?v=O0AOnxXp-o4
+
+### Using Stable Diffusion to generate images
+
+https://www.youtube.com/watch?v=gh7b-rt70Ug
+
+## Building a model image
+
+### Building a model image from model in Hugging Face and running inference
+
+https://www.youtube.com/watch?v=DI5NbdEFLC8
+
+### Building a model image from model in ollama (OCI artifacts) and running inference
+
+https://www.youtube.com/watch?v=G6PrzhEe_p8
+
+### Building a model image from configuration and running inference
+
+https://www.youtube.com/watch?v=5AQfG5VwN2c
+
+## Fine tuning
+
+### Fine Tuning Mistral 7b with OpenHermes dataset and building a model image for inference
+
+https://www.youtube.com/watch?v=FZuVb-9i-94

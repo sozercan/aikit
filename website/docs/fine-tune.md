@@ -81,6 +81,10 @@ $ ls -al _output
 -rw-r--r--  1 sozercan sozercan 7161089856 Mar  3 00:19 aikit-model-q4_k_m.gguf
 ```
 
+## Demo
+
+https://www.youtube.com/watch?v=FZuVb-9i-94
+
 ## What's next?
 
 👉 Now that you have a fine-tuned model output as a GGUF file, you can refer to [Creating Model Images](./create-images.md) on how to create an image with AIKit to serve your fine-tuned model!

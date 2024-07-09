@@ -16,7 +16,9 @@ docker buildx create --use --name aikit-builder
 
 You can easily build an image using the following ways:
 
-## Hugging Face
+### Hugging Face
+
+🎬 Demo: https://www.youtube.com/watch?v=DI5NbdEFLC8
 
 You can use [Hugging Face](https://huggingface.co) models directly by providing the model URL. For example:
 
@@ -47,6 +49,8 @@ docker buildx build -t my-model --load \
 Resulting model name will be the file name. In this case, `llama-2-7b-chat.Q4_K_M.gguf`.
 
 ### OCI Artifacts
+
+🎬 Demo: https://www.youtube.com/watch?v=G6PrzhEe_p8
 
 You can use OCI artifacts to download models. For example:
 
@@ -94,6 +98,8 @@ Please note that ARM64 support only applies to the `llama.cpp` backend with CPU 
 :::
 
 ## Advanced Usage
+
+🎬 Demo: https://www.youtube.com/watch?v=5AQfG5VwN2c&list=PLx4Tje2rS923Bkw83GkobOyjIFLfxNrvs&index=2
 
 Create an `aikitfile.yaml` with the following structure:
 

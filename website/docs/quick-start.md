@@ -45,6 +45,10 @@ Output should be similar to:
 
 That's it! 🎉 API is OpenAI compatible so this is a drop-in replacement for any OpenAI API compatible client.
 
+## Demo
+
+https://www.youtube.com/watch?v=O0AOnxXp-o4
+
 ## What's next?
 
 👉 If you are interested in other pre-made models (such as Gemma, Mixtral or Phi), please refer to [Pre-made models](./premade-models.md).

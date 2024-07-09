@@ -56,3 +56,7 @@ If GPU acceleration is working, you'll see output that is similar to following i
 5:32AM DBG GRPC(llama-2-7b-chat.Q4_K_M.gguf-127.0.0.1:43735): stderr llm_load_tensors: offloaded 35/35 layers to GPU
 5:32AM DBG GRPC(llama-2-7b-chat.Q4_K_M.gguf-127.0.0.1:43735): stderr llm_load_tensors: VRAM used: 5869 MB
 ```
+
+## Demo
+
+https://www.youtube.com/watch?v=yFh_Zfk34PE
