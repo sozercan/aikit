@@ -15,7 +15,7 @@ const (
 	distrolessBase = "gcr.io/distroless/cc-debian12:latest"
 
 	localAIRepo    = "https://github.com/mudler/LocalAI"
-	localAIVersion = "v2.17.1"
+	localAIVersion = "v2.18.1"
 	cudaVersion    = "12-5"
 )
 
@@ -163,7 +163,7 @@ func addLocalAI(s llb.State, merge llb.State, platform specs.Platform) (llb.Stat
 	if !exists {
 		return s, merge, fmt.Errorf("unsupported architecture %s", platform.Architecture)
 	}
-	localAIURL := fmt.Sprintf("https://sertaccdnvs.azureedge.net/localai/%[1]s/%[2]s", localAIVersion, binaryName)
+	localAIURL := fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%[1]s/%[2]s", localAIVersion, binaryName)
 
 	savedState := s
 
