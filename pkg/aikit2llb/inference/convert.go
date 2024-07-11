@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	distrolessBase = "gcr.io/distroless/cc-debian12:latest"
+	distrolessBase = "gcr.io/distroless/base-nossl-debian12:latest"
 
 	localAIRepo    = "https://github.com/mudler/LocalAI"
 	localAIVersion = "v2.18.1"
