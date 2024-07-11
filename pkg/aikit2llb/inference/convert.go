@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	distrolessBase = "gcr.io/distroless/base-nossl-debian12:latest"
+	distrolessBase = "docker.io/sozercan/chiselled-ubuntu:latest" // nolint: misspell
 
 	localAIRepo    = "https://github.com/mudler/LocalAI"
 	localAIVersion = "v2.18.1"
