@@ -1,0 +1,24 @@
+ARG UBUNTU_RELEASE=22.04
+
+FROM golang:1.22-bookworm@sha256:6c2780255bb7b881e904e303be0d7a079054160b2ce1efde446693c0850a39ad AS builder
+ARG UBUNTU_RELEASE
+ARG TARGETARCH
+
+RUN apt-get update \
+    && apt-get install -y ca-certificates file
+
+RUN go install github.com/canonical/chisel/cmd/chisel@v0.10.0 \
+    && wget -O /usr/bin/chisel-wrapper https://raw.githubusercontent.com/canonical/rocks-toolbox/v1.1.2/chisel-wrapper \
+    && chmod 755 /usr/bin/chisel-wrapper
+
+RUN mkdir -p /rootfs/var/lib/dpkg/ \
+    && chisel-wrapper --generate-dpkg-status /rootfs/var/lib/dpkg/status -- \
+        --release ubuntu-$UBUNTU_RELEASE --root /rootfs \
+            base-files_base \
+            base-files_release-info \
+            ca-certificates_data \
+            libgcc-s1_libs \
+            libc6_libs
+
+FROM scratch
+COPY --from=builder /rootfs /
