@@ -13,7 +13,6 @@ import (
 
 const (
 	distrolessBase = "docker.io/sozercan/chiselled-ubuntu:latest" // nolint: misspell
-
 	localAIRepo    = "https://github.com/mudler/LocalAI"
 	localAIVersion = "v2.18.1"
 	cudaVersion    = "12-5"
@@ -22,7 +21,7 @@ const (
 // Aikit2LLB converts an InferenceConfig to an LLB state.
 func Aikit2LLB(c *config.InferenceConfig, platform *specs.Platform) (llb.State, *specs.Image, error) {
 	var merge llb.State
-	state := llb.Image(utils.DebianSlim, llb.Platform(*platform))
+	state := llb.Image(utils.UbuntuBase, llb.Platform(*platform))
 	base := getBaseImage(c, platform)
 
 	var err error
@@ -47,7 +46,7 @@ func Aikit2LLB(c *config.InferenceConfig, platform *specs.Platform) (llb.State, 
 		case utils.BackendExllama, utils.BackendExllamaV2:
 			merge = installExllama(c, state, merge)
 		case utils.BackendStableDiffusion:
-			merge = installOpenCV(state, merge, *platform)
+			merge = installOpenCV(state, merge)
 		case utils.BackendMamba:
 			merge = installMamba(state, merge)
 		}
@@ -60,7 +59,7 @@ func Aikit2LLB(c *config.InferenceConfig, platform *specs.Platform) (llb.State, 
 // getBaseImage returns the base image given the InferenceConfig and platform.
 func getBaseImage(c *config.InferenceConfig, platform *specs.Platform) llb.State {
 	if len(c.Backends) > 0 {
-		return llb.Image(utils.DebianSlim, llb.Platform(*platform))
+		return llb.Image(utils.UbuntuBase, llb.Platform(*platform))
 	}
 	return llb.Image(distrolessBase, llb.Platform(*platform))
 }

@@ -8,7 +8,7 @@ ARG TARGETARCH
 # Get chisel binary
 ADD https://github.com/canonical/chisel/releases/download/v0.10.0/chisel_v0.10.0_linux_$TARGETARCH.tar.gz chisel.tar.gz
 RUN tar -xvf chisel.tar.gz -C /usr/bin/
-RUN apt-get update && \
+RUN apt-get update &&
     DEBIAN_FRONTEND=noninteractive apt-get install -y ca-certificates
 WORKDIR /rootfs
 RUN chisel cut --release ubuntu-$UBUNTU_RELEASE --root /rootfs \
