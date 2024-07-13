@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	distrolessBase = "docker.io/sozercan/chiselled-ubuntu:latest" // nolint: misspell
+	distrolessBase = "ghcr.io/sozercan/base:latest"
 	localAIRepo    = "https://github.com/mudler/LocalAI"
 	localAIVersion = "v2.18.1"
 	cudaVersion    = "12-5"
