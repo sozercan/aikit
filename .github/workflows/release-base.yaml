@@ -52,6 +52,7 @@ jobs:
           sbom: true
           provenance: true
           platforms: linux/amd64,linux/arm64
+          file: Dockerfile.base
 
       - name: Sign the images with GitHub OIDC Token
         env:
