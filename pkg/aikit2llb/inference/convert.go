@@ -108,7 +108,7 @@ func copyModels(c *config.InferenceConfig, base llb.State, s llb.State, platform
 
 // installCuda installs cuda libraries and dependencies.
 func installCuda(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.State, llb.State) {
-	cudaKeyringURL := "https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/cuda-keyring_1.1-1_all.deb"
+	cudaKeyringURL := "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb"
 	cudaKeyring := llb.HTTP(cudaKeyringURL)
 	s = s.File(
 		llb.Copy(cudaKeyring, utils.FileNameFromURL(cudaKeyringURL), "/"),
@@ -124,10 +124,6 @@ func installCuda(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.S
 	if len(c.Backends) == 0 {
 		// install cuda libraries and pciutils for gpu detection
 		s = s.Run(utils.Shf("apt-get install -y --no-install-recommends pciutils libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean", cudaVersion)).Root()
-		// using a distroless base image here
-		// convert debian package metadata status file to distroless status.d directory
-		// clean up apt directories
-		s = s.Run(utils.Bashf("apt-get install -y --no-install-recommends libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean && mkdir -p /var/lib/dpkg/status.d && description_flag=false; while IFS= read -r line || [[ -n $line ]]; do if [[ $line == Package:* ]]; then pkg_name=$(echo $line | cut -d' ' -f2); elif [[ $line == Maintainer:* ]]; then maintainer=$(echo $line | cut -d' ' -f2-); if [[ $maintainer == 'cudatools <cudatools@nvidia.com>' ]]; then pkg_file=/var/lib/dpkg/status.d/${pkg_name}; echo 'Package: '$pkg_name > $pkg_file; echo $line >> $pkg_file; else pkg_file=''; fi; elif [[ -n $pkg_file ]]; then if [[ $line == Description:* ]]; then description_flag=true; elif [[ $line == '' ]]; then description_flag=false; elif ! $description_flag; then echo $line >> $pkg_file; fi; fi; done < /var/lib/dpkg/status && find /var/lib/dpkg -mindepth 1 ! -regex '^/var/lib/dpkg/status\\.d\\(/.*\\)?' -delete && rm -r /var/lib/apt", cudaVersion)).Root()
 	}
 
 	// installing dev dependencies used for exllama
