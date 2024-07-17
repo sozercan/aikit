@@ -124,6 +124,7 @@ func installCuda(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.S
 	if len(c.Backends) == 0 {
 		// install cuda libraries and pciutils for gpu detection
 		s = s.Run(utils.Shf("apt-get install -y --no-install-recommends pciutils libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean", cudaVersion)).Root()
+		// TODO: clean up /var/lib/dpkg/status
 	}
 
 	// installing dev dependencies used for exllama
