@@ -17,7 +17,7 @@ const (
 
 	APIv1alpha1 = "v1alpha1"
 
-	DebianSlim = "docker.io/library/debian:12-slim"
+	UbuntuBase = "docker.io/library/ubuntu:22.04"
 	CudaDevel  = "nvcr.io/nvidia/cuda:12.3.2-devel-ubuntu22.04"
 
 	PlatformLinux = "linux"
