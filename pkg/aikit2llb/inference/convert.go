@@ -12,17 +12,16 @@ import (
 )
 
 const (
-	distrolessBase = "gcr.io/distroless/cc-debian12:latest"
-
+	distrolessBase = "ghcr.io/sozercan/base:latest"
 	localAIRepo    = "https://github.com/mudler/LocalAI"
-	localAIVersion = "v2.16.0"
+	localAIVersion = "v2.18.1"
 	cudaVersion    = "12-5"
 )
 
 // Aikit2LLB converts an InferenceConfig to an LLB state.
 func Aikit2LLB(c *config.InferenceConfig, platform *specs.Platform) (llb.State, *specs.Image, error) {
 	var merge llb.State
-	state := llb.Image(utils.DebianSlim, llb.Platform(*platform))
+	state := llb.Image(utils.UbuntuBase, llb.Platform(*platform))
 	base := getBaseImage(c, platform)
 
 	var err error
@@ -47,7 +46,7 @@ func Aikit2LLB(c *config.InferenceConfig, platform *specs.Platform) (llb.State, 
 		case utils.BackendExllama, utils.BackendExllamaV2:
 			merge = installExllama(c, state, merge)
 		case utils.BackendStableDiffusion:
-			merge = installOpenCV(state, merge, *platform)
+			merge = installOpenCV(state, merge)
 		case utils.BackendMamba:
 			merge = installMamba(state, merge)
 		}
@@ -60,7 +59,7 @@ func Aikit2LLB(c *config.InferenceConfig, platform *specs.Platform) (llb.State, 
 // getBaseImage returns the base image given the InferenceConfig and platform.
 func getBaseImage(c *config.InferenceConfig, platform *specs.Platform) llb.State {
 	if len(c.Backends) > 0 {
-		return llb.Image(utils.DebianSlim, llb.Platform(*platform))
+		return llb.Image(utils.UbuntuBase, llb.Platform(*platform))
 	}
 	return llb.Image(distrolessBase, llb.Platform(*platform))
 }
@@ -109,7 +108,7 @@ func copyModels(c *config.InferenceConfig, base llb.State, s llb.State, platform
 
 // installCuda installs cuda libraries and dependencies.
 func installCuda(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.State, llb.State) {
-	cudaKeyringURL := "https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/cuda-keyring_1.1-1_all.deb"
+	cudaKeyringURL := "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb"
 	cudaKeyring := llb.HTTP(cudaKeyringURL)
 	s = s.File(
 		llb.Copy(cudaKeyring, utils.FileNameFromURL(cudaKeyringURL), "/"),
@@ -125,10 +124,7 @@ func installCuda(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.S
 	if len(c.Backends) == 0 {
 		// install cuda libraries and pciutils for gpu detection
 		s = s.Run(utils.Shf("apt-get install -y --no-install-recommends pciutils libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean", cudaVersion)).Root()
-		// using a distroless base image here
-		// convert debian package metadata status file to distroless status.d directory
-		// clean up apt directories
-		s = s.Run(utils.Bashf("apt-get install -y --no-install-recommends libcublas-%[1]s cuda-cudart-%[1]s && apt-get clean && mkdir -p /var/lib/dpkg/status.d && description_flag=false; while IFS= read -r line || [[ -n $line ]]; do if [[ $line == Package:* ]]; then pkg_name=$(echo $line | cut -d' ' -f2); elif [[ $line == Maintainer:* ]]; then maintainer=$(echo $line | cut -d' ' -f2-); if [[ $maintainer == 'cudatools <cudatools@nvidia.com>' ]]; then pkg_file=/var/lib/dpkg/status.d/${pkg_name}; echo 'Package: '$pkg_name > $pkg_file; echo $line >> $pkg_file; else pkg_file=''; fi; elif [[ -n $pkg_file ]]; then if [[ $line == Description:* ]]; then description_flag=true; elif [[ $line == '' ]]; then description_flag=false; elif ! $description_flag; then echo $line >> $pkg_file; fi; fi; done < /var/lib/dpkg/status && find /var/lib/dpkg -mindepth 1 ! -regex '^/var/lib/dpkg/status\\.d\\(/.*\\)?' -delete && rm -r /var/lib/apt", cudaVersion)).Root()
+		// TODO: clean up /var/lib/dpkg/status
 	}
 
 	// installing dev dependencies used for exllama
@@ -163,8 +159,7 @@ func addLocalAI(s llb.State, merge llb.State, platform specs.Platform) (llb.Stat
 	if !exists {
 		return s, merge, fmt.Errorf("unsupported architecture %s", platform.Architecture)
 	}
-	// TODO: update this URL when the binary is available in github
-	localAIURL := fmt.Sprintf("https://sertaccdnvs.azureedge.net/localai/%[1]s/%[2]s", localAIVersion, binaryName)
+	localAIURL := fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%[1]s/%[2]s", localAIVersion, binaryName)
 
 	savedState := s
 

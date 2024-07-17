@@ -27,6 +27,11 @@ build-test-model:
 	docker buildx build . -t ${REGISTRY}/${TEST_IMAGE_NAME}:${TAG} -f ${TEST_FILE} --output=${OUTPUT_TYPE} \
 		--progress=plain --provenance=false
 
+.PHONY: build-distroless-base
+push-distroless-base:
+	docker buildx build . -t sozercan/aikit-base:latest -f Dockerfile.base --platform linux/amd64,linux/arm64 \
+		--sbom=true --push
+
 .PHONY: run-test-model
 run-test-model:
 	docker run --rm -p 8080:8080 ${REGISTRY}/${TEST_IMAGE_NAME}:${TAG}

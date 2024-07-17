@@ -15,7 +15,7 @@ func installExllama(c *config.InferenceConfig, s llb.State, merge llb.State) llb
 	}
 
 	savedState := s
-	s = s.Run(utils.Sh("apt-get update && apt-get install --no-install-recommends -y bash git ca-certificates python3-pip python3-dev python3-venv python-is-python3 make g++ curl && pip install uv grpcio-tools --break-system-packages && apt-get clean"), llb.IgnoreCache).Root()
+	s = s.Run(utils.Sh("apt-get update && apt-get install --no-install-recommends -y bash git ca-certificates python3-pip python3-dev python3-venv python-is-python3 make g++ curl && pip install uv grpcio-tools && apt-get clean"), llb.IgnoreCache).Root()
 
 	s = cloneLocalAI(s)
 
