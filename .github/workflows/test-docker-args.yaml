@@ -98,10 +98,6 @@ jobs:
 
       - name: build test model
         run: |
-          # github head ref is only set for pull_request targets
-          # otherwise, get the github ref name to get the source branch
-          SOURCE_BRANCH="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
-
           docker buildx build -t testmodel:test \
             --build-arg="model=$MODEL_URL" \
             --load --provenance=false --progress plain \
@@ -110,6 +106,9 @@ jobs:
             "https://raw.githubusercontent.com/${REPO}/${SOURCE_BRANCH}/test/aikitfile-args.yaml"
         env:
           REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          # github head ref is only set for pull_request targets
+          # otherwise, get the github ref name to get the source branch
+          SOURCE_BRANCH: ${{ github.head_ref || github.ref_name }}
 
       - name: list images
         run: docker images
