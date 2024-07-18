@@ -105,7 +105,7 @@ jobs:
             --cache-to=type=gha,scope=testmodel,mode=max \
             "https://raw.githubusercontent.com/${REPO}/${SOURCE_BRANCH}/test/aikitfile-args.yaml"
         env:
-          REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          REPO: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
           # github head ref is only set for pull_request targets
           # otherwise, get the github ref name to get the source branch
           SOURCE_BRANCH: ${{ github.head_ref || github.ref_name }}
