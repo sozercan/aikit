@@ -81,7 +81,7 @@ postInstall:
     enabled: true
     image:
       repository: registry.k8s.io/kubectl
-      tag: v1.30.2
+      tag: v1.30.3
       pullPolicy: IfNotPresent
       pullSecrets: []
     podSecurity: ["pod-security.kubernetes.io/audit=restricted",
