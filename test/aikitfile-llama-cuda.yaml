@@ -3,9 +3,9 @@ apiVersion: v1alpha1
 debug: true
 runtime: cuda
 models:
-  - name: llama-3-8b-instruct
-    source: https://huggingface.co/QuantFactory/Meta-Llama-3-8B-Instruct-GGUF/resolve/main/Meta-Llama-3-8B-Instruct.Q4_K_M.gguf
-    sha256: "c57380038ea85d8bec586ec2af9c91abc2f2b332d41d6cf180581d7bdffb93c1"
+  - name: llama-3.1-8b-instruct
+    source: https://huggingface.co/QuantFactory/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct.Q4_K_M.gguf
+    sha256: "6d86fb9d2910178f5c744234fdf91910e033ef7b03c5e23dcc6d25e98687e5fa"
     promptTemplates:
       - name: chatMsg
         template: |
@@ -26,30 +26,46 @@ models:
         template: |
           <|start_header_id|>system<|end_header_id|>
 
-          You are a function calling AI model. You are provided with function signatures within <tools></tools> XML tags. You may call one or more functions to assist with the user query. Don't make assumptions about what values to plug into functions. Here are the available tools:
-          <tools>
+          You have access to the following functions:
+
           {{range .Functions}}
-          {'type': 'function', 'function': {'name': '{{.Name}}', 'description': '{{.Description}}', 'parameters': {{toJson .Parameters}} }}
+          Use the function '{{.Name}}' to '{{.Description}}'
+          {{toJson .Parameters}}
           {{end}}
-          </tools>
-          Use the following pydantic model json schema for each tool call you will make:
-          {'title': 'FunctionCall', 'type': 'object', 'properties': {'arguments': {'title': 'Arguments', 'type': 'object'}, 'name': {'title': 'Name', 'type': 'string'}}, 'required': ['arguments', 'name']}<|eot_id|><|start_header_id|>assistant<|end_header_id|>
-          Function call:
+
+          Think very carefully before calling functions.
+          If a you choose to call a function ONLY reply in the following format with no prefix or suffix:
+
+          <function=example_function_name>{{`{{\"example_name\": \"example_value\"}}`}}</function>
+
+          Reminder:
+          - If looking for real time information use relevant functions before falling back to searching on internet
+          - Function calls MUST follow the specified format, start with <function= and end with </function>
+          - Required parameters MUST be specified
+          - Only call one function at a time
+          - Put the entire function call reply on one line
+          <|eot_id|>
+          {{.Input }}
+          <|start_header_id|>assistant<|end_header_id|>
       - name: chat
         template: |
-          <|begin_of_text|>{{.Input }}
+          {{.Input }}
           <|start_header_id|>assistant<|end_header_id|>
       - name: completion
           {{.Input}}
 config: |
-  - name: llama-3-8b-instruct
+  - name: llama-3.1-8b-instruct
     backend: llama
+    function:
+      disable_no_action: true
+      grammar:
+        disable: true
+      response_regex:
+      - <function=(?P<name>\w+)>(?P<arguments>.*)</function>
     parameters:
-      model: Meta-Llama-3-8B-Instruct.Q4_K_M.gguf
+      model: Meta-Llama-3.1-8B-Instruct.Q4_K_M.gguf
     context_size: 8192
-    gpu_layers: 33
     f16: true
-    mmap: true
     template:
       chat_message: \"chatMsg\"
       function: \"function\"
