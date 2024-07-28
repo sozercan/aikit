@@ -35,7 +35,7 @@ AIKit offers two main capabilities:
 You can get started with AIKit quickly on your local machine without a GPU!
 
 ```bash
-docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama3:8b
+docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama3.1:8b
 ```
 
 After running this, navigate to [http://localhost:8080/chat](http://localhost:8080/chat) to access the WebUI!
@@ -46,7 +46,7 @@ AIKit provides an OpenAI API compatible endpoint, so you can use any OpenAI API 
 
 ```bash
 curl http://localhost:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
-    "model": "llama-3-8b-instruct",
+    "model": "llama-3.1-8b-instruct",
     "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
   }'
 ```
@@ -56,7 +56,7 @@ Output should be similar to:
 ```jsonc
 {
   // ...
-    "model": "llama-3-8b-instruct",
+    "model": "llama-3.1-8b-instruct",
     "choices": [
         {
             "index": 0,
@@ -81,16 +81,14 @@ If it doesn't include a specific model, you can always [create your own images](
 
 ## CPU
 
-| Model           | Optimization | Parameters | Command                                                             | Model Name              | License                                                                             |
-| --------------- | ------------ | ---------- | ------------------------------------------------------------------- | ----------------------- | ----------------------------------------------------------------------------------- |
-| 🦙 Llama 3       | Instruct     | 8B         | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama3:8b`        | `llama-3-8b-instruct`   | [Llama](https://ai.meta.com/llama/license/)                                         |
-| 🦙 Llama 3       | Instruct     | 70B        | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama3:70b`       | `llama-3-70b-instruct`  | [Llama](https://ai.meta.com/llama/license/)                                         |
-| 🦙 Llama 2       | Chat         | 7B         | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama2:7b`        | `llama-2-7b-chat`       | [Llama](https://ai.meta.com/llama/license/)                                         |
-| 🦙 Llama 2       | Chat         | 13B        | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama2:13b`       | `llama-2-13b-chat`      | [Llama](https://ai.meta.com/llama/license/)                                         |
-| Ⓜ️ Mixtral       | Instruct     | 8x7B       | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/mixtral:8x7b`     | `mixtral-8x7b-instruct` | [Apache](https://choosealicense.com/licenses/apache-2.0/)                           |
-| 🅿️ Phi 3         | Instruct     | 3.8B       | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/phi3:3.8b`        | `phi-3-3.8b`            | [MIT](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct/resolve/main/LICENSE) |
-| 🔡 Gemma 1.1     | Instruct     | 2B         | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/gemma:2b`      | `gemma-2b-instruct` | [Gemma](https://ai.google.dev/gemma/terms)                                          |
-| ⌨️ Codestral 0.1 | Code         | 22B        | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/codestral:22b` | `codestral-22b`     | [MNLP](https://mistral.ai/licenses/MNPL-0.1.md)                                     |
+| Model           | Optimization | Parameters | Command                                                          | Model Name               | License                                                                             |
+| --------------- | ------------ | ---------- | ---------------------------------------------------------------- | ------------------------ | ----------------------------------------------------------------------------------- |
+| 🦙 Llama 3.1     | Instruct     | 8B         | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama3.1:8b`   | `llama-3.1-8b-instruct`  | [Llama](https://ai.meta.com/llama/license/)                                         |
+| 🦙 Llama 3.1     | Instruct     | 70B        | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama3.1:70b`  | `llama-3.1-70b-instruct` | [Llama](https://ai.meta.com/llama/license/)                                         |  |
+| Ⓜ️ Mixtral       | Instruct     | 8x7B       | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/mixtral:8x7b`  | `mixtral-8x7b-instruct`  | [Apache](https://choosealicense.com/licenses/apache-2.0/)                           |
+| 🅿️ Phi 3         | Instruct     | 3.8B       | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/phi3:3.8b`     | `phi-3-3.8b`             | [MIT](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct/resolve/main/LICENSE) |
+| 🔡 Gemma 1.1     | Instruct     | 2B         | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/gemma:2b`      | `gemma-2b-instruct`      | [Gemma](https://ai.google.dev/gemma/terms)                                          |
+| ⌨️ Codestral 0.1 | Code         | 22B        | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/codestral:22b` | `codestral-22b`          | [MNLP](https://mistral.ai/licenses/MNPL-0.1.md)                                     |
 
 ### NVIDIA CUDA
 
@@ -98,16 +96,14 @@ If it doesn't include a specific model, you can always [create your own images](
 > To enable GPU acceleration, please see [GPU Acceleration](https://sozercan.github.io/aikit/docs/gpu).
 > Please note that only difference between CPU and GPU section is the `--gpus all` flag in the command to enable GPU acceleration.
 
-| Model           | Optimization | Parameters | Command                                                                        | Model Name              | License                                                                             |
-| --------------- | ------------ | ---------- | ------------------------------------------------------------------------------ | ----------------------- | ----------------------------------------------------------------------------------- |
-| 🦙 Llama 3       | Instruct     | 8B         | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama3:8b`        | `llama-3-8b-instruct`   | [Llama](https://ai.meta.com/llama/license/)                                         |
-| 🦙 Llama 3       | Instruct     | 70B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama3:70b`       | `llama-3-70b-instruct`  | [Llama](https://ai.meta.com/llama/license/)                                         |
-| 🦙 Llama 2       | Chat         | 7B         | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama2:7b`        | `llama-2-7b-chat`       | [Llama](https://ai.meta.com/llama/license/)                                         |
-| 🦙 Llama 2       | Chat         | 13B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama2:13b`       | `llama-2-13b-chat`      | [Llama](https://ai.meta.com/llama/license/)                                         |
-| Ⓜ️ Mixtral       | Instruct     | 8x7B       | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/mixtral:8x7b`     | `mixtral-8x7b-instruct` | [Apache](https://choosealicense.com/licenses/apache-2.0/)                           |
-| 🅿️ Phi 3         | Instruct     | 3.8B       | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/phi3:3.8b`        | `phi-3-3.8b`            | [MIT](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct/resolve/main/LICENSE) |
-| 🔡 Gemma 1.1     | Instruct     | 2B         | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/gemma:2b`      | `gemma-2b-instruct` | [Gemma](https://ai.google.dev/gemma/terms)                                          |
-| ⌨️ Codestral 0.1 | Code         | 22B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/codestral:22b` | `codestral-22b`     | [MNLP](https://mistral.ai/licenses/MNPL-0.1.md)                                     |
+| Model           | Optimization | Parameters | Command                                                                     | Model Name               | License                                                                             |
+| --------------- | ------------ | ---------- | --------------------------------------------------------------------------- | ------------------------ | ----------------------------------------------------------------------------------- |
+| 🦙 Llama 3.1     | Instruct     | 8B         | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama3.1:8b`   | `llama-3.1-8b-instruct`  | [Llama](https://ai.meta.com/llama/license/)                                         |
+| 🦙 Llama 3.1     | Instruct     | 70B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/llama3.1:70b`  | `llama-3.1-70b-instruct` | [Llama](https://ai.meta.com/llama/license/)                                         |  |
+| Ⓜ️ Mixtral       | Instruct     | 8x7B       | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/mixtral:8x7b`  | `mixtral-8x7b-instruct`  | [Apache](https://choosealicense.com/licenses/apache-2.0/)                           |
+| 🅿️ Phi 3         | Instruct     | 3.8B       | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/phi3:3.8b`     | `phi-3-3.8b`             | [MIT](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct/resolve/main/LICENSE) |
+| 🔡 Gemma 1.1     | Instruct     | 2B         | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/gemma:2b`      | `gemma-2b-instruct`      | [Gemma](https://ai.google.dev/gemma/terms)                                          |
+| ⌨️ Codestral 0.1 | Code         | 22B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/codestral:22b` | `codestral-22b`          | [MNLP](https://mistral.ai/licenses/MNPL-0.1.md)                                     |
 
 ## What's next?
 
