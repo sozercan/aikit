@@ -63,7 +63,6 @@ jobs:
             storage.googleapis.com:443
             *.blob.core.windows.net:443
             *.azureedge.net:443
-            deb.debian.org:80
             developer.download.nvidia.com:443
             dl-cdn.alpinelinux.org:443
             *.ubuntu.com:80
@@ -193,7 +192,7 @@ jobs:
             storage.googleapis.com:443
             *.blob.core.windows.net:443
             *.azureedge.net:443
-            deb.debian.org:80
+            *.ubuntu.com:80
             developer.download.nvidia.com:443
             dl-cdn.alpinelinux.org:443
             registry.ollama.ai:443
