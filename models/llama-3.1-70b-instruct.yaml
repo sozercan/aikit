@@ -64,7 +64,7 @@ config: |
       - <function=(?P<name>\w+)>(?P<arguments>.*)</function>
     parameters:
       model: Meta-Llama-3.1-70B-Instruct-Q4_K_M.gguf
-    context_size: 131072
+    context_size: 8192
     f16: true
     template:
       chat_message: \"chatMsg\"
