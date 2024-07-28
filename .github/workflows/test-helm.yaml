@@ -49,7 +49,7 @@ jobs:
             proxy.golang.org:443
             registry-1.docker.io:443
             storage.googleapis.com:443
-            deb.debian.org:80
+            *.ubuntu.com:80
             developer.download.nvidia.com:443
             get.helm.sh:443
             *.blob.core.windows.net:443
