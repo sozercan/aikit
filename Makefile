@@ -1,4 +1,4 @@
-VERSION := v0.12.0
+VERSION := v0.12.1
 
 REGISTRY ?= ghcr.io/sozercan
 KIND_VERSION ?= 0.23.0
