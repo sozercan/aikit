@@ -17,7 +17,7 @@ extract_model_type() {
 }
 
 # Run and display results for each example
-for MODEL in "llama-2-7b-chat" "llama-2-13b-chat" "llama-3-8b-instruct" "llama-3.1-8b-instruct" "phi-3-3.8b" "gemma-2b-instruct" "codestral-22b" "llama-3-70b-instruct" "llama-3.1-70b-instruct" "mixtral-8x7b-instruct"; do
+for MODEL in "llama-2-7b-chat" "llama-2-13b-chat" "llama-3-8b-instruct" "llama-3.1-8b-instruct" "phi-3-3.8b" "gemma-2b-instruct" "gemma-2-2b-instruct" "codestral-22b" "llama-3-70b-instruct" "llama-3.1-70b-instruct" "mixtral-8x7b-instruct"; do
     echo "Model: $MODEL"
     echo "  Name: $(extract_model_name $MODEL)"
     echo "  Size: $(extract_model_size $MODEL)"
