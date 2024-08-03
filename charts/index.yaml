@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   aikit:
   - apiVersion: v2
+    appVersion: v0.12.1
+    created: "2024-08-03T20:26:38.580285414Z"
+    description: Kubernetes Helm chart to deploy AIKit LLM images
+    digest: 0f5f896fa6524cc2afc7957687bfd42b891dde8f706ad68ba6dd05b584503339
+    name: aikit
+    type: application
+    urls:
+    - https://sozercan.github.io/aikit/charts/aikit-0.12.1.tgz
+    version: 0.12.1
+  - apiVersion: v2
     appVersion: v0.12.0
     created: "2024-07-28T05:56:06.460424523Z"
     description: Kubernetes Helm chart to deploy AIKit LLM images
@@ -61,4 +71,4 @@ entries:
     urls:
     - https://sozercan.github.io/aikit/charts/aikit-0.9.0.tgz
     version: 0.9.0
-generated: "2024-07-28T05:56:06.459832171Z"
+generated: "2024-08-03T20:26:38.578799517Z"
