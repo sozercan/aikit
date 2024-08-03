@@ -22,7 +22,7 @@ jobs:
         model:
          - llama-3.1-8b-instruct
          - phi-3-3.8b
-         - gemma-2b-instruct
+         - gemma-2-2b-instruct
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
