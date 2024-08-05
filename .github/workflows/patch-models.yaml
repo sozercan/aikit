@@ -18,14 +18,12 @@ jobs:
           fail-fast: false
           matrix:
             images:
-              - ghcr.io/sozercan/llama2:7b
-              - ghcr.io/sozercan/llama2:13b
-              - ghcr.io/sozercan/llama3:8b
-              - ghcr.io/sozercan/llama3:70b
+              - ghcr.io/sozercan/llama3.1:8b
+              - ghcr.io/sozercan/llama3.1:70b
               - ghcr.io/sozercan/mixtral:8x7b
               - ghcr.io/sozercan/phi3:3.8b
               - ghcr.io/sozercan/gemma2:2b
-              - ghcr.io/sozercan/codestral0.1:22b
+              - ghcr.io/sozercan/codestral:22b
         steps:
         - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
           with:
@@ -90,7 +88,7 @@ jobs:
 
         - name: Scan with Trivy
           run: |
-            retry -attempts ${ATTEMPTS} -max-time ${MAX_TIME} trivy image --vuln-type os --exit-code 0 --format json --output report.json --timeout ${TRIVY_TIMEOUT} --ignore-unfixed ${{ matrix.images }}
+            retry -attempts ${ATTEMPTS} -max-time ${MAX_TIME} trivy image --pkg-types os --exit-code 0 --format json --output report.json --timeout ${TRIVY_TIMEOUT} --ignore-unfixed ${{ matrix.images }}
           env:
             ATTEMPTS: 25
             MAX_TIME: 0
