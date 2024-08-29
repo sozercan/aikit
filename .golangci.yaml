@@ -13,7 +13,7 @@ linters:
   enable:
     - errcheck
     - errorlint
-    - exportloopref
+    - copyloopvar
     - forcetypeassert
     - gci
     - gocritic
