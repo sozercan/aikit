@@ -15,10 +15,10 @@ jobs:
       matrix:
         backend:
           # - llama-cuda
-          # - exllama
-          - exllama2-gptq
-          - exllama2-exl2
-          # - mamba
+          - exllama
+          # - exllama2-gptq
+          # - exllama2-exl2
+          - mamba
     steps:
       - name: cleanup workspace
         run: |
