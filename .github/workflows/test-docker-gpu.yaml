@@ -15,7 +15,7 @@ jobs:
       matrix:
         backend:
           # - llama-cuda
-          - exllama
+          # - exllama
           # - exllama2-gptq
           # - exllama2-exl2
           - mamba
