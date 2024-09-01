@@ -5,13 +5,61 @@ runtime: cuda
 backends:
   - diffusers
 models:
-  - name: flux
-    source: ChuckMcSneed/FLUX.1-dev
+  - name: "flux_assets/scheduler/scheduler_config.json"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/raw/main/scheduler/scheduler_config.json"
+  - name: "flux_assets/text_encoder/config.json"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/raw/main/text_encoder/config.json"
+  - name: "flux_assets/text_encoder/model.safetensors"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/text_encoder/model.safetensors"
+  - name: "flux_assets/text_encoder_2/config.json"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/raw/main/text_encoder_2/config.json"
+  - name: "flux_assets/text_encoder_2/model-00001-of-00002.safetensors"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/text_encoder_2/model-00001-of-00002.safetensors"
+  - name: "flux_assets/text_encoder_2/model-00002-of-00002.safetensors"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/text_encoder_2/model-00002-of-00002.safetensors"
+  - name: "flux_assets/text_encoder_2/model.safetensors.index.json"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/raw/main/text_encoder_2/model.safetensors.index.json"
+  - name: "flux_assets/tokenizer/merges.txt"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/raw/main/tokenizer/merges.txt"
+  - name: "flux_assets/tokenizer/special_tokens_map.json"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/raw/main/tokenizer/special_tokens_map.json"
+  - name: "flux_assets/tokenizer/tokenizer_config.json"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/raw/main/tokenizer/tokenizer_config.json"
+  - name: "flux_assets/tokenizer/vocab.json"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/raw/main/tokenizer/vocab.json"
+  - name: "flux_assets/tokenizer_2/special_tokens_map.json"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/raw/main/tokenizer_2/special_tokens_map.json"
+  - name: "flux_assets/tokenizer_2/tokenizer.json"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/raw/main/tokenizer_2/tokenizer.json"
+  - name: "flux_assets/tokenizer_2/tokenizer_config.json"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/raw/main/tokenizer_2/tokenizer_config.json"
+  - name: "flux_assets/tokenizer_2/spiece.model"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/raw/main/tokenizer_2/spiece.model"
+  - name: "flux_assets/transformer/config.json"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/raw/main/transformer/config.json"
+  - name: "flux_assets/transformer/diffusion_pytorch_model-00001-of-00003.safetensors"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/transformer/diffusion_pytorch_model-00001-of-00003.safetensors"
+  - name: "flux_assets/transformer/diffusion_pytorch_model-00002-of-00003.safetensors"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/transformer/diffusion_pytorch_model-00002-of-00003.safetensors"
+  - name: "flux_assets/transformer/diffusion_pytorch_model-00003-of-00003.safetensors"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/transformer/diffusion_pytorch_model-00003-of-00003.safetensors"
+  - name: "flux_assets/transformer/diffusion_pytorch_model.safetensors.index.json"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/raw/main/transformer/diffusion_pytorch_model.safetensors.index.json"
+  - name: "flux_assets/vae/config.json"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/raw/main/vae/config.json"
+  - name: "flux_assets/vae/diffusion_pytorch_model.safetensors"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/vae/diffusion_pytorch_model.safetensors"
+  - name: "flux_assets/ae.safetensors"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/ae.safetensors"
+  - name: "flux_assets/flux1-schnell.safetensors"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/flux1-schnell.safetensors"
+  - name: "flux_assets/model_index.json"
+    source: "https://huggingface.co/black-forest-labs/FLUX.1-schnell/raw/main/model_index.json"
 config: |
   - name: flux
     backend: diffusers
     parameters:
-      model: /models/flux
+      model: flux_assets
     diffusers:
       cfg_scale: 0
       cuda: true

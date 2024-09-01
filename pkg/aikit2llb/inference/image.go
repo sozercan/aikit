@@ -62,6 +62,12 @@ func emptyImage(c *config.InferenceConfig, platform *specs.Platform) *specs.Imag
 				"CUDA_HOME=/usr/local/cuda",
 			}
 			img.Config.Env = append(img.Config.Env, mambaEnv...)
+		case utils.BackendDiffusers:
+			diffusersEnv := []string{
+				"EXTERNAL_GRPC_BACKENDS=diffusers:/tmp/localai/backend/python/diffusers/run.sh",
+				"CUDA_HOME=/usr/local/cuda",
+			}
+			img.Config.Env = append(img.Config.Env, diffusersEnv...)
 		}
 	}
 
