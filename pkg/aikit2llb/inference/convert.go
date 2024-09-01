@@ -49,6 +49,8 @@ func Aikit2LLB(c *config.InferenceConfig, platform *specs.Platform) (llb.State, 
 			merge = installOpenCV(state, merge)
 		case utils.BackendMamba:
 			merge = installMamba(state, merge)
+		case utils.BackendDiffusers:
+			merge = installDiffusers(state, merge)
 		}
 	}
 

@@ -1,0 +1,21 @@
+#syntax=aikit:test
+apiVersion: v1alpha1
+debug: true
+runtime: cuda
+backends:
+  - diffusers
+models:
+  - name: flux
+    source: ChuckMcSneed/FLUX.1-dev
+config: |
+  - name: flux
+    backend: diffusers
+    parameters:
+      model: /models/flux
+    diffusers:
+      cfg_scale: 0
+      cuda: true
+      enable_parameters: num_inference_steps
+      pipeline_type: FluxPipeline
+    f16: true
+    step: 25
