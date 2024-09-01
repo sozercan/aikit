@@ -19,7 +19,9 @@ func installExllama(c *config.InferenceConfig, s llb.State, merge llb.State) llb
 
 	s = cloneLocalAI(s)
 
-	s = s.Run(utils.Bashf("export BUILD_TYPE=cublas && cd /tmp/localai/backend/python/%[1]s && make %[1]s", backend)).Root()
+	// TODO: remove sed for grpcio with localai v2.20.2+
+	// https://github.com/mudler/LocalAI/pull/3428/files
+	s = s.Run(utils.Bashf("export BUILD_TYPE=cublas && export CUDA_MAJOR_VERSION=12 && cd /tmp/localai/backend/python/%[1]s && sed -i 's/grpcio==1.66.0/grpcio==1.66.1/g' requirements.txt && make %[1]s", backend)).Root()
 
 	diff := llb.Diff(savedState, s)
 	return llb.Merge([]llb.State{merge, diff})

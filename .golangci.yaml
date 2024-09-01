@@ -1,6 +1,6 @@
 run:
   timeout: 5m
-  go: "1.22"
+  go: "1.23"
 
 linters-settings:
   lll:
@@ -13,7 +13,7 @@ linters:
   enable:
     - errcheck
     - errorlint
-    - exportloopref
+    - copyloopvar
     - forcetypeassert
     - gci
     - gocritic

@@ -2,7 +2,7 @@ module github.com/sozercan/aikit
 
 go 1.21.0
 
-toolchain go1.22.5
+toolchain go1.23.0
 
 require (
 	github.com/containerd/platforms v0.2.1
