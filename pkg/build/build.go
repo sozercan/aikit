@@ -440,10 +440,6 @@ func validateInferenceConfig(c *config.InferenceConfig) error {
 		return errors.Errorf("apiVersion %s is not supported", c.APIVersion)
 	}
 
-	if len(c.Models) == 0 {
-		return errors.New("no models defined")
-	}
-
 	if len(c.Backends) > 1 {
 		return errors.New("only one backend is supported at this time")
 	}

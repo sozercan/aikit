@@ -1,0 +1,22 @@
+#syntax=aikit:test
+apiVersion: v1alpha1
+debug: true
+runtime: cuda
+backends:
+  - diffusers
+models:
+  - name: "dreamshaper_assets/DreamShaper_8_pruned.safetensors"
+    sha256: 879db523c30d3b9017143d56705015e15a2cb5628762c11d086fed9538abd7fd
+    source: "https://huggingface.co/Lykon/DreamShaper/resolve/main/DreamShaper_8_pruned.safetensors"
+config: |
+  - name: dreamshaper
+    backend: diffusers
+    parameters:
+      model: dreamshaper_assets/DreamShaper_8_pruned.safetensors
+    diffusers:
+      pipeline_type: StableDiffusionPipeline
+      cuda: true
+      enable_parameters: "negative_prompt,num_inference_steps"
+      scheduler_type: "k_dpmpp_2m"
+    step: 25
+    f16: true

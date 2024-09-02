@@ -7,7 +7,7 @@ import (
 
 func installDiffusers(s llb.State, merge llb.State) llb.State {
 	savedState := s
-	s = s.Run(utils.Sh("apt-get install --no-install-recommends -y git python3 python3-dev python3-pip python3-venv python-is-python3 libssl3 openssl curl make && pip install uv grpcio-tools && apt-get clean"), llb.IgnoreCache).Root()
+	s = s.Run(utils.Sh("apt-get install --no-install-recommends -y git python3 python3-pip python3-venv python-is-python3 make && pip install uv grpcio-tools && apt-get clean"), llb.IgnoreCache).Root()
 
 	s = cloneLocalAI(s)
 
