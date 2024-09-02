@@ -449,7 +449,7 @@ func validateInferenceConfig(c *config.InferenceConfig) error {
 	}
 
 	if (slices.Contains(c.Backends, utils.BackendExllama) || slices.Contains(c.Backends, utils.BackendExllamaV2) || slices.Contains(c.Backends, utils.BackendMamba) || slices.Contains(c.Backends, utils.BackendDiffusers)) && c.Runtime != utils.RuntimeNVIDIA {
-		return errors.New("exllama and mamba only supports nvidia cuda runtime. please add 'runtime: cuda' to your aikitfile.yaml")
+		return errors.New("exllama, mamba, and diffusers backends only supports nvidia cuda runtime. please add 'runtime: cuda' to your aikitfile.yaml")
 	}
 
 	backends := []string{utils.BackendExllama, utils.BackendExllamaV2, utils.BackendStableDiffusion, utils.BackendMamba, utils.BackendDiffusers}
