@@ -56,7 +56,7 @@ const sidebars = {
         'exllama',
         'exllama2',
         'mamba',
-        'stablediffusion',
+        'diffusion',
       ],
     },
     {

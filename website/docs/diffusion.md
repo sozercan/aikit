@@ -1,6 +1,15 @@
 ---
-title: Stable Diffusion
+title: Image Generation
 ---
+
+AIKit supports `diffusers` and `stablediffusion` backends.
+
+## diffusers
+
+`diffusers` backend uses the huggingface [`diffusers`](https://huggingface.co/docs/diffusers/en/index) library to generate images.
+
+
+## stablediffusion
 
 https://github.com/EdVince/Stable-Diffusion-NCNN
 
