@@ -14,12 +14,12 @@ jobs:
       max-parallel: 1
       matrix:
         backend:
-          # - llama-cuda
-          # - exllama
-          # - exllama2-gptq
-          # - exllama2-exl2
-          # - mamba
+          - llama-cuda
+          - exllama2-gptq
+          - exllama2-exl2
           - diffusers
+          # - exllama
+          # - mamba
     steps:
       - name: cleanup workspace
         run: |
