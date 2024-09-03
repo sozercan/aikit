@@ -5,7 +5,7 @@ runtime: cuda
 backends:
   - diffusers
 config: |
-  - name: flux
+  - name: flux-1-dev
     backend: diffusers
     parameters:
       model: ChuckMcSneed/FLUX.1-dev
