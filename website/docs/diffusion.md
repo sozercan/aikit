@@ -1,5 +1,5 @@
 ---
-title: Image Generation
+title: Diffusion
 ---
 
 AIKit supports `diffusers` and `stablediffusion` backends.
