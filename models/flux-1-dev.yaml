@@ -16,4 +16,3 @@ config: |
       pipeline_type: FluxPipeline
     f16: true
     step: 25
-    low_vram: true
