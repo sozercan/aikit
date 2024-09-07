@@ -2,12 +2,19 @@
 title: Diffusion
 ---
 
-AIKit supports `diffusers` and `stablediffusion` backends.
+AIKit supports [`diffusers`](#diffusers) and [`stablediffusion`](#stablediffusion) backends.
 
 ## diffusers
 
-`diffusers` backend uses the huggingface [`diffusers`](https://huggingface.co/docs/diffusers/en/index) library to generate images.
+`diffusers` backend uses the huggingface [`diffusers`](https://huggingface.co/docs/diffusers/en/index) library to generate images. This backend only supports CUDA runtime.
 
+### Example
+
+:::warning
+Please make sure to change syntax to `#syntax=ghcr.io/sozercan/aikit:latest` in the examples below.
+:::
+
+https://github.com/sozercan/aikit/blob/main/test/aikitfile-diffusers.yaml
 
 ## stablediffusion
 
@@ -21,7 +28,7 @@ This backend:
 This is an experimental backend and it may change in the future.
 :::
 
-## Example
+### Example
 
 :::warning
 Please make sure to change syntax to `#syntax=ghcr.io/sozercan/aikit:latest` in the examples below.
@@ -29,6 +36,6 @@ Please make sure to change syntax to `#syntax=ghcr.io/sozercan/aikit:latest` in 
 
 https://github.com/sozercan/aikit/blob/main/test/aikitfile-stablediffusion.yaml
 
-## Demo
+### Demo
 
 https://www.youtube.com/watch?v=gh7b-rt70Ug
