@@ -58,6 +58,7 @@ jobs:
             sertaccdnvs.azureedge.net:443
             developer.download.nvidia.com:443
             *.ubuntu.com:80
+            pypi.org:443
 
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
