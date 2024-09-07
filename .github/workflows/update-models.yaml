@@ -95,7 +95,7 @@ jobs:
           fi
 
           export PLATFORMS="linux/amd64,linux/arm64"
-          if [ "${MODEL_NAME}" == "flux-1-dev" ]; then
+          if [ ${{ matrix.model }} == "flux-1-dev" ]; then
             export PLATFORMS="linux/amd64"
           fi
 
