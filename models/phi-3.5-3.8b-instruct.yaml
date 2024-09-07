@@ -3,9 +3,9 @@ apiVersion: v1alpha1
 debug: true
 runtime: cuda
 models:
-  - name: phi-3-3.8b
-    source: https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi-3-mini-4k-instruct-q4.gguf
-    sha256: 8a83c7fb9049a9b2e92266fa7ad04933bb53aa1e85136b7b30f1b8000ff2edef
+  - name: phi-3.5-3.8b-instruct
+    source: https://huggingface.co/MaziyarPanahi/Phi-3.5-mini-instruct-GGUF/resolve/main/Phi-3.5-mini-instruct.Q4_K_M.gguf
+    sha256: 3f68916e850b107d8641d18bcd5548f0d66beef9e0a9077fe84ef28943eb7e88
     promptTemplates:
       - name: chatMsg
         template: |
@@ -19,10 +19,10 @@ models:
         template: |
           {{.Input}}
 config: |
-  - name: phi-3-3.8b
+  - name: phi-3.5-3.8b-instruct
     backend: llama
     parameters:
-      model: Phi-3-mini-4k-instruct-q4.gguf
+      model: Phi-3.5-mini-instruct.Q4_K_M.gguf
     context_size: 4096
     template:
       chat_message: chatMsg
@@ -32,7 +32,5 @@ config: |
     - <|user|>
     - <|assistant|>
     - <|end|>
-    - <|endoftext|>
-    gpu_layers: 33
     f16: true
     mmap: true

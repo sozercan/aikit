@@ -21,8 +21,9 @@ jobs:
       matrix:
         model:
          - llama-3.1-8b-instruct
-         - phi-3-3.8b
+         - phi-3.5-3.8b-instruct
          - gemma-2-2b-instruct
+         - flux-1-dev
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:

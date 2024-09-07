@@ -25,6 +25,5 @@ config: |
      - \"[PREFIX]\"
      - \"[MIDDLE]\"
      - \"[SUFFIX]\"
-    gpu_layers: 50
     f16: true
     mmap: true

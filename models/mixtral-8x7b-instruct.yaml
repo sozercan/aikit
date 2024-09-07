@@ -12,6 +12,5 @@ config: |
     parameters:
       model: mixtral-8x7b-instruct-v0.1.Q4_K_M.gguf
     context_size: 4096
-    gpu_layers: 15
     f16: true
     mmap: true
