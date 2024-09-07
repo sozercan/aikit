@@ -48,6 +48,7 @@ jobs:
             tuf-repo-cdn.sigstore.dev:443
             www.bestpractices.dev:443
             api.scorecard.dev:443
+            api.deps.dev:443
 
       - name: "Checkout code"
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
