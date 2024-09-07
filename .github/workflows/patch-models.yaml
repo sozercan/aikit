@@ -24,6 +24,7 @@ jobs:
               - ghcr.io/sozercan/phi3:3.8b
               - ghcr.io/sozercan/gemma2:2b
               - ghcr.io/sozercan/codestral:22b
+              - ghcr.io/sozercan/flux1:dev
         steps:
         - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
           with:

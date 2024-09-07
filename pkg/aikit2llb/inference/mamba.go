@@ -7,7 +7,6 @@ import (
 
 func installMamba(s llb.State, merge llb.State) llb.State {
 	savedState := s
-	// libexpat1 is requirement but git is not. however libexpat1 is a dependency of git
 	s = s.Run(utils.Sh("apt-get install --no-install-recommends -y git python3 python3-dev python3-pip python3-venv python-is-python3 libssl3 openssl curl && pip install uv grpcio-tools && apt-get clean"), llb.IgnoreCache).Root()
 
 	s = cloneLocalAI(s)

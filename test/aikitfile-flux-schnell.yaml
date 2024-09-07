@@ -1,0 +1,19 @@
+#syntax=aikit:test
+apiVersion: v1alpha1
+debug: true
+runtime: cuda
+backends:
+  - diffusers
+config: |
+  - name: flux-1-schnell
+    backend: diffusers
+    parameters:
+      model: black-forest-labs/FLUX.1-schnell
+    diffusers:
+      cfg_scale: 0
+      cuda: true
+      enable_parameters: num_inference_steps
+      pipeline_type: FluxPipeline
+    f16: true
+    step: 25
+    low_vram: true
