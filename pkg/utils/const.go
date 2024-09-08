@@ -11,6 +11,7 @@ const (
 	BackendExllamaV2       = "exllama2"
 	BackendMamba           = "mamba"
 	BackendDiffusers       = "diffusers"
+	BackendTransformers    = "transformers"
 
 	TargetUnsloth = "unsloth"
 
