@@ -5,7 +5,7 @@ runtime: cuda
 backends:
   - transformers
 config: |
-  - name: phi-3.5-3.8b-instruct
+  - name: llama-3.1-8b-instruct
     backend: transformers
     type: AutoModelForCausalLM
     parameters:
@@ -24,4 +24,3 @@ config: |
           <|assistant|>
       completion: |
           {{.Input}}
-
