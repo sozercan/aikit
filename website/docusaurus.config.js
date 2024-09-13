@@ -93,6 +93,11 @@ const config = {
         id: 'announcementBar-1', // Increment on change
         content: `⭐️ If you like AIKit, please give it a star on <a target="_blank" rel="noopener noreferrer" href="https://github.com/sozercan/aikit">GitHub</a>!</a>`,
       },
+      algolia: {
+        appId: 'RHJCSXGPIU',
+        apiKey: '87916a9628113114a3b81499694c8fe1',
+        indexName: 'sozercanio',
+      },
     }),
 };
 
