@@ -6,7 +6,7 @@ toolchain go1.23.0
 
 require (
 	github.com/containerd/platforms v0.2.1
-	github.com/moby/buildkit v0.15.2
+	github.com/moby/buildkit v0.16.0
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.0
 	github.com/pkg/errors v0.9.1
@@ -20,12 +20,12 @@ require (
 	github.com/AdaLogics/go-fuzz-headers v0.0.0-20230811130428-ced1acdcaa24 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
-	github.com/containerd/containerd v1.7.19 // indirect
+	github.com/containerd/containerd v1.7.21 // indirect
 	github.com/containerd/continuity v0.4.3 // indirect
 	github.com/containerd/errdefs v0.1.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect
 	github.com/containerd/ttrpc v1.2.5 // indirect
-	github.com/containerd/typeurl/v2 v2.1.1 // indirect
+	github.com/containerd/typeurl/v2 v2.2.0 // indirect
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/docker/go-connections v0.5.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
@@ -43,7 +43,7 @@ require (
 	github.com/moby/docker-image-spec v1.3.1 // indirect
 	github.com/moby/locker v1.0.1 // indirect
 	github.com/moby/patternmatcher v0.6.0 // indirect
-	github.com/moby/sys/signal v0.7.0 // indirect
+	github.com/moby/sys/signal v0.7.1 // indirect
 	github.com/secure-systems-lab/go-securesystemslib v0.8.0 // indirect
 	github.com/shibumi/go-pathspec v1.3.0 // indirect
 	github.com/tonistiigi/fsutil v0.0.0-20240424095704-91a3fc46842c // indirect
