@@ -94,8 +94,8 @@ jobs:
         run: |
           docker buildx build . -t aikit:test \
             --load --provenance=false --progress plain \
-            --cache-from=type=gha,scope=aikit \
-            --cache-to=type=gha,scope=aikit,mode=max \
+            --cache-from=type=gha,scope=aikit-${{ matrix.arch }} \
+            --cache-to=type=gha,scope=aikit-${{ matrix.arch }},mode=max \
             --platform linux/${{ matrix.arch }}
 
       - name: build test model
@@ -103,8 +103,8 @@ jobs:
           docker buildx build . -t testmodel:test \
             -f test/aikitfile-${{ matrix.backend }}.yaml \
             --load --provenance=false --progress plain \
-            --cache-from=type=gha,scope=testmodel \
-            --cache-to=type=gha,scope=testmodel,mode=max \
+            --cache-from=type=gha,scope=testmodel-${{ matrix.arch }} \
+            --cache-to=type=gha,scope=testmodel-${{ matrix.arch }},mode=max \
             --platform linux/${{ matrix.arch }}
 
       - name: list images
@@ -225,16 +225,16 @@ jobs:
         run: |
           docker buildx build . -t aikit:test \
             --load --provenance=false --progress plain \
-            --cache-from=type=gha,scope=aikit \
-            --cache-to=type=gha,scope=aikit,mode=max
+            --cache-from=type=gha,scope=aikit-amd64 \
+            --cache-to=type=gha,scope=aikit-amd64,mode=max
 
       - name: build test model
         run: |
           docker buildx build . -t testmodel:test \
             -f test/aikitfile-${{ matrix.protocol }}.yaml \
             --load --provenance=false --progress plain \
-            --cache-from=type=gha,scope=testmodel \
-            --cache-to=type=gha,scope=testmodel,mode=max
+            --cache-from=type=gha,scope=testmodel-${{ matrix.protocol }} \
+            --cache-to=type=gha,scope=testmodel-${{ matrix.protocol }},mode=max
 
       - name: list images
         run: docker images
