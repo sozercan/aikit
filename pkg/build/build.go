@@ -444,22 +444,22 @@ func validateInferenceConfig(c *config.InferenceConfig) error {
 		return errors.New("only one backend is supported at this time")
 	}
 
-	if slices.Contains(c.Backends, utils.BackendStableDiffusion) && (slices.Contains(c.Backends, utils.BackendExllama) || slices.Contains(c.Backends, utils.BackendExllamaV2)) {
-		return errors.New("cannot specify both stablediffusion with exllama or exllama2 at this time")
+	if slices.Contains(c.Backends, utils.BackendStableDiffusion) && (slices.Contains(c.Backends, utils.BackendExllamaV2)) {
+		return errors.New("cannot specify both stablediffusion with exllama2 at this time")
 	}
 
-	if (slices.Contains(c.Backends, utils.BackendExllama) || slices.Contains(c.Backends, utils.BackendExllamaV2) || slices.Contains(c.Backends, utils.BackendMamba) || slices.Contains(c.Backends, utils.BackendDiffusers)) && c.Runtime != utils.RuntimeNVIDIA {
+	if (slices.Contains(c.Backends, utils.BackendExllamaV2) || slices.Contains(c.Backends, utils.BackendMamba) || slices.Contains(c.Backends, utils.BackendDiffusers)) && c.Runtime != utils.RuntimeNVIDIA {
 		return errors.New("exllama, mamba, and diffusers backends only supports nvidia cuda runtime. please add 'runtime: cuda' to your aikitfile.yaml")
 	}
 
-	backends := []string{utils.BackendExllama, utils.BackendExllamaV2, utils.BackendStableDiffusion, utils.BackendMamba, utils.BackendDiffusers}
+	backends := []string{utils.BackendExllamaV2, utils.BackendStableDiffusion, utils.BackendMamba, utils.BackendDiffusers}
 	for _, b := range c.Backends {
 		if !slices.Contains(backends, b) {
 			return errors.Errorf("backend %s is not supported", b)
 		}
 	}
 
-	runtimes := []string{"", utils.RuntimeNVIDIA, utils.RuntimeCPUAVX, utils.RuntimeCPUAVX2, utils.RuntimeCPUAVX512}
+	runtimes := []string{"", utils.RuntimeNVIDIA}
 	if !slices.Contains(runtimes, c.Runtime) {
 		return errors.Errorf("runtime %s is not supported", c.Runtime)
 	}

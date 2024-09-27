@@ -1,13 +1,9 @@
 package utils
 
 const (
-	RuntimeNVIDIA    = "cuda"
-	RuntimeCPUAVX    = "avx"
-	RuntimeCPUAVX2   = "avx2"
-	RuntimeCPUAVX512 = "avx512"
+	RuntimeNVIDIA = "cuda"
 
 	BackendStableDiffusion = "stablediffusion"
-	BackendExllama         = "exllama"
 	BackendExllamaV2       = "exllama2"
 	BackendMamba           = "mamba"
 	BackendDiffusers       = "diffusers"
