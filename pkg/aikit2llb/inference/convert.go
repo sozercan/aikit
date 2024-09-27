@@ -44,7 +44,7 @@ func Aikit2LLB(c *config.InferenceConfig, platform *specs.Platform) (llb.State, 
 	for b := range c.Backends {
 		switch c.Backends[b] {
 		case utils.BackendExllamaV2:
-			merge = installExllama(c, state, merge)
+			merge = installExllama(state, merge)
 		case utils.BackendStableDiffusion:
 			merge = installOpenCV(state, merge)
 		case utils.BackendMamba:
