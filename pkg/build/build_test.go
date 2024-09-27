@@ -41,7 +41,7 @@ func Test_validateConfig(t *testing.T) {
 			args: args{c: &config.InferenceConfig{
 				APIVersion: "v1alpha1",
 				Runtime:    "cuda",
-				Backends:   []string{"exllama"},
+				Backends:   []string{"exllama2"},
 				Models: []config.Model{
 					{
 						Name:   "test",
@@ -69,7 +69,7 @@ func Test_validateConfig(t *testing.T) {
 			name: "valid backend but no cuda runtime",
 			args: args{c: &config.InferenceConfig{
 				APIVersion: "v1alpha1",
-				Backends:   []string{"exllama"},
+				Backends:   []string{"exllama2"},
 				Models: []config.Model{
 					{
 						Name:   "test",
@@ -80,22 +80,7 @@ func Test_validateConfig(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "invalid backend combination 1",
-			args: args{c: &config.InferenceConfig{
-				APIVersion: "v1alpha1",
-				Runtime:    "cuda",
-				Backends:   []string{"exllama", "exllama2"},
-				Models: []config.Model{
-					{
-						Name:   "test",
-						Source: "foo",
-					},
-				},
-			}},
-			wantErr: true,
-		},
-		{
-			name: "invalid backend combination 2",
+			name: "invalid backend combination",
 			args: args{c: &config.InferenceConfig{
 				APIVersion: "v1alpha1",
 				Runtime:    "cuda",

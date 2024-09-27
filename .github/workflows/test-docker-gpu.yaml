@@ -18,7 +18,6 @@ jobs:
           - exllama2-gptq
           - exllama2-exl2
           - diffusers
-          # - exllama
           # - mamba
     steps:
       - name: cleanup workspace
@@ -63,7 +62,7 @@ jobs:
           fi
 
       - name: run test (exl2/gptq)
-        if: matrix.backend == 'exllama2-gptq' || matrix.backend == 'exllama2-exl2' || matrix.backend == 'exllama'
+        if: matrix.backend == 'exllama2-gptq' || matrix.backend == 'exllama2-exl2'
         run: |
           result=$(curl --fail --retry 10 --retry-all-errors http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
             "model": "llama-2-7b-chat",

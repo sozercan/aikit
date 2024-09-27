@@ -31,7 +31,7 @@ Make sure to customize these values based on your model and GPU specs.
 :::
 
 :::note
-For `exllama` and `exllama2` backends, GPU acceleration is enabled by default and cannot be disabled.
+For `exllama2` backend, GPU acceleration is enabled by default and cannot be disabled.
 :::
 
 After building the model, you can run it with [`--gpus all`](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/docker-specialized.html#gpu-enumeration) flag to enable GPU support:

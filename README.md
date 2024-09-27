@@ -23,7 +23,7 @@ AIKit offers two main capabilities:
 - ✨ OpenAI API compatible to use with any OpenAI API compatible client
 - 📸 [Multi-modal model support](https://sozercan.github.io/aikit/docs/vision)
 - 🖼️ [Image generation support](https://sozercan.github.io/aikit/docs/diffusion)
-- 🦙 Support for GGUF ([`llama`](https://github.com/ggerganov/llama.cpp)), GPTQ ([`exllama`](https://github.com/turboderp/exllama) or [`exllama2`](https://github.com/turboderp/exllamav2)), EXL2 ([`exllama2`](https://github.com/turboderp/exllamav2)), and GGML ([`llama-ggml`](https://github.com/ggerganov/llama.cpp)) and [Mamba](https://github.com/state-spaces/mamba) models
+- 🦙 Support for GGUF ([`llama`](https://github.com/ggerganov/llama.cpp)), GPTQ or EXL2 ([`exllama2`](https://github.com/turboderp/exllamav2)), and GGML ([`llama-ggml`](https://github.com/ggerganov/llama.cpp)) and [Mamba](https://github.com/state-spaces/mamba) models
 - 🚢 [Kubernetes deployment ready](https://sozercan.github.io/aikit/docs/kubernetes)
 - 📦 Supports multiple models with a single image
 - 🖥️ Supports [AMD64 and ARM64](https://sozercan.github.io/aikit/docs/create-images#multi-platform-support) CPUs and [GPU-accelerated inferencing with NVIDIA GPUs](https://sozercan.github.io/aikit/docs/gpu)

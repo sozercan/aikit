@@ -50,9 +50,9 @@ func emptyImage(c *config.InferenceConfig, platform *specs.Platform) *specs.Imag
 
 	for b := range c.Backends {
 		switch c.Backends[b] {
-		case utils.BackendExllama, utils.BackendExllamaV2:
+		case utils.BackendExllamaV2:
 			exllamaEnv := []string{
-				"EXTERNAL_GRPC_BACKENDS=exllama:/tmp/localai/backend/python/exllama/run.sh,exllama2:/tmp/localai/backend/python/exllama2/run.sh",
+				"EXTERNAL_GRPC_BACKENDS=exllama2:/tmp/localai/backend/python/exllama2/run.sh",
 				"CUDA_HOME=/usr/local/cuda",
 			}
 			img.Config.Env = append(img.Config.Env, exllamaEnv...)

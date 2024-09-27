@@ -43,8 +43,8 @@ func Aikit2LLB(c *config.InferenceConfig, platform *specs.Platform) (llb.State, 
 	// install backend dependencies
 	for b := range c.Backends {
 		switch c.Backends[b] {
-		case utils.BackendExllama, utils.BackendExllamaV2:
-			merge = installExllama(c, state, merge)
+		case utils.BackendExllamaV2:
+			merge = installExllama(state, merge)
 		case utils.BackendStableDiffusion:
 			merge = installOpenCV(state, merge)
 		case utils.BackendMamba:
@@ -131,12 +131,8 @@ func installCuda(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.S
 
 	// installing dev dependencies used for exllama
 	for b := range c.Backends {
-		if c.Backends[b] == utils.BackendExllama || c.Backends[b] == utils.BackendExllamaV2 {
-			var exllama2Dep string
-			if c.Backends[b] == utils.BackendExllamaV2 {
-				exllama2Dep = fmt.Sprintf("libcurand-dev-%[1]s", cudaVersion)
-			}
-			exllamaDeps := fmt.Sprintf("apt-get install -y --no-install-recommends cuda-cudart-dev-%[1]s cuda-crt-%[1]s libcusparse-dev-%[1]s libcublas-dev-%[1]s libcusolver-dev-%[1]s cuda-nvcc-%[1]s %[2]s && apt-get clean", cudaVersion, exllama2Dep)
+		if c.Backends[b] == utils.BackendExllamaV2 {
+			exllamaDeps := fmt.Sprintf("apt-get install -y --no-install-recommends cuda-cudart-dev-%[1]s cuda-crt-%[1]s libcusparse-dev-%[1]s libcublas-dev-%[1]s libcusolver-dev-%[1]s cuda-nvcc-%[1]s libcurand-dev-%[1]s && apt-get clean", cudaVersion)
 
 			s = s.Run(utils.Sh(exllamaDeps)).Root()
 		}
