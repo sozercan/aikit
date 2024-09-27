@@ -84,20 +84,20 @@ jobs:
         run: |
           docker buildx build . -t aikit:test \
             --load --provenance=false --progress plain \
-            --cache-from=type=gha,scope=aikit \
-            --cache-to=type=gha,scope=aikit,mode=max
+            --cache-from=type=gha,scope=aikit-amd64 \
+            --cache-to=type=gha,scope=aikit-amd64,mode=max
 
       - name: set url
         run: |
           if [ "${{ matrix.protocol }}" = "oci" ]; then
-            echo "MODEL_URL=oci://registry.ollama.ai/library/llama3:8b" >> $GITHUB_ENV
-            echo "MODEL_NAME=llama3" >> $GITHUB_ENV
+            echo "MODEL_URL=oci://registry.ollama.ai/library/llama3.2:1b" >> $GITHUB_ENV
+            echo "MODEL_NAME=llama3.2" >> $GITHUB_ENV
           elif [ "${{ matrix.protocol }}" = "huggingface" ]; then
-            echo "MODEL_URL=huggingface://QuantFactory/Meta-Llama-3-8B-Instruct-GGUF/Meta-Llama-3-8B-Instruct.Q4_K_M.gguf" >> $GITHUB_ENV
-            echo "MODEL_NAME=Meta-Llama-3-8B-Instruct.Q4_K_M.gguf" >> $GITHUB_ENV
+            echo "MODEL_URL=huggingface://MaziyarPanahi/Llama-3.2-1B-Instruct-GGUF/Llama-3.2-1B-Instruct.Q4_K_M.gguf" >> $GITHUB_ENV
+            echo "MODEL_NAME=Llama-3.2-1B-Instruct.Q4_K_M.gguf" >> $GITHUB_ENV
           elif [ "${{ matrix.protocol }}" = "https" ]; then
-            echo "MODEL_URL=https://huggingface.co/QuantFactory/Meta-Llama-3-8B-Instruct-GGUF/resolve/main/Meta-Llama-3-8B-Instruct.Q4_K_M.gguf" >> $GITHUB_ENV
-            echo "MODEL_NAME=Meta-Llama-3-8B-Instruct.Q4_K_M.gguf" >> $GITHUB_ENV
+            echo "MODEL_URL=https://huggingface.co/MaziyarPanahi/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct.Q4_K_M.gguf" >> $GITHUB_ENV
+            echo "MODEL_NAME=Llama-3.2-1B-Instruct.Q4_K_M.gguf" >> $GITHUB_ENV
           fi
 
       - name: build test model
@@ -105,8 +105,8 @@ jobs:
           docker buildx build -t testmodel:test \
             --build-arg="model=$MODEL_URL" \
             --load --provenance=false --progress plain \
-            --cache-from=type=gha,scope=testmodel \
-            --cache-to=type=gha,scope=testmodel,mode=max \
+            --cache-from=type=gha,scope=testmodel-${{ matrix.protocol }} \
+            --cache-to=type=gha,scope=testmodel-${{ matrix.protocol }},mode=max \
             "https://raw.githubusercontent.com/${REPO}/${SOURCE_BRANCH}/test/aikitfile-args.yaml"
         env:
           REPO: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
