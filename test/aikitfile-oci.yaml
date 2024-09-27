@@ -2,8 +2,8 @@
 apiVersion: v1alpha1
 debug: true
 models:
-  - name: llama-3-8b-instruct
-    source: oci://registry.ollama.ai/library/llama3:8b
+  - name: llama-3.2-1b-instruct
+    source: oci://registry.ollama.ai/library/llama3.2:1b
     promptTemplates:
       - name: chatMsg
         template: |
@@ -40,10 +40,10 @@ models:
       - name: completion
           {{.Input}}
 config: |
-  - name: llama-3-8b-instruct
+  - name: llama-3.2-1b-instruct
     backend: llama
     parameters:
-      model: llama3
+      model: llama3.2
     context_size: 8192
     template:
       chat_message: \"chatMsg\"
@@ -53,5 +53,5 @@ config: |
     stopwords:
       - <|im_end|>
       - <dummy32000>
-      - \"<|eot_id|>\"
+      - <|eot_id|>
       - <|end_of_text|>
