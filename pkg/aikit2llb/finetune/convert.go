@@ -66,7 +66,7 @@ func Aikit2LLB(c *config.FineTuneConfig) llb.State {
 		state = state.Run(utils.Shf("%[1]s && %[2]s && python -m target_unsloth", nvidiaMknod, sourceVenv), llb.Security(llb.SecurityModeInsecure)).Root()
 
 		// copy gguf to scratch which will be the output
-		const inputFile = "*.gguf"
+		const inputFile = "model/*.gguf"
 		copyOpts := []llb.CopyOption{}
 		copyOpts = append(copyOpts, &llb.CopyInfo{AllowWildcard: true})
 		outputFile := fmt.Sprintf("%s-%s.gguf", c.Output.Name, c.Output.Quantize)
