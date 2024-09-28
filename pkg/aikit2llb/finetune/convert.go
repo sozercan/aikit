@@ -46,7 +46,7 @@ func Aikit2LLB(c *config.FineTuneConfig) llb.State {
 	if c.Target == utils.TargetUnsloth {
 		// installing unsloth and its dependencies
 		// uv does not support installing xformers via unsloth pyproject
-		state = state.Run(utils.Shf("pip install --upgrade pip uv && uv venv --system-site-packages && %[1]s && uv pip install packaging torch==2.3.0 ipython ninja packaging bitsandbytes setuptools==69.5.1 wheel psutil && uv pip install --upgrade --force-reinstall transformers==4.44.2 numpy==2.0.2 && uv pip install flash-attn --no-build-isolation && python -m pip install 'unsloth[cu121_ampere_torch230] @ git+https://github.com/unslothai/unsloth.git@%[2]s'", sourceVenv, unslothCommitOrTag)).Root()
+		state = state.Run(utils.Shf("pip install --upgrade pip uv && uv venv --system-site-packages && %[1]s && uv pip install --upgrade --force-reinstall packaging torch==2.4.0 ipython ninja packaging bitsandbytes setuptools==69.5.1 wheel psutil transformers==4.44.2 numpy==2.0.2 && uv pip install flash-attn --no-build-isolation && python -m pip install 'unsloth[cu121_ampere_torch240] @ git+https://github.com/unslothai/unsloth.git@%[2]s'", sourceVenv, unslothCommitOrTag)).Root()
 
 		version := version.Version
 		if version == "" {
