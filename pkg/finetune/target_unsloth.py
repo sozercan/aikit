@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from unsloth import is_bfloat16_supported
+from transformers import TrainingArguments, DataCollatorForSeq2Seq
 from unsloth import FastLanguageModel
 import torch
 from trl import SFTTrainer
@@ -71,13 +73,14 @@ if source.startswith('http'):
 else:
     dataset = load_dataset(source, split = "train")
 
-dataset = dataset.map(formatting_prompts_func, batched = True)
+dataset = dataset.map(formatting_prompts_func, batched=True)
 
 trainer = SFTTrainer(
     model=model,
     train_dataset=dataset,
     dataset_text_field="text",
     max_seq_length=max_seq_length,
+    data_collator=DataCollatorForSeq2Seq(tokenizer=tokenizer),
     tokenizer=tokenizer,
     dataset_num_proc = 2,
     packing = cfg.get('packing'), # Can make training 5x faster for short sequences.
@@ -87,8 +90,8 @@ trainer = SFTTrainer(
         warmup_steps=cfg.get('warmupSteps'),
         max_steps=cfg.get('maxSteps'),
         learning_rate = cfg.get('learningRate'),
-        fp16=not torch.cuda.is_bf16_supported(),
-        bf16=torch.cuda.is_bf16_supported(),
+        fp16=not is_bfloat16_supported(),
+        bf16=is_bfloat16_supported(),
         logging_steps=cfg.get('loggingSteps'),
         optim=cfg.get('optimizer'),
         weight_decay = cfg.get('weightDecay'),
