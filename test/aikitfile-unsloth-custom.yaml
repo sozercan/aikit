@@ -18,12 +18,8 @@ config: |
   - name: custom
     backend: llama
     parameters:
-      top_k: 80
-      temperature: 0.8
-      top_p: 0.7
       model: model-q4_k_m.gguf
     context_size: 4096
-    gpu_layers: 35
     f16: true
     mmap: true
     template:
