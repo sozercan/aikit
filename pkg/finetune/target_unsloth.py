@@ -80,7 +80,6 @@ trainer = SFTTrainer(
     train_dataset=dataset,
     dataset_text_field="text",
     max_seq_length=max_seq_length,
-    data_collator=DataCollatorForSeq2Seq(tokenizer=tokenizer),
     tokenizer=tokenizer,
     dataset_num_proc = 2,
     packing = cfg.get('packing'), # Can make training 5x faster for short sequences.
