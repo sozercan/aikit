@@ -1,6 +1,6 @@
 #syntax=aikit:test
 apiVersion: v1alpha1
-baseModel: unsloth/Meta-Llama-3.1-8B
+baseModel: unsloth/Meta-Llama-3.1-8B-bnb-4bit
 datasets:
   - source: "yahma/alpaca-cleaned"
     type: alpaca
