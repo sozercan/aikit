@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	unslothCommitOrTag = "27fa021a7bb959a53667dd4e7cdb9598c207aa0d" // June-2024
+	unslothCommitOrTag = "fb77505f8429566f5d21d6ea5318c342e8a67991" // September-2024
 	nvidiaMknod        = "mknod --mode 666 /dev/nvidiactl c 195 255 && mknod --mode 666 /dev/nvidia-uvm c 235 0 && mknod --mode 666 /dev/nvidia-uvm-tools c 235 1 && mknod --mode 666 /dev/nvidia0 c 195 0 && nvidia-smi"
 	sourceVenv         = ". .venv/bin/activate"
 )
@@ -46,7 +46,7 @@ func Aikit2LLB(c *config.FineTuneConfig) llb.State {
 	if c.Target == utils.TargetUnsloth {
 		// installing unsloth and its dependencies
 		// uv does not support installing xformers via unsloth pyproject
-		state = state.Run(utils.Shf("pip install --upgrade pip uv && uv venv --system-site-packages && %[1]s && uv pip install packaging torch==2.3.0 ipython ninja packaging bitsandbytes setuptools==69.5.1 wheel psutil && uv pip install flash-attn --no-build-isolation && python -m pip install 'unsloth[cu121_ampere_torch230] @ git+https://github.com/unslothai/unsloth.git@%[2]s'", sourceVenv, unslothCommitOrTag)).Root()
+		state = state.Run(utils.Shf("pip install --upgrade pip uv && uv venv --system-site-packages && %[1]s && uv pip install --upgrade --force-reinstall packaging torch==2.4.0 ipython ninja packaging bitsandbytes setuptools==69.5.1 wheel psutil transformers==4.44.2 numpy==2.0.2 && uv pip install flash-attn --no-build-isolation && python -m pip install 'unsloth[cu121_ampere_torch240] @ git+https://github.com/unslothai/unsloth.git@%[2]s'", sourceVenv, unslothCommitOrTag)).Root()
 
 		version := version.Version
 		if version == "" {
@@ -66,7 +66,7 @@ func Aikit2LLB(c *config.FineTuneConfig) llb.State {
 		state = state.Run(utils.Shf("%[1]s && %[2]s && python -m target_unsloth", nvidiaMknod, sourceVenv), llb.Security(llb.SecurityModeInsecure)).Root()
 
 		// copy gguf to scratch which will be the output
-		const inputFile = "*.gguf"
+		const inputFile = "model/*.gguf"
 		copyOpts := []llb.CopyOption{}
 		copyOpts = append(copyOpts, &llb.CopyInfo{AllowWildcard: true})
 		outputFile := fmt.Sprintf("%s-%s.gguf", c.Output.Name, c.Output.Quantize)
