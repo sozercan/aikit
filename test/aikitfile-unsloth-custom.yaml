@@ -5,15 +5,6 @@ runtime: cuda
 models:
   - name: custom
     source: model-q4_k_m.gguf
-    promptTemplates:
-    - name: instruct
-      template: |
-        Below is an instruction that describes a task. Write a response that appropriately completes the request.
-
-        ### Instruction:
-        {{.Input}}
-
-        ### Response:
 config: |
   - name: custom
     backend: llama
@@ -22,5 +13,3 @@ config: |
     context_size: 4096
     f16: true
     mmap: true
-    template:
-      chat: instruct
