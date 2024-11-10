@@ -485,7 +485,7 @@ func parsePlatforms(v string) ([]*specs.Platform, error) {
 func parseCacheOptions(opts map[string]string) ([]client.CacheOptionsEntry, error) {
 	var cacheImports []client.CacheOptionsEntry
 	if cacheImportsStr := opts[keyCacheImports]; cacheImportsStr != "" {
-		var cacheImportsUM []controlapi.CacheOptionsEntry
+		var cacheImportsUM []*controlapi.CacheOptionsEntry
 		if err := json.Unmarshal([]byte(cacheImportsStr), &cacheImportsUM); err != nil {
 			return nil, errors.Wrapf(err, "failed to unmarshal %s (%q)", keyCacheImports, cacheImportsStr)
 		}
