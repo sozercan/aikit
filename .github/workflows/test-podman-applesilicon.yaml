@@ -63,11 +63,11 @@ jobs:
       - run: podman stop testmodel
         if: always()
 
-      - name: prune
-        run: |
-          docker system prune -a -f --volumes || true
-          podman system prune -a -f --volumes || true
-        if: always()
+      # - name: prune
+      #   run: |
+      #     docker system prune -a -f --volumes || true
+      #     podman system prune -a -f --volumes || true
+      #   if: always()
 
       - name: publish test artifacts
         if: always()
