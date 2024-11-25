@@ -47,17 +47,17 @@ jobs:
       - name: Set runtime variables for matrix
         run: |
           if [ ${{ matrix.runtime }} == "base" ]; then
-            export PLATFORMS="linux/amd64,linux/arm64"
-            export FILE="Dockerfile.base"
-            export TAG="ghcr.io/sozercan/base:latest"
-            export CACHE_FROM="type=gha,scope=base"
-            export CACHE_TO="type=gha,scope=base,mode=max"
+            echo PLATFORMS="linux/amd64,linux/arm64" >> $GITHUB_ENV
+            echo FILE="Dockerfile.base" >> $GITHUB_ENV
+            echo TAG="ghcr.io/sozercan/base:latest" >> $GITHUB_ENV
+            echo CACHE_FROM="type=gha,scope=base" >> $GITHUB_ENV
+            echo CACHE_TO="type=gha,scope=base,mode=max" >> $GITHUB_ENV
           elif [ ${{ matrix.runtime }} == "applesilicon" ]; then
-            export PLATFORMS="linux/arm64"
-            export FILE="Dockerfile.base-applesilicon"
-            export TAG="ghcr.io/sozercan/applesilicon/base:latest"
-            export CACHE_FROM="type=gha,scope=base-applesilicon"
-            export CACHE_TO="type=gha,scope=base-applesilicon,mode=max"
+            echo PLATFORMS="linux/arm64" >> $GITHUB_ENV
+            echo FILE="Dockerfile.base-applesilicon" >> $GITHUB_ENV
+            echo TAG="ghcr.io/sozercan/applesilicon/base:latest" >> $GITHUB_ENV
+            echo CACHE_FROM="type=gha,scope=base-applesilicon" >> $GITHUB_ENV
+            echo CACHE_TO="type=gha,scope=base-applesilicon,mode=max" >> $GITHUB_ENV
           fi
 
       - name: Build and push

@@ -18,25 +18,30 @@ jobs:
 
         # use default docker driver builder with containerd image store for local aikit image
         # these must be setup before running this test
-      - run: docker buildx use default
+      - run: docker buildx use desktop-linux
 
       - name: build aikit
         run: |
           docker buildx build . -t aikit:test \
             --load --provenance=false --progress plain
 
-      - name: build test model
+      - name: build and push test model
         run: |
-          docker buildx build . -t testmodel:test \
+          docker buildx build . -t sozercan/testmodel:test \
             -f test/aikitfile-llama.yaml \
-            --load --provenance=false --progress plain \
-            --build-arg="runtime=applesilicon"
+            --provenance=false --progress plain \
+            --build-arg="runtime=applesilicon" \
+            --push
 
       - name: list images
         run: docker images
 
       - name: run test model
-        run: podman run --name testmodel -d --rm --device /dev/dri -p 8080:8080 --pull always testmodel:test
+        run: |
+          podman run --name testmodel -d --rm -p 8080:8080 \
+            --device /dev/dri \
+            --pull always \
+            sozercan/testmodel:test
 
       - name: run test (gguf)
         run: |
@@ -58,8 +63,11 @@ jobs:
       - run: podman stop testmodel
         if: always()
 
-      - run: podman system prune -a -f --volumes || true
-        if: always()
+      # - name: prune
+      #   run: |
+      #     docker system prune -a -f --volumes || true
+      #     podman system prune -a -f --volumes || true
+      #   if: always()
 
       - name: publish test artifacts
         if: always()

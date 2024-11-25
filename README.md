@@ -83,6 +83,7 @@ If it doesn't include a specific model, you can always [create your own images](
 
 > [!NOTE]
 > AIKit supports both AMD64 and ARM64 CPUs. You can run the same command on either architecture, and Docker will automatically pull the correct image for your CPU.
+>
 > Depending on your CPU capabilities, AIKit will automatically select the most optimized instruction set.
 
 | Model           | Optimization | Parameters | Command                                                          | Model Name               | License                                                                            |
@@ -100,6 +101,7 @@ If it doesn't include a specific model, you can always [create your own images](
 
 > [!NOTE]
 > To enable GPU acceleration, please see [GPU Acceleration](https://sozercan.github.io/aikit/docs/gpu).
+>
 > Please note that only difference between CPU and GPU section is the `--gpus all` flag in the command to enable GPU acceleration.
 
 | Model           | Optimization  | Parameters | Command                                                                     | Model Name               | License                                                                                                                     |
@@ -118,7 +120,9 @@ If it doesn't include a specific model, you can always [create your own images](
 
 > [!NOTE]
 > To enable GPU acceleration on Apple Silicon, please see [Podman Desktop documentation](https://podman-desktop.io/docs/podman/gpu).
+>
 > Apple Silicon is an _experimental_ runtime and it may change in the future. This runtime is specific to Apple Silicon only, and it will not work as expected on other architectures, including Intel Macs.
+>
 > Only `gguf` models are supported on Apple Silicon.
 
 | Model       | Optimization | Parameters | Command                                                                                       | Model Name              | License                                                                            |
