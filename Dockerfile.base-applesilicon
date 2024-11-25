@@ -1,0 +1,12 @@
+ARG MESA_VERSION=23.3.5-102
+
+FROM fedora:39@sha256:d63d63fe593749a5e8dbc8152427d40bbe0ece53d884e00e5f3b44859efa5077
+USER 0
+
+# Install the patched mesa-krunkit drivers
+RUN dnf -y install dnf-plugins-core && \
+    dnf -y copr enable slp/mesa-krunkit && \
+    dnf -y install \
+        mesa-vulkan-drivers-${MESA_VERSION} \
+        vulkan-loader-devel vulkan-tools vulkan-loader && \
+    dnf clean all
