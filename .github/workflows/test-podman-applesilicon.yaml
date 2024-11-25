@@ -1,0 +1,70 @@
+name: podman-test-gpu
+
+on:
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  test:
+    runs-on: self-hosted
+    timeout-minutes: 240
+    steps:
+      - name: cleanup workspace
+        run: |
+          rm -rf ./* || true
+          rm -rf ./.??* || true
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+        # use default docker driver builder with containerd image store for local aikit image
+        # these must be setup before running this test
+      - run: docker buildx use default
+
+      - name: build aikit
+        run: |
+          docker buildx build . -t aikit:test \
+            --load --provenance=false --progress plain
+
+      - name: build test model
+        run: |
+          docker buildx build . -t testmodel:test \
+            -f test/aikitfile-llama.yaml \
+            --load --provenance=false --progress plain \
+            --build-arg="runtime=applesilicon"
+
+      - name: list images
+        run: docker images
+
+      - name: run test model
+        run: podman run --name testmodel -d --rm --device /dev/dri -p 8080:8080 --pull always testmodel:test
+
+      - name: run test (gguf)
+        run: |
+          result=$(curl --fail --retry 10 --retry-all-errors http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
+            "model": "llama-3.2-1b-instruct",
+            "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
+          }')
+          echo $result
+
+          choices=$(echo "$result" | jq '.choices')
+          if [ -z "$choices" ]; then
+            exit 1
+          fi
+
+      - name: save logs
+        if: always()
+        run: podman logs testmodel > /tmp/podman-gpu.log
+
+      - run: podman stop testmodel
+        if: always()
+
+      - run: podman system prune -a -f --volumes || true
+        if: always()
+
+      - name: publish test artifacts
+        if: always()
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+        with:
+          name: test-podman-gpu
+          path: |
+            /tmp/*.log

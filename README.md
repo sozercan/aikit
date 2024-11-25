@@ -81,6 +81,10 @@ If it doesn't include a specific model, you can always [create your own images](
 
 ## CPU
 
+> [!NOTE]
+> AIKit supports both AMD64 and ARM64 CPUs. You can run the same command on either architecture, and Docker will automatically pull the correct image for your CPU.
+> Depending on your CPU capabilities, AIKit will automatically select the most optimized instruction set.
+
 | Model           | Optimization | Parameters | Command                                                          | Model Name               | License                                                                            |
 | --------------- | ------------ | ---------- | ---------------------------------------------------------------- | ------------------------ | ---------------------------------------------------------------------------------- |
 | 🦙 Llama 3.2     | Instruct     | 1B         | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama3.2:1b`   | `llama-3.2-1b-instruct`  | [Llama](https://ai.meta.com/llama/license/)                                        |
@@ -109,6 +113,21 @@ If it doesn't include a specific model, you can always [create your own images](
 | 🔡 Gemma 2       | Instruct      | 2B         | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/gemma2:2b`     | `gemma-2-2b-instruct`    | [Gemma](https://ai.google.dev/gemma/terms)                                                                                  |
 | ⌨️ Codestral 0.1 | Code          | 22B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/codestral:22b` | `codestral-22b`          | [MNLP](https://mistral.ai/licenses/MNPL-0.1.md)                                                                             |
 | 📸 Flux 1 Dev    | Text to image | 12B        | `docker run -d --rm --gpus all -p 8080:8080 ghcr.io/sozercan/flux1:dev`     | `flux-1-dev`             | [FLUX.1 [dev] Non-Commercial License](https://github.com/black-forest-labs/flux/blob/main/model_licenses/LICENSE-FLUX1-dev) |
+
+### Apple Silicon (experimental)
+
+> [!NOTE]
+> To enable GPU acceleration on Apple Silicon, please see [Podman Desktop documentation](https://podman-desktop.io/docs/podman/gpu).
+> Apple Silicon is an _experimental_ runtime and it may change in the future. This runtime is specific to Apple Silicon only, and it will not work as expected on other architectures, including Intel Macs.
+> Only `gguf` models are supported on Apple Silicon.
+
+| Model       | Optimization | Parameters | Command                                                                                       | Model Name              | License                                                                            |
+| ----------- | ------------ | ---------- | --------------------------------------------------------------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------- |
+| 🦙 Llama 3.2 | Instruct     | 1B         | `podman run -d --rm --device /dev/dri -p 8080:8080 ghcr.io/sozercan/applesilicon/llama3.2:1b` | `llama-3.2-1b-instruct` | [Llama](https://ai.meta.com/llama/license/)                                        |
+| 🦙 Llama 3.2 | Instruct     | 3B         | `podman run -d --rm --device /dev/dri -p 8080:8080 ghcr.io/sozercan/applesilicon/llama3.2:3b` | `llama-3.2-3b-instruct` | [Llama](https://ai.meta.com/llama/license/)                                        |
+| 🦙 Llama 3.1 | Instruct     | 8B         | `podman run -d --rm --device /dev/dri -p 8080:8080 ghcr.io/sozercan/applesilicon/llama3.1:8b` | `llama-3.1-8b-instruct` | [Llama](https://ai.meta.com/llama/license/)                                        |
+| 🅿️ Phi 3.5   | Instruct     | 3.8B       | `podman run -d --rm --device /dev/dri -p 8080:8080 ghcr.io/sozercan/applesilicon/phi3.5:3.8b` | `phi-3.5-3.8b-instruct` | [MIT](https://huggingface.co/microsoft/Phi-3.5-mini-instruct/resolve/main/LICENSE) |
+| 🔡 Gemma 2   | Instruct     | 2B         | `podman run -d --rm --device /dev/dri -p 8080:8080 ghcr.io/sozercan/applesilicon/gemma2:2b`   | `gemma-2-2b-instruct`   | [Gemma](https://ai.google.dev/gemma/terms)                                         |
 
 ## What's next?
 

@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       staging:
-        description: 'push to test registry'
+        description: "push to test registry"
         required: false
         default: false
         type: boolean
@@ -15,17 +15,23 @@ permissions:
   id-token: write
 
 jobs:
- update-models:
+  update-models:
     strategy:
       fail-fast: false
       matrix:
         model:
-        - llama-3.2-1b-instruct
-        - llama-3.2-3b-instruct
-        - llama-3.1-8b-instruct
-        - phi-3.5-3.8b-instruct
-        - gemma-2-2b-instruct
-        - flux-1-dev
+          - llama-3.2-1b-instruct
+          - llama-3.2-3b-instruct
+          - llama-3.1-8b-instruct
+          - phi-3.5-3.8b-instruct
+          - gemma-2-2b-instruct
+          - flux-1-dev
+        runtime:
+          - cuda
+          - applesilicon
+        exclude:
+        - model: flux-1-dev # requires cuda runtime
+          runtime: applesilicon
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
@@ -96,14 +102,31 @@ jobs:
           fi
 
           if ${{ inputs.staging }}; then
-            export REGISTRY=ghcr.io/sozercan/test
+            if [ ${{ matrix.runtime }} == "applesilicon" ]; then
+              export REGISTRY=ghcr.io/sozercan/test/applesilicon
+            else
+              export REGISTRY=ghcr.io/sozercan/test
+            fi
           else
-            export REGISTRY=ghcr.io/sozercan
+            if [ ${{ matrix.runtime }} == "applesilicon" ]; then
+              export REGISTRY=ghcr.io/sozercan/applesilicon
+            else
+              export REGISTRY=ghcr.io/sozercan
+            fi
           fi
 
           export PLATFORMS="linux/amd64,linux/arm64"
           if [ ${{ matrix.model }} == "flux-1-dev" ]; then
             export PLATFORMS="linux/amd64"
+          fi
+          if [ ${{ matrix.runtime }} == "applesilicon" ]; then
+            export PLATFORMS="linux/arm64"
+          fi
+
+          if [ ${{ matrix.runtime }} == "applesilicon" ]; then
+            export BUILD_ARGS="--build-arg runtime=applesilicon"
+          else
+            export BUILD_ARGS=""
           fi
 
           docker buildx build . \
@@ -112,7 +135,7 @@ jobs:
             -f models/${{ matrix.model }}.yaml \
             --push --progress plain \
             --sbom=true --provenance=true \
-            --platform ${PLATFORMS}
+            --platform ${PLATFORMS} ${BUILD_ARGS}
           echo "DIGEST=$(cosign triangulate ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE} --type digest)" >> $GITHUB_ENV
 
       - name: Sign the images with GitHub OIDC Token

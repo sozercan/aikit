@@ -14,14 +14,18 @@ import (
 const (
 	distrolessBase = "ghcr.io/sozercan/base:latest"
 	localAIRepo    = "https://github.com/mudler/LocalAI"
-	localAIVersion = "v2.22.1"
+	localAIVersion = "v2.23.0"
 	cudaVersion    = "12-5"
 )
 
 // Aikit2LLB converts an InferenceConfig to an LLB state.
 func Aikit2LLB(c *config.InferenceConfig, platform *specs.Platform) (llb.State, *specs.Image, error) {
-	var merge llb.State
-	state := llb.Image(utils.UbuntuBase, llb.Platform(*platform))
+	var merge, state llb.State
+	if c.Runtime == utils.RuntimeAppleSilicon {
+		state = llb.Image(utils.AppleSiliconBase, llb.Platform(*platform))
+	} else {
+		state = llb.Image(utils.UbuntuBase, llb.Platform(*platform))
+	}
 	base := getBaseImage(c, platform)
 
 	var err error
@@ -30,7 +34,7 @@ func Aikit2LLB(c *config.InferenceConfig, platform *specs.Platform) (llb.State, 
 		return state, nil, err
 	}
 
-	state, merge, err = addLocalAI(state, merge, *platform)
+	state, merge, err = addLocalAI(c, state, merge, *platform)
 	if err != nil {
 		return state, nil, err
 	}
@@ -62,6 +66,9 @@ func Aikit2LLB(c *config.InferenceConfig, platform *specs.Platform) (llb.State, 
 func getBaseImage(c *config.InferenceConfig, platform *specs.Platform) llb.State {
 	if len(c.Backends) > 0 {
 		return llb.Image(utils.UbuntuBase, llb.Platform(*platform))
+	}
+	if c.Runtime == utils.RuntimeAppleSilicon {
+		return llb.Image(utils.AppleSiliconBase, llb.Platform(*platform))
 	}
 	return llb.Image(distrolessBase, llb.Platform(*platform))
 }
@@ -148,16 +155,21 @@ func installCuda(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.S
 }
 
 // addLocalAI adds the LocalAI binary to the image.
-func addLocalAI(s llb.State, merge llb.State, platform specs.Platform) (llb.State, llb.State, error) {
-	binaryNames := map[string]string{
-		utils.PlatformAMD64: "local-ai-Linux-x86_64",
-		utils.PlatformARM64: "local-ai-Linux-arm64",
+func addLocalAI(c *config.InferenceConfig, s llb.State, merge llb.State, platform specs.Platform) (llb.State, llb.State, error) {
+	var localAIURL string
+	if c.Runtime == utils.RuntimeAppleSilicon {
+		localAIURL = fmt.Sprintf("https://sertacstoragevs.blob.core.windows.net/localai/%[1]s/vulkan/local-ai", localAIVersion)
+	} else {
+		binaryNames := map[string]string{
+			utils.PlatformAMD64: "local-ai-Linux-x86_64",
+			utils.PlatformARM64: "local-ai-Linux-arm64",
+		}
+		binaryName, exists := binaryNames[platform.Architecture]
+		if !exists {
+			return s, merge, fmt.Errorf("unsupported architecture %s", platform.Architecture)
+		}
+		localAIURL = fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%[1]s/%[2]s", localAIVersion, binaryName)
 	}
-	binaryName, exists := binaryNames[platform.Architecture]
-	if !exists {
-		return s, merge, fmt.Errorf("unsupported architecture %s", platform.Architecture)
-	}
-	localAIURL := fmt.Sprintf("https://github.com/mudler/LocalAI/releases/download/%[1]s/%[2]s", localAIVersion, binaryName)
 
 	savedState := s
 

@@ -1,13 +1,15 @@
 VERSION := v0.14.0
 
 REGISTRY ?= ghcr.io/sozercan
-KIND_VERSION ?= 0.23.0
-KUBERNETES_VERSION ?= 1.30.1
-HELM_VERSION ?= 3.15.1
+KIND_VERSION ?= 0.25.0
+KUBERNETES_VERSION ?= 1.31.2
+HELM_VERSION ?= 3.16.3
 TAG ?= test
 OUTPUT_TYPE ?= type=docker
 TEST_IMAGE_NAME ?= testmodel
 TEST_FILE ?= test/aikitfile-llama.yaml
+RUNTIME ?= ""
+PLATFORMS ?= linux/amd64,linux/arm64
 
 GIT_COMMIT := $(shell git rev-list --abbrev-commit --tags --max-count=1)
 GIT_TAG := $(shell git describe --abbrev=0 --tags ${GIT_COMMIT} 2>/dev/null || true)
@@ -19,17 +21,22 @@ lint:
 
 .PHONY: build-aikit
 build-aikit:
-	docker buildx build . -t ${REGISTRY}/aikit:${TAG} --output=${OUTPUT_TYPE} --build-arg LDFLAGS=${LDFLAGS} \
+	docker buildx build . -t ${REGISTRY}/aikit:${TAG} --output=${OUTPUT_TYPE} \
+		--build-arg LDFLAGS=${LDFLAGS} \
 		--progress=plain
 
 .PHONY: build-test-model
 build-test-model:
-	docker buildx build . -t ${REGISTRY}/${TEST_IMAGE_NAME}:${TAG} -f ${TEST_FILE} --output=${OUTPUT_TYPE} \
-		--progress=plain --provenance=false
+	docker buildx build . -t ${REGISTRY}/${TEST_IMAGE_NAME}:${TAG} -f ${TEST_FILE} \
+		--progress=plain --provenance=false \
+		--output=${OUTPUT_TYPE} \
+		--build-arg runtime=${RUNTIME} \
+		--platform ${PLATFORMS}
 
 .PHONY: build-distroless-base
 push-distroless-base:
-	docker buildx build . -t sozercan/aikit-base:latest -f Dockerfile.base --platform linux/amd64,linux/arm64 \
+	docker buildx build . -t sozercan/aikit-base:latest -f Dockerfile.base \
+		--platform linux/amd64,linux/arm64 \
 		--sbom=true --push
 
 .PHONY: run-test-model
@@ -39,6 +46,10 @@ run-test-model:
 .PHONY: run-test-model-gpu
 run-test-model-gpu:
 	docker run --rm -p 8080:8080 --gpus all ${REGISTRY}/${TEST_IMAGE_NAME}:${TAG}
+
+.PHONY: run-test-model-applesilicon
+run-test-model-applesilicon:
+	podman run --rm -p 8080:8080 --device /dev/dri ${REGISTRY}/${TEST_IMAGE_NAME}:${TAG}
 
 .PHONY: test
 test:

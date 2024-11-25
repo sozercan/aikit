@@ -14,6 +14,12 @@ jobs:
   release-base:
     runs-on: ubuntu-latest
     timeout-minutes: 360
+    strategy:
+      fail-fast: true
+      matrix:
+        runtime:
+          - base
+          - applesilicon
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
@@ -38,18 +44,34 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set runtime variables for matrix
+        run: |
+          if [ ${{ matrix.runtime }} == "base" ]; then
+            export PLATFORMS="linux/amd64,linux/arm64"
+            export FILE="Dockerfile.base"
+            export TAG="ghcr.io/sozercan/base:latest"
+            export CACHE_FROM="type=gha,scope=base"
+            export CACHE_TO="type=gha,scope=base,mode=max"
+          elif [ ${{ matrix.runtime }} == "applesilicon" ]; then
+            export PLATFORMS="linux/arm64"
+            export FILE="Dockerfile.base-applesilicon"
+            export TAG="ghcr.io/sozercan/applesilicon/base:latest"
+            export CACHE_FROM="type=gha,scope=base-applesilicon"
+            export CACHE_TO="type=gha,scope=base-applesilicon,mode=max"
+          fi
+
       - name: Build and push
         uses: docker/build-push-action@4f58ea79222b3b9dc2c8bbdd6debcef730109a75 # v6.9.0
         id: build-and-push
         with:
           push: true
-          tags: ghcr.io/sozercan/base:latest
-          cache-from: type=gha,scope=base
-          cache-to: type=gha,scope=base,mode=max
           sbom: true
           provenance: true
-          platforms: linux/amd64,linux/arm64
-          file: Dockerfile.base
+          tags: ${{ env.TAG }}
+          cache-from: ${{ env.CACHE_FROM }}
+          cache-to: ${{ env.CACHE_TO }}
+          platforms: ${{ env.PLATFORMS }}
+          file: ${{ env.FILE }}
 
       - name: Sign the images with GitHub OIDC Token
         env:

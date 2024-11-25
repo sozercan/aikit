@@ -123,6 +123,14 @@ func buildInference(ctx context.Context, c client.Client, cfg *config.InferenceC
 		targetPlatforms = []*specs.Platform{&defaultBuildPlatform}
 	}
 
+	if cfg.Runtime == utils.RuntimeAppleSilicon {
+		for _, tp := range targetPlatforms {
+			if tp.Architecture != utils.PlatformARM64 {
+				return nil, errors.New("apple silicon runtime only supports arm64 platform")
+			}
+		}
+	}
+
 	isMultiPlatform := len(targetPlatforms) > 1
 	exportPlatforms := &exptypes.Platforms{
 		Platforms: make([]exptypes.Platform, len(targetPlatforms)),
@@ -452,6 +460,10 @@ func validateInferenceConfig(c *config.InferenceConfig) error {
 		return errors.New("exllama, mamba, and diffusers backends only supports nvidia cuda runtime. please add 'runtime: cuda' to your aikitfile.yaml")
 	}
 
+	if c.Runtime == utils.RuntimeAppleSilicon && len(c.Backends) > 0 {
+		return errors.New("apple silicon runtime only supports the default llama-cpp backend")
+	}
+
 	backends := []string{utils.BackendExllamaV2, utils.BackendStableDiffusion, utils.BackendMamba, utils.BackendDiffusers}
 	for _, b := range c.Backends {
 		if !slices.Contains(backends, b) {
@@ -459,7 +471,7 @@ func validateInferenceConfig(c *config.InferenceConfig) error {
 		}
 	}
 
-	runtimes := []string{"", utils.RuntimeNVIDIA}
+	runtimes := []string{"", utils.RuntimeNVIDIA, utils.RuntimeAppleSilicon}
 	if !slices.Contains(runtimes, c.Runtime) {
 		return errors.Errorf("runtime %s is not supported", c.Runtime)
 	}

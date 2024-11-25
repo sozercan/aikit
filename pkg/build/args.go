@@ -20,6 +20,12 @@ func parseBuildArgs(opts map[string]string, inferenceCfg *config.InferenceConfig
 	modelArg := getBuildArg(opts, "model")
 	runtimeArg := getBuildArg(opts, "runtime")
 
+	// Set the runtime if provided
+	if runtimeArg != "" {
+		inferenceCfg.Runtime = runtimeArg
+	}
+
+	// Set the model if provided
 	if modelArg != "" {
 		var modelName, modelSource string
 		var err error
@@ -50,7 +56,6 @@ func parseBuildArgs(opts map[string]string, inferenceCfg *config.InferenceConfig
 		}
 
 		// Set the inference configuration
-		inferenceCfg.Runtime = runtimeArg
 		inferenceCfg.Models = []config.Model{
 			{
 				Name:   modelName,
