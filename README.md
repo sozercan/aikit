@@ -81,6 +81,10 @@ If it doesn't include a specific model, you can always [create your own images](
 
 ## CPU
 
+> [!NOTE]
+> AIKit supports both AMD64 and ARM64 CPUs. You can run the same command on either architecture, and Docker will automatically pull the correct image for your CPU.
+> Depending on your CPU capabilities, AIKit will automatically select the most optimized instruction set.
+
 | Model           | Optimization | Parameters | Command                                                          | Model Name               | License                                                                            |
 | --------------- | ------------ | ---------- | ---------------------------------------------------------------- | ------------------------ | ---------------------------------------------------------------------------------- |
 | 🦙 Llama 3.2     | Instruct     | 1B         | `docker run -d --rm -p 8080:8080 ghcr.io/sozercan/llama3.2:1b`   | `llama-3.2-1b-instruct`  | [Llama](https://ai.meta.com/llama/license/)                                        |
@@ -114,7 +118,8 @@ If it doesn't include a specific model, you can always [create your own images](
 
 > [!NOTE]
 > To enable GPU acceleration on Apple Silicon, please see [Podman Desktop documentation](https://podman-desktop.io/docs/podman/gpu).
-> Apple Silicon is an experimental runtime and it may change in the future. Only `gguf` models are supported on Apple Silicon.
+> Apple Silicon is an _experimental_ runtime and it may change in the future. This runtime is specific to Apple Silicon only, and it will not work as expected on other architectures, including Intel Macs.
+> Only `gguf` models are supported on Apple Silicon.
 
 | Model       | Optimization | Parameters | Command                                                                                       | Model Name              | License                                                                            |
 | ----------- | ------------ | ---------- | --------------------------------------------------------------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------- |
