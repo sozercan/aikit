@@ -7,6 +7,6 @@ USER 0
 RUN dnf -y install dnf-plugins-core && \
     dnf -y copr enable slp/mesa-krunkit && \
     dnf -y install \
-        mesa-vulkan-drivers-${MESA_VERSION} \
+        mesa-vulkan-drivers-$MESA_VERSION \
         vulkan-loader-devel vulkan-tools vulkan-loader && \
     dnf clean all
