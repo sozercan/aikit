@@ -76,9 +76,15 @@ The `model` build argument is the model URL to download and use. You can use any
 
 #### `runtime`
 
-The `runtime` build argument adds the applicable runtimes to the image. By default, aikit will automatically choose the most optimized CPU runtime. You can use `cuda` to include NVIDIA CUDA runtime libraries. For example:
+The `runtime` build argument adds the applicable runtimes to the image. By default, aikit will automatically choose the most optimized CPU runtime.
+
+You can use `cuda` to include NVIDIA CUDA runtime libraries. For example:
 
 `--build-arg="runtime=cuda"`.
+
+or `applesilicon` to include Apple Silicon runtime libraries. For example:
+
+`--build-arg="runtime=applesilicon"`.
 
 ### Multi-Platform Support
 
