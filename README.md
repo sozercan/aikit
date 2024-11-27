@@ -119,7 +119,7 @@ If it doesn't include a specific model, you can always [create your own images](
 ### Apple Silicon (experimental)
 
 > [!NOTE]
-> To enable GPU acceleration on Apple Silicon, please see [Podman Desktop documentation](https://podman-desktop.io/docs/podman/gpu).
+> To enable GPU acceleration on Apple Silicon, please see [Podman Desktop documentation](https://podman-desktop.io/docs/podman/gpu). For more information, please see [GPU Acceleration](https://sozercan.github.io/aikit/docs/gpu).
 >
 > Apple Silicon is an _experimental_ runtime and it may change in the future. This runtime is specific to Apple Silicon only, and it will not work as expected on other architectures, including Intel Macs.
 >
