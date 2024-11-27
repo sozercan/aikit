@@ -65,6 +65,7 @@ jobs:
             storage.googleapis.com:443
             tuf-repo-cdn.sigstore.dev:443
             sertaccdnvs.azureedge.net:443
+            sertacstoragevs.blob.core.windows.net:443
             developer.download.nvidia.com:443
             *.ubuntu.com:80
             pypi.org:443
