@@ -55,6 +55,8 @@ func Aikit2LLB(c *config.InferenceConfig, platform *specs.Platform) (llb.State, 
 			merge = installMamba(state, merge)
 		case utils.BackendDiffusers:
 			merge = installDiffusers(state, merge)
+		case utils.BackendVLLM:
+			merge = installVLLM(state, merge)
 		}
 	}
 
