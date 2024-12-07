@@ -8,6 +8,16 @@ on:
         required: false
         default: false
         type: boolean
+      models:
+        description: "models to update"
+        required: true
+        default: '["llama-3.2-1b-instruct", "llama-3.2-3b-instruct", "llama-3.1-8b-instruct", "phi-3.5-3.8b-instruct", "gemma-2-2b-instruct", "flux-1-dev"]'
+        type: string
+      runtime:
+        description: "runtime to build"
+        required: true
+        default: '["cuda", "applesilicon"]'
+        type: string
 
 permissions:
   contents: write
@@ -19,16 +29,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        model:
-          - llama-3.2-1b-instruct
-          - llama-3.2-3b-instruct
-          - llama-3.1-8b-instruct
-          - phi-3.5-3.8b-instruct
-          - gemma-2-2b-instruct
-          - flux-1-dev
-        runtime:
-          - cuda
-          - applesilicon
+        model: ${{ fromJSON(github.event.inputs.models) }}
+        runtime: ${{ fromJSON(github.event.inputs.runtime) }}
         exclude:
         - model: flux-1-dev # requires cuda runtime
           runtime: applesilicon

@@ -3,9 +3,9 @@ apiVersion: v1alpha1
 debug: true
 runtime: cuda
 models:
-  - name: llama-3.1-70b-instruct
-    source: https://huggingface.co/MaziyarPanahi/Meta-Llama-3.1-70B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-70B-Instruct.Q4_K_M.gguf
-    sha256: "3f16ab17da4521fe3ed7c5d7beed960d3fe7b5b64421ee9650aa53d6b649ccab"
+  - name: llama-3.3-70b-instruct
+    source: https://huggingface.co/MaziyarPanahi/Llama-3.3-70B-Instruct-GGUF/resolve/main/Llama-3.3-70B-Instruct.Q4_K_M.gguf
+    sha256: "4f3b04ecae278bdb0fd545b47c210bc5edf823e5ebf7d41e0b526c81d54b1ff3"
     promptTemplates:
       - name: chatMsg
         template: |
@@ -54,7 +54,7 @@ models:
       - name: completion
           {{.Input}}
 config: |
-  - name: llama-3.1-70b-instruct
+  - name: llama-3.3-70b-instruct
     backend: llama
     function:
       disable_no_action: true
@@ -63,7 +63,7 @@ config: |
       response_regex:
       - <function=(?P<name>\w+)>(?P<arguments>.*)</function>
     parameters:
-      model: Meta-Llama-3.1-70B-Instruct.Q4_K_M.gguf
+      model: Llama-3.3-70B-Instruct.Q4_K_M.gguf
     context_size: 8192
     f16: true
     template:
