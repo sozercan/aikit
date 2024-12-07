@@ -19,7 +19,7 @@ jobs:
           matrix:
             images:
               - ghcr.io/sozercan/llama3.1:8b
-              - ghcr.io/sozercan/llama3.1:70b
+              - ghcr.io/sozercan/llama3.3:70b
               - ghcr.io/sozercan/llama3.2:1b
               - ghcr.io/sozercan/llama3.2:3b
               - ghcr.io/sozercan/mixtral:8x7b
