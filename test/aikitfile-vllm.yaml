@@ -5,16 +5,50 @@ runtime: cuda
 backends:
   - vllm
 models:
-  - name: Llama2-7B-chat-exl2/output.safetensors
-    source: https://huggingface.co/turboderp/Llama2-7B-chat-exl2/resolve/2.5bpw/output.safetensors
-  - name: Llama2-7B-chat-exl2/tokenizer.model
-    source: https://huggingface.co/turboderp/Llama2-7B-chat-exl2/resolve/2.5bpw/tokenizer.model
-  - name: Llama2-7B-chat-exl2/config.json
-    source: https://huggingface.co/turboderp/Llama2-7B-chat-exl2/raw/2.5bpw/config.json
+- name: Phi-3.5-vision-instruct/config.json
+  source: https://huggingface.co/microsoft/Phi-3.5-vision-instruct/resolve/main/config.json
+- name: Phi-3.5-vision-instruct/configuration_phi3_v.py
+  source: https://huggingface.co/microsoft/Phi-3.5-vision-instruct/resolve/main/configuration_phi3_v.py
+- name: Phi-3.5-vision-instruct/generation_config.json
+  source: https://huggingface.co/microsoft/Phi-3.5-vision-instruct/resolve/main/generation_config.json
+- name: Phi-3.5-vision-instruct/model-00001-of-00002.safetensors
+  source: https://huggingface.co/microsoft/Phi-3.5-vision-instruct/resolve/main/model-00001-of-00002.safetensors
+- name: Phi-3.5-vision-instruct/model-00002-of-00002.safetensors
+  source: https://huggingface.co/microsoft/Phi-3.5-vision-instruct/resolve/main/model-00002-of-00002.safetensors
+- name: Phi-3.5-vision-instruct/model.safetensors.index.json
+  source: https://huggingface.co/microsoft/Phi-3.5-vision-instruct/resolve/main/model.safetensors.index.json
+- name: Phi-3.5-vision-instruct/modeling_phi3_v.py
+  source: https://huggingface.co/microsoft/Phi-3.5-vision-instruct/resolve/main/modeling_phi3_v.py
+- name: Phi-3.5-vision-instruct/preprocessor_config.json
+  source: https://huggingface.co/microsoft/Phi-3.5-vision-instruct/resolve/main/preprocessor_config.json
+- name: Phi-3.5-vision-instruct/processing_phi3_v.py
+  source: https://huggingface.co/microsoft/Phi-3.5-vision-instruct/resolve/main/processing_phi3_v.py
+- name: Phi-3.5-vision-instruct/processor_config.json
+  source: https://huggingface.co/microsoft/Phi-3.5-vision-instruct/resolve/main/processor_config.json
+- name: Phi-3.5-vision-instruct/special_tokens_map.json
+  source: https://huggingface.co/microsoft/Phi-3.5-vision-instruct/resolve/main/special_tokens_map.json
+- name: Phi-3.5-vision-instruct/tokenizer.json
+  source: https://huggingface.co/microsoft/Phi-3.5-vision-instruct/resolve/main/tokenizer.json
+- name: Phi-3.5-vision-instruct/tokenizer_config.json
+  source: https://huggingface.co/microsoft/Phi-3.5-vision-instruct/resolve/main/tokenizer_config.json
 config: |
-  - name: llama-2-7b-chat
+  - name: phi-3.5-vision-instruct
     backend: vllm
-    context_size: 4096
+    context_size: 8096
     parameters:
-      model: "Llama2-7B-chat-exl2"
-      temperature: 0.2
+      model: /models/Phi-3.5-vision-instruct
+    trust_remote_code: true
+    max_model_len: 32768
+    template:
+      chat_message: |-
+          <|{{ .RoleName }}|>
+          {{.Content}}<|end|>
+      chat: >-
+        {{.Input}}
+
+        <|assistant|>
+      completion: |
+          {{.Input}}
+      use_tokenizer_template: false
+      multimodal: \"{{ range .Images }}<|image_{{ add1 .ID}}|>{{end}}\n{{.Text}}\"
+      image: \"<|image_{{ add1 .ID }}|>\\n{{.Text}}\"

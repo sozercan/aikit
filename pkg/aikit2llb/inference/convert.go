@@ -56,7 +56,7 @@ func Aikit2LLB(c *config.InferenceConfig, platform *specs.Platform) (llb.State, 
 		case utils.BackendDiffusers:
 			merge = installDiffusers(state, merge)
 		case utils.BackendVLLM:
-			merge = installVLLM(state, merge)
+			merge = installVLLM(c, state, merge)
 		}
 	}
 
@@ -149,6 +149,11 @@ func installCuda(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.S
 		if c.Backends[b] == utils.BackendMamba {
 			mambaDeps := fmt.Sprintf("apt-get install -y --no-install-recommends cuda-crt-%[1]s cuda-cudart-dev-%[1]s cuda-nvcc-%[1]s && apt-get clean", cudaVersion)
 			s = s.Run(utils.Sh(mambaDeps)).Root()
+		}
+
+		if c.Backends[b] == utils.BackendVLLM && c.Runtime == utils.RuntimeNVIDIA {
+			vllmDeps := fmt.Sprintf("apt-get install -y --no-install-recommends cuda-crt-%[1]s cuda-cudart-dev-%[1]s cuda-nvcc-%[1]s && apt-get clean", cudaVersion)
+			s = s.Run(utils.Sh(vllmDeps)).Root()
 		}
 	}
 
