@@ -69,7 +69,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       # need containerd image store for testing local images
-      - uses: crazy-max/ghaction-setup-docker@635d07c09dc2b52072362e9bb37e7e789767106d # v3.5.0
+      - uses: crazy-max/ghaction-setup-docker@01efb57f882e3b1a22e7cf3501dbe51287b0ecb4 # v4.0.0
         with:
           daemon-config: |
             {
