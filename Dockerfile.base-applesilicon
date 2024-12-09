@@ -1,13 +1,12 @@
-FROM fedora:39@sha256:d63d63fe593749a5e8dbc8152427d40bbe0ece53d884e00e5f3b44859efa5077
+FROM fedora:41@sha256:3ec60eb34fa1a095c0c34dd37cead9fd38afb62612d43892fcf1d3425c32bc1e
 
-ARG MESA_VERSION="23.3.5-102"
+ARG MESA_VERSION="24.1.2-101"
 
 USER 0
 
 # Install the patched mesa-krunkit drivers
 RUN dnf -y install dnf-plugins-core && \
-    dnf -y copr enable slp/mesa-krunkit && \
+    dnf -y copr enable slp/mesa-krunkit epel-9-aarch64 && \
     dnf -y install \
-        mesa-vulkan-drivers-$MESA_VERSION \
-        vulkan-loader-devel vulkan-tools vulkan-loader && \
+        mesa-vulkan-drivers-$MESA_VERSION.el9.aarch64 && \
     dnf clean all

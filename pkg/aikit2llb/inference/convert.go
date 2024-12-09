@@ -158,7 +158,7 @@ func installCuda(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.S
 func addLocalAI(c *config.InferenceConfig, s llb.State, merge llb.State, platform specs.Platform) (llb.State, llb.State, error) {
 	var localAIURL string
 	if c.Runtime == utils.RuntimeAppleSilicon {
-		localAIURL = fmt.Sprintf("https://sertaccdnvs.azureedge.net/localai/%[1]s/vulkan/local-ai", localAIVersion)
+		localAIURL = fmt.Sprintf("https://sertaccdnvs.azureedge.net/localai/%[1]s/kompute/local-ai", localAIVersion)
 	} else {
 		binaryNames := map[string]string{
 			utils.PlatformAMD64: "local-ai-Linux-x86_64",
