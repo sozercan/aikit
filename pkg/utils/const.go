@@ -16,7 +16,7 @@ const (
 	APIv1alpha1 = "v1alpha1"
 
 	UbuntuBase       = "docker.io/library/ubuntu:22.04"
-	AppleSiliconBase = "docker.io/sozercan/base:applesilicon"
+	AppleSiliconBase = "ghcr.io/sozercan/applesilicon/base:latest"
 	CudaDevel        = "nvcr.io/nvidia/cuda:12.3.2-devel-ubuntu22.04"
 
 	PlatformLinux = "linux"
