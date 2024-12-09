@@ -1,4 +1,4 @@
-FROM golang:1.23-bookworm@sha256:1479eb35034e30b5e3139ea6bde56754ccd0d57bad1fc8cc613e79ef63786cfe AS builder
+FROM golang:1.23-bookworm@sha256:ef30001eeadd12890c7737c26f3be5b3a8479ccdcdc553b999c84879875a27ce AS builder
 ARG LDFLAGS
 COPY . /go/src/github.com/sozercan/aikit
 WORKDIR /go/src/github.com/sozercan/aikit
