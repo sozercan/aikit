@@ -36,7 +36,7 @@ jobs:
           swap-storage: true
 
       - name: Harden Runner
-        uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
+        uses: step-security/harden-runner@cb605e52c26070c328afc4562f0b4ada7618a84e # v2.10.4
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -68,7 +68,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       # need containerd image store for testing local images
-      - uses: crazy-max/ghaction-setup-docker@01efb57f882e3b1a22e7cf3501dbe51287b0ecb4 # v4.0.0
+      - uses: crazy-max/ghaction-setup-docker@370a7dad4b8ce8dbf00f9363e1652e5074dd6abe # v4.1.0
         with:
           daemon-config: |
             {
@@ -135,7 +135,7 @@ jobs:
 
       - name: publish logs
         if: always()
-        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
         with:
           name: kind-logs
           path: $KIND_LOGS_PATH
