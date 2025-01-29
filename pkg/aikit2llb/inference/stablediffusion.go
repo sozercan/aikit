@@ -4,12 +4,23 @@ import (
 	"fmt"
 
 	"github.com/moby/buildkit/client/llb"
+	specs "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/sozercan/aikit/pkg/utils"
 )
 
-func installOpenCV(s llb.State, merge llb.State) llb.State {
+func installOpenCV(s llb.State, merge llb.State, platform specs.Platform) llb.State {
+	libPaths := map[string]string{
+		utils.PlatformAMD64: "/usr/lib/x86_64-linux-gnu",
+		utils.PlatformARM64: "/usr/lib/aarch64-linux-gnu",
+	}
+	libPath, exists := libPaths[platform.Architecture]
+	if !exists {
+		return s
+	}
+
 	savedState := s
-	s = s.Run(utils.Sh("apt-get update && mkdir -p /tmp/generated/images && apt-get install --no-install-recommends -y libopencv-imgcodecs4.5d && apt-get clean"), llb.IgnoreCache).Root()
+
+	s = s.Run(utils.Shf("apt-get update && mkdir -p /tmp/generated/images && apt-get install --no-install-recommends -y libopencv-imgcodecs4.5d && ln -s %[1]s/libopencv_core.so.4.5d %[1]s/libopencv_core.so.406 && ln -s %[1]s/libopencv_imgcodecs.so.4.5d %[1]s/libopencv_imgcodecs.so.406 && ln -s %[1]s/libopencv_imgproc.so.4.5d %[1]s/libopencv_imgproc.so.406 && apt-get clean", libPath), llb.IgnoreCache).Root()
 	diff := llb.Diff(savedState, s)
 	merge = llb.Merge([]llb.State{merge, diff})
 
