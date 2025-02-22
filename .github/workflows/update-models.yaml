@@ -11,7 +11,7 @@ on:
       models:
         description: "models to update"
         required: true
-        default: '["llama-3.2-1b-instruct", "llama-3.2-3b-instruct", "llama-3.1-8b-instruct", "phi-3.5-3.8b-instruct", "gemma-2-2b-instruct", "flux-1-dev"]'
+        default: '["llama-3.2-1b-instruct", "llama-3.2-3b-instruct", "llama-3.1-8b-instruct", "phi-3.5-3.8b-instruct", "gemma-2-2b-instruct", "flux-1-dev", "deepseek-r1-distill-llama-8b", "deepseek-r1-distill-qwen-7b"]'
         type: string
       runtime:
         description: "runtime to build"
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
-      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be
         with:
           tool-cache: true
           android: true
@@ -48,7 +48,7 @@ jobs:
           swap-storage: true
 
       - name: Harden Runner
-        uses: step-security/harden-runner@cb605e52c26070c328afc4562f0b4ada7618a84e # v2.10.4
+        uses: step-security/harden-runner@cb605e52c26070c328afc4562f0b4ada7618a84e
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -73,17 +73,17 @@ jobs:
             pypi.org:443
             files.pythonhosted.org:443
 
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
       - name: Install Cosign
-        uses: sigstore/cosign-installer@dc72c7d5c4d10cd6bcb8cf6e3fd625a9e5e537da # v3.7.0
+        uses: sigstore/cosign-installer@dc72c7d5c4d10cd6bcb8cf6e3fd625a9e5e537da
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@6524bf65af31da8d45b59e8c27de4bd072b392f5 # v3.8.0
-      - uses: crazy-max/ghaction-github-runtime@b3a9207c0e1ef41f4cf215303c976869d0c2c1c4 # v3.0.0
+        uses: docker/setup-buildx-action@6524bf65af31da8d45b59e8c27de4bd072b392f5
+      - uses: crazy-max/ghaction-github-runtime@b3a9207c0e1ef41f4cf215303c976869d0c2c1c4
 
       - name: Login to GHCR
-        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -91,11 +91,13 @@ jobs:
 
       - name: parse matrix
         run: |
-          echo "MODEL_NAME=$(echo ${{ matrix.model }} | sed -E 's/^llama-(3\.[1-9])-([0-9]+\.?[0-9]*b)-.*/llama\1/;t; s/^flux-([0-9]+)-dev$/flux\1/;t; s/^phi-(3\.5)-([0-9]+\.?[0-9]*b)-.*/phi\1/;t; s/^([a-z]+)-([0-9]+x[0-9]+b|[0-9]+\.?[0-9]*b)-.*/\1/; s/^([a-z]+)-([0-9]+)-.*/\1\2/; s/^([a-z]+)-([0-9]+\.?[0-9]*b)$/\1/')" >> $GITHUB_ENV
+          echo "MODEL_NAME=$(echo ${{ matrix.model }} | sed -E 's/^llama-(3\.[1-9])-([0-9]+\.?[0-9]*b)-.*/llama\1/;t; s/^flux-([0-9]+)-dev$/flux\1/;t; s/^phi-(3\.5)-([0-9]+\.?[0-9]*b)-.*/phi\1/;t; s/^deepseek-(r[0-9]+)-.*/deepseek-\1/;t; s/^([a-z]+)-([0-9]+x[0-9]+b|[0-9]+\.?[0-9]*b)-.*/\1/; s/^([a-z]+)-([0-9]+)-.*/\1\2/; s/^([a-z]+)-([0-9]+\.?[0-9]*b)$/\1/')" >> $GITHUB_ENV
 
-          echo "MODEL_SIZE=$(echo ${{ matrix.model }} | sed -E 's/^llama-(3\.[1-9])-([0-9]+\.?[0-9]*b)-.*/\2/;t; s/^flux-[0-9]+-dev$/dev/;t; s/^[a-z]+-([0-9]+x[0-9]+b|[0-9]+\.?[0-9]*b)-.*/\1/; s/^[a-z]+-[0-9]+(\.[0-9]+)?-([0-9]+\.?[0-9]*b).*/\2/; s/^[a-z]+-([0-9]+\.?[0-9]*b)$/\1/')" >> $GITHUB_ENV
+          echo "MODEL_SIZE=$(echo ${{ matrix.model }} | sed -E 's/^llama-(3\.[1-9])-([0-9]+\.?[0-9]*b)-.*/\2/;t; s/^flux-[0-9]+-dev$/dev/;t; s/^phi-(3\.5)-([0-9]+\.?[0-9]*b)-.*/\2/;t; s/.*-([0-9]+\.?[0-9]*b)$/\1/;t; s/^[a-z]+-([0-9]+x[0-9]+b|[0-9]+\.?[0-9]*b)-.*/\1/; s/^[a-z]+-[0-9]+(\.[0-9]+)?-([0-9]+\.?[0-9]*b).*/\2/; s/^[a-z]+-([0-9]+\.?[0-9]*b)$/\1/')" >> $GITHUB_ENV
 
           echo "MODEL_TYPE=-$(echo ${{ matrix.model }} | sed -n -e 's/^flux-[0-9]+-\(dev\)$/\1/p' -e 's/.*\(chat\).*/\1/p' -e 's/.*\(instruct\).*/\1/p')" >> $GITHUB_ENV
+
+          echo "MODEL_METADATA=$(echo ${{ matrix.model }} | sed -E -n 's/.*(distill-[^-]+).*/\1/p')" >> $GITHUB_ENV
 
       - name: Build and push
         run: |
@@ -132,14 +134,27 @@ jobs:
             export BUILD_ARGS=""
           fi
 
-          docker buildx build . \
-            -t ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE} \
-            -t ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE}${MODEL_TYPE} \
-            -f models/${{ matrix.model }}.yaml \
-            --push --progress plain \
-            --sbom=true --provenance=true \
-            --platform ${PLATFORMS} ${BUILD_ARGS}
-          echo "DIGEST=$(cosign triangulate ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE} --type digest)" >> $GITHUB_ENV
+          if [ -n "$MODEL_METADATA" ]; then
+            # For models with metadata, use metadata-size as tag
+            TAG="${MODEL_METADATA}-${MODEL_SIZE}"
+            docker buildx build . \
+              -t ${REGISTRY}/${MODEL_NAME}:${TAG} \
+              -f models/${{ matrix.model }}.yaml \
+              --push --progress plain \
+              --sbom=true --provenance=true \
+              --platform ${PLATFORMS} ${BUILD_ARGS}
+            echo "DIGEST=$(cosign triangulate ${REGISTRY}/${MODEL_NAME}:${TAG} --type digest)" >> $GITHUB_ENV
+          else
+            # Original behavior for other models
+            docker buildx build . \
+              -t ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE} \
+              -t ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE}${MODEL_TYPE} \
+              -f models/${{ matrix.model }}.yaml \
+              --push --progress plain \
+              --sbom=true --provenance=true \
+              --platform ${PLATFORMS} ${BUILD_ARGS}
+            echo "DIGEST=$(cosign triangulate ${REGISTRY}/${MODEL_NAME}:${MODEL_SIZE} --type digest)" >> $GITHUB_ENV
+          fi
 
       - name: Sign the images with GitHub OIDC Token
         if: ${{ !inputs.staging }}

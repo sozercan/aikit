@@ -1,0 +1,32 @@
+#syntax=aikit:test
+apiVersion: v1alpha1
+debug: true
+runtime: cuda
+models:
+  - name: deepseek-r1-distill-qwen-7b
+    source: https://huggingface.co/unsloth/DeepSeek-R1-Distill-Qwen-7B-GGUF/resolve/main/DeepSeek-R1-Distill-Qwen-7B-Q4_K_M.gguf
+    sha256: 78272d8d32084548bd450394a560eb2d70de8232ab96a725769b1f9171235c1c
+config: |
+  - name: deepseek-r1-distill-qwen-7b
+    backend: llama
+    parameters:
+      model: DeepSeek-R1-Distill-Qwen-7B-Q4_K_M.gguf
+    context_size: 131072
+    mmap: true
+    f16: true
+    stopwords:
+      - <|begin▁of▁sentence｜>
+      - <｜end▁of▁sentence｜>
+      - <｜User｜>
+      - <｜Assistant｜>
+    template:
+      chat_message: |
+        {{if eq .RoleName "system" -}}{{.Content }}
+        {{ end -}}
+        {{if eq .RoleName "user" -}}<｜User｜>{{.Content}}
+        {{end -}}
+        {{if eq .RoleName "assistant" -}}<｜Assistant｜>{{.Content}}<｜end▁of▁sentence｜>{{end}}
+      completion: |
+        {{.Input}}
+      chat: |
+        {{.Input -}}<｜Assistant｜>
