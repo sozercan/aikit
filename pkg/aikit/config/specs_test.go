@@ -24,7 +24,6 @@ apiVersion: v1alpha1
 runtime: cuda
 backends:
 - exllama2
-- stablediffusion
 models:
 - name: test
   source: foo
@@ -34,7 +33,6 @@ models:
 				Runtime:    utils.RuntimeNVIDIA,
 				Backends: []string{
 					utils.BackendExllamaV2,
-					utils.BackendStableDiffusion,
 				},
 				Models: []Model{
 					{
