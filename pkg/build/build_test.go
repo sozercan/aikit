@@ -84,7 +84,7 @@ func Test_validateConfig(t *testing.T) {
 			args: args{c: &config.InferenceConfig{
 				APIVersion: "v1alpha1",
 				Runtime:    "cuda",
-				Backends:   []string{"exllama", "stablediffusion"},
+				Backends:   []string{"exllama", "diffusers"},
 				Models: []config.Model{
 					{
 						Name:   "test",
