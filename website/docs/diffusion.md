@@ -25,7 +25,7 @@ This backend:
 - does not support CUDA runtime yet
 
 :::note
-This has been deprecated as of `v0.17.0` release.
+This has been deprecated as of `v0.18.0` release.
 :::
 
 ### Example
