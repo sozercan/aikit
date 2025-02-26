@@ -4,10 +4,9 @@ const (
 	RuntimeNVIDIA       = "cuda"
 	RuntimeAppleSilicon = "applesilicon" // experimental apple silicon runtime with vulkan arm64 support
 
-	BackendStableDiffusion = "stablediffusion"
-	BackendExllamaV2       = "exllama2"
-	BackendMamba           = "mamba"
-	BackendDiffusers       = "diffusers"
+	BackendExllamaV2 = "exllama2"
+	BackendMamba     = "mamba"
+	BackendDiffusers = "diffusers"
 
 	TargetUnsloth = "unsloth"
 
