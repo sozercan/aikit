@@ -1,0 +1,41 @@
+{{- if .Values.leaderWorkerSet.enabled -}}
+apiVersion: leaderworkerset.x-k8s.io/v1
+kind: LeaderWorkerSet
+metadata:
+  name: aikit
+spec:
+  replicas: 1
+  leaderWorkerTemplate:
+    size: 5
+    restartPolicy: RecreateGroupOnPodRestart
+    leaderTemplate:
+      metadata:
+        labels:
+          app: aikit
+      spec:
+        containers:
+        - name: leader
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+          args: [ "run", "--p2p" ]
+    workerTemplate:
+      spec:
+        containers:
+        - name: worker
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+          # worker llama-cpp-rpc --llama-cpp-args="-H <listening_address> -p <listening_port> -m <memory>"
+          args: ["worker", "llama-cpp-rpc", "--llama-cpp-args=-H 0.0.0.0 -m 4192", "--log-level=debug"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aikit
+spec:
+  selector:
+    app: aikit
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+{{- end }}

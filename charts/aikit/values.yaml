@@ -93,3 +93,9 @@ postInstall:
     extraAnnotations: {}
     extraRules: []
     priorityClassName: ""
+
+leaderWorkerSet:
+  enabled: false
+  replicas: 1
+  size: 5
+  restartPolicy: RecreateGroupOnPodRestart
