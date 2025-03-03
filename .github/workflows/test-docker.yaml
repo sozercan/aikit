@@ -73,7 +73,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       # need containerd image store for testing local images
-      - uses: crazy-max/ghaction-setup-docker@370a7dad4b8ce8dbf00f9363e1652e5074dd6abe # v4.1.0
+      - uses: crazy-max/ghaction-setup-docker@c2d73c1a11a9b44be6d855121d75c3e0dac814c1 # v4.2.0
         with:
           daemon-config: |
             {
@@ -83,7 +83,7 @@ jobs:
               }
             }
       - uses: crazy-max/ghaction-github-runtime@b3a9207c0e1ef41f4cf215303c976869d0c2c1c4 # v3.0.0
-      - uses: docker/setup-qemu-action@4574d27a4764455b42196d70a065bc6853246a25 # v3.4.0
+      - uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3.6.0
         if: ${{ matrix.arch == 'arm64' }}
 
       - name: build aikit
@@ -188,7 +188,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       # need containerd image store for testing local images
-      - uses: crazy-max/ghaction-setup-docker@370a7dad4b8ce8dbf00f9363e1652e5074dd6abe # v4.1.0
+      - uses: crazy-max/ghaction-setup-docker@c2d73c1a11a9b44be6d855121d75c3e0dac814c1 # v4.2.0
         with:
           daemon-config: |
             {
