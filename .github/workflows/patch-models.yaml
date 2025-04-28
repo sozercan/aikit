@@ -39,7 +39,7 @@ jobs:
             swap-storage: true
 
         - name: Harden Runner
-          uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
+          uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
           with:
             egress-policy: block
             allowed-endpoints: >
@@ -122,7 +122,7 @@ jobs:
 
         - name: Install Cosign
           if: steps.copa.conclusion == 'success'
-          uses: sigstore/cosign-installer@d7d6bc7722e3daa8354c50bcb52f4837da5e9b6a # v3.8.1
+          uses: sigstore/cosign-installer@3454372f43399081ed03b604cb2d021dabca52bb # v3.8.2
 
         - name: Docker Push Patched Image
           id: push
