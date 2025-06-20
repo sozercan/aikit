@@ -18,6 +18,9 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: "{{ .Values.image.pullPolicy }}"
           args: [ "run", "--p2p" ]
+          env:
+          - name: LLAMACPP_GRPC_SERVERS
+            value: "0.0.0.0:8080"
     workerTemplate:
       spec:
         containers:
@@ -25,7 +28,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: "{{ .Values.image.pullPolicy }}"
           # worker llama-cpp-rpc --llama-cpp-args="-H <listening_address> -p <listening_port> -m <memory>"
-          args: ["worker", "llama-cpp-rpc", "--llama-cpp-args=-H 0.0.0.0 -m 4192", "--log-level=debug"]
+          args: ["worker", "llama-cpp-rpc", "--llama-cpp-args=-H 0.0.0.0 -m 4192"]
 ---
 apiVersion: v1
 kind: Service

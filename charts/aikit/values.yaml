@@ -95,7 +95,7 @@ postInstall:
     priorityClassName: ""
 
 leaderWorkerSet:
-  enabled: false
+  enabled: true
   replicas: 1
   size: 5
   restartPolicy: RecreateGroupOnPodRestart
