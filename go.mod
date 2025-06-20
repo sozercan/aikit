@@ -1,6 +1,6 @@
 module github.com/sozercan/aikit
 
-go 1.22.7
+go 1.23.0
 
 toolchain go1.23.3
 
@@ -11,7 +11,7 @@ require (
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.3
-	golang.org/x/sync v0.11.0
+	golang.org/x/sync v0.15.0
 	google.golang.org/grpc v1.71.0
 	gopkg.in/yaml.v2 v2.4.0
 )
