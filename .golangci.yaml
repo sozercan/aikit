@@ -1,35 +1,50 @@
+version: "2"
 run:
-  timeout: 5m
   go: "1.24"
-
-linters-settings:
-  lll:
-    line-length: 200
-  misspell:
-    locale: US
-
 linters:
-  disable-all: true
+  default: none
   enable:
+    - copyloopvar
     - errcheck
     - errorlint
-    - copyloopvar
     - forcetypeassert
-    - gci
-    - gocritic
     - goconst
+    - gocritic
     - godot
-    - gofmt
-    - gofumpt
-    - goimports
     - gosec
-    - gosimple
     - govet
     - ineffassign
     - misspell
     - revive
     - staticcheck
-    - typecheck
     - unconvert
     - unused
     - whitespace
+  settings:
+    lll:
+      line-length: 200
+    misspell:
+      locale: US
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
