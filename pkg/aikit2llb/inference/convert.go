@@ -14,7 +14,7 @@ import (
 const (
 	distrolessBase = "ghcr.io/sozercan/base:latest"
 	localAIRepo    = "https://github.com/mudler/LocalAI"
-	localAIVersion = "v3.0.0"
+	localAIVersion = "v3.1.0"
 	cudaVersion    = "12-5"
 )
 
