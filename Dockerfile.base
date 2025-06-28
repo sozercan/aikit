@@ -12,7 +12,8 @@ RUN mkdir -p /rootfs && chisel cut --release ubuntu-$UBUNTU_RELEASE --root /root
     base-files_release-info \
     ca-certificates_data \
     libgcc-s1_libs \
-    libc6_libs
+    libc6_libs \
+    libgomp1_libs
 
 FROM scratch
 COPY --from=builder /rootfs /
