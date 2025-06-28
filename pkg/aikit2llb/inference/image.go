@@ -35,7 +35,6 @@ func emptyImage(c *config.InferenceConfig, platform *specs.Platform) *specs.Imag
 	img.Config.Env = []string{
 		"PATH=" + system.DefaultPathEnv(utils.PlatformLinux),
 		"CONFIG_FILE=/config.yaml",
-		"LOCALAI_SKIP_LIBRARY_PATH=1",
 	}
 
 	cudaEnv := []string{
