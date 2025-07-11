@@ -185,5 +185,5 @@ func addLocalAI(c *config.InferenceConfig, s llb.State, merge llb.State, platfor
 
 // cloneLocalAI clones the LocalAI repository to the image used for python backends.
 func cloneLocalAI(s llb.State) llb.State {
-	return s.Run(utils.Shf("git clone --filter=blob:none --no-checkout %[1]s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python && git checkout %[2]s && rm -rf .git", localAIRepo, localAIVersion)).Root()
+	return s.Run(utils.Shf("git clone --filter=blob:none --no-checkout %[1]s /tmp/localai/ && cd /tmp/localai && git sparse-checkout init --cone && git sparse-checkout set backend/python && git checkout %[2]s && rm -rf .git && mkdir -p /tmp/localai/backend_data/backend-assets/lib/ && ln -s /usr/lib/x86_64-linux-gnu/libc.so.6 /tmp/localai/backend_data/backend-assets/lib/libc.so.6", localAIRepo, localAIVersion)).Root()
 }
