@@ -14,11 +14,11 @@ jobs:
       max-parallel: 1
       matrix:
         backend:
-          - llama-cuda
+          # - llama-cuda
           - exllama2-gptq
           - exllama2-exl2
           - diffusers
-          # - mamba
+          - mamba
     steps:
       - name: cleanup workspace
         run: |
@@ -106,7 +106,7 @@ jobs:
 
       - name: save generated image
         if: matrix.backend == 'diffusers'
-        run: docker cp testmodel:/tmp/generated/images /tmp
+        run: docker cp testmodel:/tmp/generated/content/images /tmp
 
       - name: save logs
         if: always()

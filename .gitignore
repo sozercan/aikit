@@ -24,3 +24,4 @@ bin
 coverage.txt
 
 _output
+.vscode
