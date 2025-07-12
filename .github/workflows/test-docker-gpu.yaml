@@ -2,6 +2,19 @@ name: docker-test-gpu
 
 on:
   workflow_dispatch:
+    inputs:
+      backend:
+        description: 'Backend to test (leave empty to test all)'
+        required: false
+        type: choice
+        default: 'all'
+        options:
+          - all
+          - llama-cuda
+          - exllama2-gptq
+          - exllama2-exl2
+          - diffusers
+          - mamba
 
 permissions: read-all
 
@@ -13,12 +26,7 @@ jobs:
       fail-fast: false
       max-parallel: 1
       matrix:
-        backend:
-          - llama-cuda
-          - exllama2-gptq
-          - exllama2-exl2
-          - diffusers
-          # - mamba
+        backend: ${{ inputs.backend == 'all' && fromJson('["llama-cuda", "exllama2-gptq", "exllama2-exl2", "diffusers", "mamba"]') || fromJson(format('["{0}"]', inputs.backend)) }}
     steps:
       - name: cleanup workspace
         run: |
