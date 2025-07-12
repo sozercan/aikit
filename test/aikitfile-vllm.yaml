@@ -5,8 +5,22 @@ runtime: cuda
 backends:
   - vllm
 config: |
-  - name: opt-125m
+  - name: phi
     backend: vllm
     parameters:
-      model: "facebook/opt-125m"
+      model: "microsoft/Phi-3-vision-128k-instruct"
     trust_remote_code: true
+    max_model_len: 32768
+    template:
+      chat_message: |-
+          <|{{ .RoleName }}|>
+          {{.Content}}<|end|>
+      chat: >-
+        {{.Input}}
+
+        <|assistant|>
+
+      completion: |
+          {{.Input}}
+      use_tokenizer_template: false
+      multimodal: \"{{ range .Images }}<|image_{{ add1 .ID}}|>{{end}}\n{{.Text}}\"
