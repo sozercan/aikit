@@ -14,10 +14,10 @@ jobs:
       max-parallel: 1
       matrix:
         backend:
-          - llama-cuda
-          - exllama2-gptq
-          - exllama2-exl2
-          - diffusers
+          # - llama-cuda
+          # - exllama2-gptq
+          # - exllama2-exl2
+          # - diffusers
           - vllm
           # - mamba
     steps:
