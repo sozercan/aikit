@@ -29,13 +29,9 @@ jobs:
       matrix:
         backend:
           - llama
-          - stablediffusion
         arch:
           - amd64
           - arm64
-        exclude:
-        - backend: stablediffusion
-          arch: arm64
     steps:
       - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:
@@ -48,7 +44,7 @@ jobs:
           swap-storage: true
 
       - name: Harden Runner
-        uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
+        uses: step-security/harden-runner@6c439dc8bdf85cadbbce9ed30d1c7b959517bc49 # v2.12.2
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -77,7 +73,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       # need containerd image store for testing local images
-      - uses: crazy-max/ghaction-setup-docker@635d07c09dc2b52072362e9bb37e7e789767106d # v3.5.0
+      - uses: crazy-max/ghaction-setup-docker@b60f85385d03ac8acfca6d9996982511d8620a19 # v4.3.0
         with:
           daemon-config: |
             {
@@ -86,8 +82,8 @@ jobs:
                 "containerd-snapshotter": true
               }
             }
-      - uses: crazy-max/ghaction-github-runtime@b3a9207c0e1ef41f4cf215303c976869d0c2c1c4 # v3.0.0
-      - uses: docker/setup-qemu-action@49b3bc8e6bdd4a60e6116a5414239cba5943d3cf # v3.2.0
+      - uses: crazy-max/ghaction-github-runtime@3cb05d89e1f492524af3d41a1c98c83bc3025124 # v3.1.0
+      - uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3.6.0
         if: ${{ matrix.arch == 'arm64' }}
 
       - name: build aikit
@@ -127,31 +123,13 @@ jobs:
             exit 1
           fi
 
-      - name: run stablediffusion test
-        if: matrix.backend == 'stablediffusion'
-        run: |
-          result=$(curl --fail --retry 10 --retry-all-errors http://127.0.0.1:8080/v1/images/generations -H "Content-Type: application/json" -d '{
-            "prompt": "A cute baby llama",
-            "size": "256x256"
-          }')
-          echo $result
-
-          url=$(echo "$result" | jq '.data[0].url')
-          if [ -z "$url" ]; then
-            exit 1
-          fi
-
       - name: save logs
         if: always()
         run: docker logs testmodel > /tmp/docker-${{ matrix.backend }}.log
 
-      - name: save generated image
-        if: matrix.backend == 'stablediffusion'
-        run: docker cp testmodel:/tmp/generated/images /tmp
-
       - name: publish test artifacts
         if: always()
-        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: test-${{ matrix.arch }}-${{ matrix.backend }}
           path: |
@@ -179,7 +157,7 @@ jobs:
           swap-storage: true
 
       - name: Harden Runner
-        uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
+        uses: step-security/harden-runner@6c439dc8bdf85cadbbce9ed30d1c7b959517bc49 # v2.12.2
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -210,7 +188,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       # need containerd image store for testing local images
-      - uses: crazy-max/ghaction-setup-docker@635d07c09dc2b52072362e9bb37e7e789767106d # v3.5.0
+      - uses: crazy-max/ghaction-setup-docker@b60f85385d03ac8acfca6d9996982511d8620a19 # v4.3.0
         with:
           daemon-config: |
             {
@@ -219,7 +197,7 @@ jobs:
                 "containerd-snapshotter": true
               }
             }
-      - uses: crazy-max/ghaction-github-runtime@b3a9207c0e1ef41f4cf215303c976869d0c2c1c4 # v3.0.0
+      - uses: crazy-max/ghaction-github-runtime@3cb05d89e1f492524af3d41a1c98c83bc3025124 # v3.1.0
 
       - name: build aikit
         run: |
@@ -261,7 +239,7 @@ jobs:
 
       - name: publish test artifacts
         if: always()
-        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: test-${{ matrix.protocol }}
           path: |

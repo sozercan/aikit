@@ -43,7 +43,7 @@ jobs:
           swap-storage: true
 
       - name: Harden Runner
-        uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
+        uses: step-security/harden-runner@6c439dc8bdf85cadbbce9ed30d1c7b959517bc49 # v2.12.2
         with:
           egress-policy: audit
           allowed-endpoints: >
@@ -69,7 +69,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       # need containerd image store for testing local images
-      - uses: crazy-max/ghaction-setup-docker@635d07c09dc2b52072362e9bb37e7e789767106d # v3.5.0
+      - uses: crazy-max/ghaction-setup-docker@b60f85385d03ac8acfca6d9996982511d8620a19 # v4.3.0
         with:
           daemon-config: |
             {
@@ -78,7 +78,7 @@ jobs:
                 "containerd-snapshotter": true
               }
             }
-      - uses: crazy-max/ghaction-github-runtime@b3a9207c0e1ef41f4cf215303c976869d0c2c1c4 # v3.0.0
+      - uses: crazy-max/ghaction-github-runtime@3cb05d89e1f492524af3d41a1c98c83bc3025124 # v3.1.0
 
       - name: build aikit
         run: |
@@ -140,7 +140,7 @@ jobs:
 
       - name: publish test artifacts
         if: always()
-        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: test-${{ matrix.protocol }}
           path: |

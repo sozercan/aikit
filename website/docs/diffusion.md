@@ -2,7 +2,7 @@
 title: Diffusion
 ---
 
-AIKit supports [`diffusers`](#diffusers) and [`stablediffusion`](#stablediffusion) backends.
+AIKit supports [`diffusers`](#diffusers) backend.
 
 ## diffusers
 
@@ -16,7 +16,7 @@ Please make sure to change syntax to `#syntax=ghcr.io/sozercan/aikit:latest` in 
 
 https://github.com/sozercan/aikit/blob/main/test/aikitfile-diffusers.yaml
 
-## stablediffusion
+## stablediffusion NCNN
 
 https://github.com/EdVince/Stable-Diffusion-NCNN
 
@@ -25,7 +25,7 @@ This backend:
 - does not support CUDA runtime yet
 
 :::note
-This is an experimental backend and it may change in the future.
+This has been deprecated as of `v0.18.0` release.
 :::
 
 ### Example

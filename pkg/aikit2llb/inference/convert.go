@@ -14,7 +14,7 @@ import (
 const (
 	distrolessBase = "ghcr.io/sozercan/base:latest"
 	localAIRepo    = "https://github.com/mudler/LocalAI"
-	localAIVersion = "v2.23.0"
+	localAIVersion = "v2.26.0"
 	cudaVersion    = "12-5"
 )
 
@@ -49,8 +49,6 @@ func Aikit2LLB(c *config.InferenceConfig, platform *specs.Platform) (llb.State, 
 		switch c.Backends[b] {
 		case utils.BackendExllamaV2:
 			merge = installExllama(state, merge)
-		case utils.BackendStableDiffusion:
-			merge = installOpenCV(state, merge)
 		case utils.BackendMamba:
 			merge = installMamba(state, merge)
 		case utils.BackendDiffusers:
@@ -165,7 +163,7 @@ func installCuda(c *config.InferenceConfig, s llb.State, merge llb.State) (llb.S
 func addLocalAI(c *config.InferenceConfig, s llb.State, merge llb.State, platform specs.Platform) (llb.State, llb.State, error) {
 	var localAIURL string
 	if c.Runtime == utils.RuntimeAppleSilicon {
-		localAIURL = fmt.Sprintf("https://sertacstoragevs.blob.core.windows.net/localai/%[1]s/vulkan/local-ai", localAIVersion)
+		localAIURL = fmt.Sprintf("https://sertaccdnvs.azureedge.net/localai/%[1]s/kompute/local-ai", localAIVersion)
 	} else {
 		binaryNames := map[string]string{
 			utils.PlatformAMD64: "local-ai-Linux-x86_64",

@@ -452,10 +452,6 @@ func validateInferenceConfig(c *config.InferenceConfig) error {
 		return errors.New("only one backend is supported at this time")
 	}
 
-	if slices.Contains(c.Backends, utils.BackendStableDiffusion) && (slices.Contains(c.Backends, utils.BackendExllamaV2)) {
-		return errors.New("cannot specify both stablediffusion with exllama2 at this time")
-	}
-
 	if (slices.Contains(c.Backends, utils.BackendExllamaV2) ||
 		slices.Contains(c.Backends, utils.BackendMamba) ||
 		slices.Contains(c.Backends, utils.BackendDiffusers) ||
@@ -470,7 +466,6 @@ func validateInferenceConfig(c *config.InferenceConfig) error {
 
 	backends := []string{
 		utils.BackendExllamaV2,
-		utils.BackendStableDiffusion,
 		utils.BackendMamba,
 		utils.BackendDiffusers,
 		utils.BackendVLLM,
