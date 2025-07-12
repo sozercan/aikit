@@ -1,8 +1,0 @@
-{
-    "yaml.schemas": {
-        "https://raw.githubusercontent.com/sozercan/aikit/gen-spec/schema/finetunespec.schema.json": [
-            "aikitfile*.yaml",
-            "file:///home/sozercan/go/src/github.com/sozercan/aikit/test/aikitfile-vllm.yaml"
-        ]
-    }
-}
