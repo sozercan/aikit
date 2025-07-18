@@ -16,7 +16,7 @@ func installVLLM(c *config.InferenceConfig, s llb.State, merge llb.State) llb.St
 		s = s.AddEnv("BUILD_TYPE", "cublas").AddEnv("CUDA_MAJOR_VERSION", "12")
 	}
 
-	s = s.Run(utils.Bashf("cd /tmp/localai/backend/python/%[1]s && make %[1]s", utils.BackendVLLM)).Root()
+	s = s.Run(utils.Bashf("cd /tmp/localai/backend/python/%[1]s && make %[1]s && pip install flash-attn==2.7.3", utils.BackendVLLM)).Root()
 
 	diff := llb.Diff(savedState, s)
 	return llb.Merge([]llb.State{merge, diff})
