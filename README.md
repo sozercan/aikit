@@ -137,6 +137,10 @@ If it doesn't include a specific model, you can always [create your own images](
 | 🅿️ Phi 3.5   | Instruct     | 3.8B       | `podman run -d --rm --device /dev/dri -p 8080:8080 ghcr.io/sozercan/applesilicon/phi3.5:3.8b` | `phi-3.5-3.8b-instruct` | [MIT](https://huggingface.co/microsoft/Phi-3.5-mini-instruct/resolve/main/LICENSE) |
 | 🔡 Gemma 2   | Instruct     | 2B         | `podman run -d --rm --device /dev/dri -p 8080:8080 ghcr.io/sozercan/applesilicon/gemma2:2b`   | `gemma-2-2b-instruct`   | [Gemma](https://ai.google.dev/gemma/terms)                                         |
 
+## Contributing
+
+Want to contribute to AIKit? Check out our [Contributing Guide](./CONTRIBUTING.md) for development setup, testing instructions, and contribution guidelines.
+
 ## What's next?
 
 👉 For more information and how to fine tune models or create your own images, please see [AIKit website](https://sozercan.github.io/aikit/)!
