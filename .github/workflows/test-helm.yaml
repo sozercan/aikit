@@ -1,18 +1,19 @@
 name: helm-test
 
 on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - '**.md'
-      - 'website/**'
-  pull_request:
-    branches:
-      - main
-    paths-ignore:
-      - '**.md'
-      - 'website/**'
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - main
+  #   paths-ignore:
+  #     - '**.md'
+  #     - 'website/**'
+  # pull_request:
+  #   branches:
+  #     - main
+  #   paths-ignore:
+  #     - '**.md'
+  #     - 'website/**'
 
 permissions: read-all
 
@@ -36,9 +37,9 @@ jobs:
           swap-storage: true
 
       - name: Harden Runner
-        uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
+        uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
         with:
-          egress-policy: block
+          egress-policy: audit
           allowed-endpoints: >
             auth.docker.io:443
             huggingface.co:443
@@ -68,7 +69,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       # need containerd image store for testing local images
-      - uses: crazy-max/ghaction-setup-docker@370a7dad4b8ce8dbf00f9363e1652e5074dd6abe # v4.1.0
+      - uses: crazy-max/ghaction-setup-docker@b60f85385d03ac8acfca6d9996982511d8620a19 # v4.3.0
         with:
           daemon-config: |
             {
@@ -77,7 +78,7 @@ jobs:
                 "containerd-snapshotter": true
               }
             }
-      - uses: crazy-max/ghaction-github-runtime@b3a9207c0e1ef41f4cf215303c976869d0c2c1c4 # v3.0.0
+      - uses: crazy-max/ghaction-github-runtime@3cb05d89e1f492524af3d41a1c98c83bc3025124 # v3.1.0
 
       - name: build aikit
         run: |
@@ -117,7 +118,7 @@ jobs:
 
       - name: run test
         run: |
-          result=$(curl --fail --retry 10 --retry-all-errors http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
+          result=$(curl --fail --retry 10 --retry-all-errors http://localhost:8080/v1/chat/completions -H "Content-Type: application/json" -d '{
             "model": "llama-3.2-1b-instruct",
             "messages": [{"role": "user", "content": "explain kubernetes in a sentence"}]
           }')
@@ -131,11 +132,11 @@ jobs:
       - name: save logs
         if: always()
         run: |
-          echo "KIND_LOGS_PATH=$(kind export logs)" >> $GITHUB_ENV
+          kind export logs /tmp/kind-logs
 
       - name: publish logs
         if: always()
-        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: kind-logs
-          path: $KIND_LOGS_PATH
+          path: /tmp/kind-logs
