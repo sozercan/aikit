@@ -64,7 +64,7 @@ jobs:
         id: build-and-push
         with:
           push: true
-          tags: ghcr.io/kait-project/aikit/aikit:dev
+          tags: ghcr.io/kaito-project/aikit/aikit:dev
           cache-from: type=gha,scope=aikit
           cache-to: type=gha,scope=aikit,mode=max
           sbom: true
@@ -78,12 +78,12 @@ jobs:
       - name: Sign the images with GitHub OIDC Token
         env:
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
-        run: cosign sign --yes "ghcr.io/kait-project/aikit/aikit@${DIGEST}"
+        run: cosign sign --yes "ghcr.io/kaito-project/aikit/aikit@${DIGEST}"
 
       - name: Verify image signature
         env:
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
         run: |
-          cosign verify ghcr.io/kait-project/aikit/aikit@${DIGEST} \
+          cosign verify ghcr.io/kaito-project/aikit/aikit@${DIGEST} \
             --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-            --certificate-identity https://github.com/kait-project/aikit/.github/workflows/pre-release.yaml@refs/heads/main
+            --certificate-identity https://github.com/kaito-project/aikit/.github/workflows/pre-release.yaml@refs/heads/main
