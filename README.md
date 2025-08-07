@@ -10,24 +10,24 @@ AIKit offers two main capabilities:
 
 - **Inference**: AIKit uses [LocalAI](https://localai.io/), which supports a wide range of inference capabilities and formats. LocalAI provides a drop-in replacement REST API that is OpenAI API compatible, so you can use any OpenAI API compatible client, such as [Kubectl AI](https://github.com/sozercan/kubectl-ai), [Chatbot-UI](https://github.com/sozercan/chatbot-ui) and many more, to send requests to open LLMs!
 
-- **[Fine-Tuning](https://sozercan.github.io/aikit/docs/fine-tune)**: AIKit offers an extensible fine-tuning interface. It supports [Unsloth](https://github.com/unslothai/unsloth) for fast, memory efficient, and easy fine-tuning experience.
+- **[Fine-Tuning](https://kaito-project.github.io/aikit/docs/fine-tune)**: AIKit offers an extensible fine-tuning interface. It supports [Unsloth](https://github.com/unslothai/unsloth) for fast, memory efficient, and easy fine-tuning experience.
 
-👉 For full documentation, please see [AIKit website](https://sozercan.github.io/aikit/)!
+👉 For full documentation, please see [AIKit website](https://kaito-project.github.io/aikit/)!
 
 ## Features
 
 - 🐳 No GPU, Internet access or additional tools needed except for [Docker](https://docs.docker.com/desktop/install/linux-install/)!
 - 🤏 Minimal image size, resulting in less vulnerabilities and smaller attack surface with a custom [distroless](https://github.com/GoogleContainerTools/distroless)-based image
-- 🎵 [Fine-tune support](https://sozercan.github.io/aikit/docs/fine-tune)
-- 🚀 Easy to use declarative configuration for [inference](https://sozercan.github.io/aikit/docs/specs-inference) and [fine-tuning](https://sozercan.github.io/aikit/docs/specs-finetune)
+- 🎵 [Fine-tune support](https://kaito-project.github.io/aikit/docs/fine-tune)
+- 🚀 Easy to use declarative configuration for [inference](https://kaito-project.github.io/aikit/docs/specs-inference) and [fine-tuning](https://kaito-project.github.io/aikit/docs/specs-finetune)
 - ✨ OpenAI API compatible to use with any OpenAI API compatible client
-- 📸 [Multi-modal model support](https://sozercan.github.io/aikit/docs/vision)
-- 🖼️ [Image generation support](https://sozercan.github.io/aikit/docs/diffusion)
+- 📸 [Multi-modal model support](https://kaito-project.github.io/aikit/docs/vision)
+- 🖼️ [Image generation support](https://kaito-project.github.io/aikit/docs/diffusion)
 - 🦙 Support for GGUF ([`llama`](https://github.com/ggerganov/llama.cpp)), GPTQ or EXL2 ([`exllama2`](https://github.com/turboderp/exllamav2)), and GGML ([`llama-ggml`](https://github.com/ggerganov/llama.cpp)) and [Mamba](https://github.com/state-spaces/mamba) models
-- 🚢 [Kubernetes deployment ready](https://sozercan.github.io/aikit/docs/kubernetes)
+- 🚢 [Kubernetes deployment ready](https://kaito-project.github.io/aikit/docs/kubernetes)
 - 📦 Supports multiple models with a single image
-- 🖥️ Supports [AMD64 and ARM64](https://sozercan.github.io/aikit/docs/create-images#multi-platform-support) CPUs and [GPU-accelerated inferencing with NVIDIA GPUs](https://sozercan.github.io/aikit/docs/gpu)
-- 🔐 Ensure [supply chain security](https://sozercan.github.io/aikit/docs/security) with SBOMs, Provenance attestations, and signed images
+- 🖥️ Supports [AMD64 and ARM64](https://kaito-project.github.io/aikit/docs/create-images#multi-platform-support) CPUs and [GPU-accelerated inferencing with NVIDIA GPUs](https://kaito-project.github.io/aikit/docs/gpu)
+- 🔐 Ensure [supply chain security](https://kaito-project.github.io/aikit/docs/security) with SBOMs, Provenance attestations, and signed images
 - 🌈 Supports air-gapped environments with self-hosted, local, or any remote container registries to store model images for inference on the edge.
 
 ## Quick Start
@@ -77,7 +77,7 @@ That's it! 🎉 API is OpenAI compatible so this is a drop-in replacement for an
 
 AIKit comes with pre-made models that you can use out-of-the-box!
 
-If it doesn't include a specific model, you can always [create your own images](https://sozercan.github.io/aikit/docs/create-images), and host in a container registry of your choice!
+If it doesn't include a specific model, you can always [create your own images](https://kaito-project.github.io/aikit/docs/create-images), and host in a container registry of your choice!
 
 ## CPU
 
@@ -102,7 +102,7 @@ If it doesn't include a specific model, you can always [create your own images](
 ### NVIDIA CUDA
 
 > [!NOTE]
-> To enable GPU acceleration, please see [GPU Acceleration](https://sozercan.github.io/aikit/docs/gpu).
+> To enable GPU acceleration, please see [GPU Acceleration](https://kaito-project.github.io/aikit/docs/gpu).
 >
 > Please note that only difference between CPU and GPU section is the `--gpus all` flag in the command to enable GPU acceleration.
 
@@ -123,7 +123,7 @@ If it doesn't include a specific model, you can always [create your own images](
 ### Apple Silicon (experimental)
 
 > [!NOTE]
-> To enable GPU acceleration on Apple Silicon, please see [Podman Desktop documentation](https://podman-desktop.io/docs/podman/gpu). For more information, please see [GPU Acceleration](https://sozercan.github.io/aikit/docs/gpu).
+> To enable GPU acceleration on Apple Silicon, please see [Podman Desktop documentation](https://podman-desktop.io/docs/podman/gpu). For more information, please see [GPU Acceleration](https://kaito-project.github.io/aikit/docs/gpu).
 >
 > Apple Silicon is an _experimental_ runtime and it may change in the future. This runtime is specific to Apple Silicon only, and it will not work as expected on other architectures, including Intel Macs.
 >
@@ -139,4 +139,4 @@ If it doesn't include a specific model, you can always [create your own images](
 
 ## What's next?
 
-👉 For more information and how to fine tune models or create your own images, please see [AIKit website](https://sozercan.github.io/aikit/)!
+👉 For more information and how to fine tune models or create your own images, please see [AIKit website](https://kaito-project.github.io/aikit/)!
