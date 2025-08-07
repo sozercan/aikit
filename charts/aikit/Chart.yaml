@@ -1,6 +1,6 @@
 apiVersion: v2
 name: aikit
-description: Kubernetes Helm chart to deploy AIKit LLM images
+description: Kubernetes Helm chart to deploy AIKit LLM images with support for distributed inference using LeaderWorkerSet
 
 # A chart can be either an 'application' or a 'library' chart.
 #
@@ -22,3 +22,15 @@ version: 0.18.0
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: v0.18.0
+
+keywords:
+  - ai
+  - llm
+  - machine-learning
+  - distributed-inference
+  - leaderworkerset
+
+annotations:
+  # Indicate that this chart supports LeaderWorkerSet for distributed inference
+  aikit.io/supports-distributed-inference: "true"
+  aikit.io/leaderworkerset-compatible: "true"

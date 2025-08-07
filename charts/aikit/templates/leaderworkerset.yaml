@@ -1,0 +1,147 @@
+{{- if .Values.leaderWorkerSet.enabled }}
+apiVersion: leaderworkerset.x-k8s.io/v1
+kind: LeaderWorkerSet
+metadata:
+  name: {{ include "aikit.fullname" . }}
+  labels:
+    {{- include "aikit.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.leaderWorkerSet.replicas }}
+  leaderWorkerTemplate:
+    size: {{ .Values.leaderWorkerSet.leaderWorkerTemplate.size }}
+    {{- with .Values.leaderWorkerSet.leaderWorkerTemplate.restartPolicy }}
+    restartPolicy: {{ . }}
+    {{- end }}
+    leaderTemplate:
+      metadata:
+        {{- with .Values.podAnnotations }}
+        annotations:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        labels:
+          {{- include "aikit.labels" . | nindent 10 }}
+          {{- with .Values.podLabels }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+      spec:
+        {{- with .Values.imagePullSecrets }}
+        imagePullSecrets:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        securityContext:
+          {{- if .Values.leaderWorkerSet.leader.securityContext }}
+          {{- toYaml .Values.leaderWorkerSet.leader.securityContext | nindent 10 }}
+          {{- else }}
+          {{- toYaml .Values.podSecurityContext | nindent 10 }}
+          {{- end }}
+        containers:
+          - name: {{ .Chart.Name }}-leader
+            securityContext:
+              {{- if .Values.enableRuntimeDefaultSeccompProfile }}
+              seccompProfile:
+                type: RuntimeDefault
+              {{- end }}
+              {{- toYaml .Values.securityContext | nindent 14 }}
+            {{- if .Values.leaderWorkerSet.leader.image.repository }}
+            image: "{{ .Values.leaderWorkerSet.leader.image.repository }}:{{ .Values.leaderWorkerSet.leader.image.tag | default .Chart.AppVersion }}"
+            imagePullPolicy: {{ .Values.leaderWorkerSet.leader.image.pullPolicy | default .Values.image.pullPolicy }}
+            {{- else }}
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            {{- end }}
+            {{- with .Values.leaderWorkerSet.leader.command }}
+            command:
+              {{- toYaml . | nindent 14 }}
+            {{- end }}
+            {{- with .Values.leaderWorkerSet.leader.args }}
+            args:
+              {{- toYaml . | nindent 14 }}
+            {{- end }}
+            {{- with .Values.leaderWorkerSet.leader.env }}
+            env:
+              {{- toYaml . | nindent 14 }}
+            {{- end }}
+            ports:
+              - name: http
+                containerPort: 8080
+                protocol: TCP
+            livenessProbe:
+              {{- toYaml .Values.livenessProbe | nindent 14 }}
+            readinessProbe:
+              {{- toYaml .Values.readinessProbe | nindent 14 }}
+            resources:
+              {{- if .Values.leaderWorkerSet.leader.resources }}
+              {{- toYaml .Values.leaderWorkerSet.leader.resources | nindent 14 }}
+              {{- else }}
+              {{- toYaml .Values.resources | nindent 14 }}
+              {{- end }}
+        {{- with .Values.nodeSelector }}
+        nodeSelector:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.affinity }}
+        affinity:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.tolerations }}
+        tolerations:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+    workerTemplate:
+      spec:
+        {{- with .Values.imagePullSecrets }}
+        imagePullSecrets:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        securityContext:
+          {{- if .Values.leaderWorkerSet.worker.securityContext }}
+          {{- toYaml .Values.leaderWorkerSet.worker.securityContext | nindent 10 }}
+          {{- else }}
+          {{- toYaml .Values.podSecurityContext | nindent 10 }}
+          {{- end }}
+        containers:
+          - name: {{ .Chart.Name }}-worker
+            securityContext:
+              {{- if .Values.enableRuntimeDefaultSeccompProfile }}
+              seccompProfile:
+                type: RuntimeDefault
+              {{- end }}
+              {{- toYaml .Values.securityContext | nindent 14 }}
+            {{- if .Values.leaderWorkerSet.worker.image.repository }}
+            image: "{{ .Values.leaderWorkerSet.worker.image.repository }}:{{ .Values.leaderWorkerSet.worker.image.tag }}"
+            imagePullPolicy: {{ .Values.leaderWorkerSet.worker.image.pullPolicy }}
+            {{- else }}
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            {{- end }}
+            {{- with .Values.leaderWorkerSet.worker.command }}
+            command:
+              {{- toYaml . | nindent 14 }}
+            {{- end }}
+            {{- with .Values.leaderWorkerSet.worker.args }}
+            args:
+              {{- toYaml . | nindent 14 }}
+            {{- end }}
+            {{- with .Values.leaderWorkerSet.worker.env }}
+            env:
+              {{- toYaml . | nindent 14 }}
+            {{- end }}
+            resources:
+              {{- if .Values.leaderWorkerSet.worker.resources }}
+              {{- toYaml .Values.leaderWorkerSet.worker.resources | nindent 14 }}
+              {{- else }}
+              {{- toYaml .Values.resources | nindent 14 }}
+              {{- end }}
+        {{- with .Values.nodeSelector }}
+        nodeSelector:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.affinity }}
+        affinity:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.tolerations }}
+        tolerations:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+{{- end }}

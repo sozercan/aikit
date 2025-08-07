@@ -12,4 +12,8 @@ spec:
       protocol: TCP
       name: http
   selector:
+    {{- if .Values.leaderWorkerSet.enabled }}
     {{- include "aikit.selectorLabels" . | nindent 4 }}
+    {{- else }}
+    {{- include "aikit.selectorLabels" . | nindent 4 }}
+    {{- end }}

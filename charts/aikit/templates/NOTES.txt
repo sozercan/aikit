@@ -1,3 +1,16 @@
+{{- if .Values.leaderWorkerSet.enabled }}
+AIKit deployed in distributed inference mode using LeaderWorkerSet!
+
+- LeaderWorkerSet replicas: {{ .Values.leaderWorkerSet.replicas }}
+- Pods per replica: {{ .Values.leaderWorkerSet.leaderWorkerTemplate.size }} (1 leader + {{ sub .Values.leaderWorkerSet.leaderWorkerTemplate.size 1 }} workers)
+
+Check deployment status:
+  kubectl get leaderworkerset {{ include "aikit.fullname" . }} -n {{ .Release.Namespace }}
+
+{{- else }}
+AIKit deployed in standard mode!
+
+{{- end }}
 Access AIKit WebUI or API by running the following commands:
 
 - Port forward the service to your local machine:
@@ -11,3 +24,17 @@ Access AIKit WebUI or API by running the following commands:
   # replace this with the model name you want to use
   export MODEL_NAME="llama-3-8b-instruct"
   curl http://127.0.0.1:8080/v1/chat/completions -H "Content-Type: application/json" -d "{\"model\": \"${MODEL_NAME}\", \"messages\": [{\"role\": \"user\", \"content\": \"what is the meaning of life?\"}]}"
+
+{{- if .Values.leaderWorkerSet.enabled }}
+
+Monitor distributed inference:
+  # Check leader pod logs
+  kubectl logs -l app.kubernetes.io/name={{ include "aikit.name" . }},leaderworkerset.sigs.k8s.io/pod-role=leader -n {{ .Release.Namespace }}
+
+  # Check worker pod logs
+  kubectl logs -l app.kubernetes.io/name={{ include "aikit.name" . }},leaderworkerset.sigs.k8s.io/pod-role=worker -n {{ .Release.Namespace }}
+
+For more information about distributed inference, see:
+  https://github.com/kubernetes-sigs/lws
+
+{{- end }}

@@ -1,0 +1,123 @@
+# Example configuration for llamacpp-style distributed inference
+# Based on the llamacpp example from kubernetes-sigs/lws
+
+image:
+  repository: ghcr.io/sozercan/llama3.1
+  tag: "8b"
+  pullPolicy: IfNotPresent
+
+# Enable distributed inference
+leaderWorkerSet:
+  enabled: true
+  replicas: 1
+  leaderWorkerTemplate:
+    size: 5  # 1 leader + 4 workers
+    restartPolicy: RecreateGroupOnPodRestart
+
+  leader:
+    image:
+      repository: ""  # Use main image
+      tag: ""
+      pullPolicy: ""
+    resources:
+      limits:
+        memory: 8Gi
+        cpu: "4"
+      requests:
+        cpu: 2000m
+        memory: 4Gi
+    command:
+      - "/llamacpp-leader"
+    args:
+      - "--"
+      - "--n-gpu-layers"
+      - "0"  # CPU inference
+      - "--verbose"
+      - "--ctx-size"
+      - "4096"
+      - "--threads"
+      - "4"
+    env:
+      - name: LWS_GROUP_SIZE
+        value: "5"
+      - name: LWS_LEADER_ADDRESS
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.name
+
+  worker:
+    image:
+      repository: "llamacpp-worker"
+      tag: "latest"
+      pullPolicy: IfNotPresent
+    resources:
+      limits:
+        memory: 4Gi
+        cpu: "2"
+      requests:
+        cpu: 1000m
+        memory: 2Gi
+    args:
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "50052"
+      - "--mem"
+      - "2048"
+
+# CPU-optimized node selection
+nodeSelector:
+  node.kubernetes.io/instance-type: "c5.4xlarge"
+
+# Spread workers across nodes for better performance
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - aikit
+        topologyKey: kubernetes.io/hostname
+
+# Security settings
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+  runAsGroup: 999
+  runAsNonRoot: true
+  runAsUser: 1000
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 8080
+
+# Readiness/liveness probes with longer timeouts for distributed setup
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 60
+  periodSeconds: 30
+  timeoutSeconds: 10
+  failureThreshold: 3
+
+# Disable autoscaling
+autoscaling:
+  enabled: false
