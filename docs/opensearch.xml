@@ -4,8 +4,8 @@
   <ShortName>AIKit</ShortName>
   <Description>Search AIKit</Description>
   <InputEncoding>UTF-8</InputEncoding>
-  <Image width="16" height="16" type="image/x-icon">https://sozercan.github.io/aikit/docs/img/favicon.ico</Image>
-  <Url type="text/html" method="get" template="https://sozercan.github.io/aikit/docs/search?q={searchTerms}"/>
-  <Url type="application/opensearchdescription+xml" rel="self" template="https://sozercan.github.io/aikit/docs/opensearch.xml" />
-  <moz:SearchForm>https://sozercan.github.io/aikit/docs/</moz:SearchForm>
+  <Image width="16" height="16" type="image/x-icon">https://kaito-project.github.io/aikit/docs/img/favicon.ico</Image>
+  <Url type="text/html" method="get" template="https://kaito-project.github.io/aikit/docs/search?q={searchTerms}"/>
+  <Url type="application/opensearchdescription+xml" rel="self" template="https://kaito-project.github.io/aikit/docs/opensearch.xml" />
+  <moz:SearchForm>https://kaito-project.github.io/aikit/docs/</moz:SearchForm>
 </OpenSearchDescription>
