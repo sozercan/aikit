@@ -1,10 +1,10 @@
 package inference
 
 import (
+	"github.com/kaito-project/aikit/pkg/aikit/config"
+	"github.com/kaito-project/aikit/pkg/utils"
 	"github.com/moby/buildkit/util/system"
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
-	"github.com/sozercan/aikit/pkg/aikit/config"
-	"github.com/sozercan/aikit/pkg/utils"
 )
 
 func NewImageConfig(c *config.InferenceConfig, platform *specs.Platform) *specs.Image {

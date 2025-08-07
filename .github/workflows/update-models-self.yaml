@@ -65,9 +65,9 @@ jobs:
           fi
 
           if ${{ inputs.staging }}; then
-            export REGISTRY=ghcr.io/sozercan/test
+            export REGISTRY=ghcr.io/kaito-project/aikit/test
           else
-            export REGISTRY=ghcr.io/sozercan
+            export REGISTRY=ghcr.io/kaito-project/aikit
           fi
 
           docker buildx build . \
@@ -88,4 +88,4 @@ jobs:
         run: |
           cosign verify ${DIGEST} \
             --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-            --certificate-identity-regexp 'https://github\.com/sozercan/aikit/\.github/workflows/.+'
+            --certificate-identity-regexp 'https://github\.com/kaito-project/aikit/\.github/workflows/.+'

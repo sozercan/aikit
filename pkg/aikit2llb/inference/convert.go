@@ -5,14 +5,14 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/kaito-project/aikit/pkg/aikit/config"
+	"github.com/kaito-project/aikit/pkg/utils"
 	"github.com/moby/buildkit/client/llb"
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
-	"github.com/sozercan/aikit/pkg/aikit/config"
-	"github.com/sozercan/aikit/pkg/utils"
 )
 
 const (
-	distrolessBase = "ghcr.io/sozercan/base:latest"
+	distrolessBase = "ghcr.io/kaito-project/aikit/base:latest"
 	localAIRepo    = "https://github.com/mudler/LocalAI"
 	localAIVersion = "v2.26.0"
 	cudaVersion    = "12-5"

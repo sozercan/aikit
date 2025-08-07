@@ -49,13 +49,13 @@ jobs:
           if [ ${{ matrix.runtime }} == "base" ]; then
             echo PLATFORMS="linux/amd64,linux/arm64" >> $GITHUB_ENV
             echo FILE="Dockerfile.base" >> $GITHUB_ENV
-            echo TAG="ghcr.io/sozercan/base:latest" >> $GITHUB_ENV
+            echo TAG="ghcr.io/kaito-project/aikit/base:latest" >> $GITHUB_ENV
             echo CACHE_FROM="type=gha,scope=base" >> $GITHUB_ENV
             echo CACHE_TO="type=gha,scope=base,mode=max" >> $GITHUB_ENV
           elif [ ${{ matrix.runtime }} == "applesilicon" ]; then
             echo PLATFORMS="linux/arm64" >> $GITHUB_ENV
             echo FILE="Dockerfile.base-applesilicon" >> $GITHUB_ENV
-            echo TAG="ghcr.io/sozercan/applesilicon/base:latest" >> $GITHUB_ENV
+            echo TAG="ghcr.io/kaito-project/aikit/applesilicon/base:latest" >> $GITHUB_ENV
             echo CACHE_FROM="type=gha,scope=base-applesilicon" >> $GITHUB_ENV
             echo CACHE_TO="type=gha,scope=base-applesilicon,mode=max" >> $GITHUB_ENV
           fi
@@ -76,12 +76,12 @@ jobs:
       - name: Sign the images with GitHub OIDC Token
         env:
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
-        run: cosign sign --yes "ghcr.io/sozercan/base@${DIGEST}"
+        run: cosign sign --yes "ghcr.io/kaito-project/aikit/base@${DIGEST}"
 
       - name: Verify image signature
         env:
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
         run: |
-          cosign verify ghcr.io/sozercan/base@${DIGEST} \
+          cosign verify ghcr.io/kaito-project/aikit/base@${DIGEST} \
             --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-            --certificate-identity https://github.com/sozercan/aikit/.github/workflows/release-base.yaml@refs/heads/main
+            --certificate-identity https://github.com/kaito-project/aikit/.github/workflows/release-base.yaml@refs/heads/main

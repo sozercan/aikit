@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/sozercan/aikit/pkg/aikit/config"
+	"github.com/kaito-project/aikit/pkg/aikit/config"
 )
 
 func Test_validateConfig(t *testing.T) {
