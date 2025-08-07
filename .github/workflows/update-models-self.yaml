@@ -15,12 +15,14 @@ on:
         type: boolean
 
 permissions:
-  contents: write
-  packages: write
-  id-token: write
+  contents: read
 
 jobs:
   update-models-self:
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
     strategy:
       fail-fast: false
       matrix:
@@ -65,9 +67,9 @@ jobs:
           fi
 
           if ${{ inputs.staging }}; then
-            export REGISTRY=ghcr.io/sozercan/test
+            export REGISTRY=ghcr.io/kaito-project/aikit/test
           else
-            export REGISTRY=ghcr.io/sozercan
+            export REGISTRY=ghcr.io/kaito-project/aikit
           fi
 
           docker buildx build . \
@@ -88,4 +90,4 @@ jobs:
         run: |
           cosign verify ${DIGEST} \
             --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-            --certificate-identity-regexp 'https://github\.com/sozercan/aikit/\.github/workflows/.+'
+            --certificate-identity-regexp 'https://github\.com/kaito-project/aikit/\.github/workflows/.+'

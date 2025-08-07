@@ -8,6 +8,10 @@ import (
 	"strings"
 
 	"github.com/containerd/platforms"
+	"github.com/kaito-project/aikit/pkg/aikit/config"
+	"github.com/kaito-project/aikit/pkg/aikit2llb/finetune"
+	"github.com/kaito-project/aikit/pkg/aikit2llb/inference"
+	"github.com/kaito-project/aikit/pkg/utils"
 	controlapi "github.com/moby/buildkit/api/services/control"
 	"github.com/moby/buildkit/client/llb"
 	"github.com/moby/buildkit/exporter/containerimage/exptypes"
@@ -16,10 +20,6 @@ import (
 	"github.com/moby/buildkit/frontend/gateway/client"
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/pkg/errors"
-	"github.com/sozercan/aikit/pkg/aikit/config"
-	"github.com/sozercan/aikit/pkg/aikit2llb/finetune"
-	"github.com/sozercan/aikit/pkg/aikit2llb/inference"
-	"github.com/sozercan/aikit/pkg/utils"
 	"golang.org/x/sync/errgroup"
 )
 

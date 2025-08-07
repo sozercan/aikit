@@ -1,8 +1,8 @@
 package inference
 
 import (
+	"github.com/kaito-project/aikit/pkg/utils"
 	"github.com/moby/buildkit/client/llb"
-	"github.com/sozercan/aikit/pkg/utils"
 )
 
 func installMamba(s llb.State, merge llb.State) llb.State {

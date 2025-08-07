@@ -20,12 +20,14 @@ on:
         type: string
 
 permissions:
-  contents: write
-  packages: write
-  id-token: write
+  contents: read
 
 jobs:
   update-models:
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
     strategy:
       fail-fast: false
       matrix:
@@ -106,15 +108,15 @@ jobs:
 
           if ${{ inputs.staging }}; then
             if [ ${{ matrix.runtime }} == "applesilicon" ]; then
-              export REGISTRY=ghcr.io/sozercan/test/applesilicon
+              export REGISTRY=ghcr.io/kaito-project/aikit/test/applesilicon
             else
-              export REGISTRY=ghcr.io/sozercan/test
+              export REGISTRY=ghcr.io/kaito-project/aikit/test
             fi
           else
             if [ ${{ matrix.runtime }} == "applesilicon" ]; then
-              export REGISTRY=ghcr.io/sozercan/applesilicon
+              export REGISTRY=ghcr.io/kaito-project/aikit/applesilicon
             else
-              export REGISTRY=ghcr.io/sozercan
+              export REGISTRY=ghcr.io/kaito-project/aikit
             fi
           fi
 
@@ -150,4 +152,4 @@ jobs:
         run: |
           cosign verify ${DIGEST} \
             --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-            --certificate-identity-regexp 'https://github\.com/sozercan/aikit/\.github/workflows/.+'
+            --certificate-identity-regexp 'https://github\.com/kaito-project/aikit/\.github/workflows/.+'

@@ -27,7 +27,7 @@ jobs:
 
       - name: build and push test model
         run: |
-          docker buildx build . -t sozercan/testmodel:test \
+          docker buildx build . -t testmodel:test \
             -f test/aikitfile-llama.yaml \
             --provenance=false --progress plain \
             --build-arg="runtime=applesilicon" \
@@ -41,7 +41,7 @@ jobs:
           podman run --name testmodel -d --rm -p 8080:8080 \
             --device /dev/dri \
             --pull always \
-            sozercan/testmodel:test
+            testmodel:test
 
       - name: run test (gguf)
         run: |
