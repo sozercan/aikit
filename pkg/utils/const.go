@@ -1,4 +1,4 @@
-package utils
+package utils // nolint:revive
 
 const (
 	RuntimeNVIDIA       = "cuda"
