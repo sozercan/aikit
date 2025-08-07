@@ -20,12 +20,14 @@ on:
         type: string
 
 permissions:
-  contents: write
-  packages: write
-  id-token: write
+  contents: read
 
 jobs:
   update-models:
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
     strategy:
       fail-fast: false
       matrix:

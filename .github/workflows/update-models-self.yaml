@@ -15,12 +15,14 @@ on:
         type: boolean
 
 permissions:
-  contents: write
-  packages: write
-  id-token: write
+  contents: read
 
 jobs:
   update-models-self:
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
     strategy:
       fail-fast: false
       matrix:
