@@ -15,7 +15,7 @@ This is an experimental backend and it may change in the future.
 ## Example
 
 :::warning
-Please make sure to change syntax to `#syntax=ghcr.io/sozercan/aikit:latest` in the examples below.
+Please make sure to change syntax to `#syntax=ghcr.io/kaito-project/aikit/aikit:latest` in the examples below.
 :::
 
-https://github.com/sozercan/aikit/blob/main/test/aikitfile-mamba.yaml
+https://github.com/kaito-project/aikit/blob/main/test/aikitfile-mamba.yaml

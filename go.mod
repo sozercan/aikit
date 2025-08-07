@@ -1,4 +1,4 @@
-module github.com/sozercan/aikit
+module github.com/kaito-project/aikit
 
 go 1.23.0
 

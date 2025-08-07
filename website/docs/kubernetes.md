@@ -21,7 +21,7 @@ Please make sure you have Helm installed and configured. If you don't have Helm 
 Install the chart using the following command:
 
 ```bash
-helm repo add aikit https://sozercan.github.io/aikit/charts
+helm repo add aikit https://kaito-project.github.io/aikit/charts
 helm install aikit/aikit --name-template=aikit --namespace=aikit --create-namespace
 ```
 
@@ -74,7 +74,7 @@ curl http://localhost:8080/v1/chat/completions -H "Content-Type: application/jso
 
 | Key                                          | Type    | Default                                                                               | Description                                        |
 | -------------------------------------------- | ------- | ------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| `image.repository`                           | String  | `ghcr.io/sozercan/llama3`                                                             | The image repository                               |
+| `image.repository`                           | String  | `ghcr.io/kaito-project/aikit/llama3`                                                             | The image repository                               |
 | `image.tag`                                  | String  | `8b`                                                                                  | The image tag                                      |
 | `image.pullPolicy`                           | String  | `IfNotPresent`                                                                        | The image pull policy                              |
 | `replicaCount`                               | Integer | `1`                                                                                   | The number of replicas                             |
@@ -110,7 +110,7 @@ You can also deploy your models manually using `kubectl`. Here is an example:
 ```bash
 # create a deployment
 # replace the image with your own if needed
-kubectl create deployment aikit-llama3 --image=ghcr.io/sozercan/llama3:8b
+kubectl create deployment aikit-llama3 --image=ghcr.io/kaito-project/aikit/llama3:8b
 
 # expose it as a service
 kubectl expose deployment aikit-llama3 --port=8080 --target-port=8080 --name=aikit
