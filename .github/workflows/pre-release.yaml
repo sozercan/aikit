@@ -59,14 +59,14 @@ jobs:
           set -x
           GIT_COMMIT=$(git rev-list --abbrev-commit --tags --max-count=1)
           GIT_TAG=$(git describe --abbrev=0 --tags ${GIT_COMMIT} 2>/dev/null)
-          echo LDFLAGS="-X github.com/sozercan/aikit/pkg/version.Version=${GIT_TAG}" >> $GITHUB_ENV
+          echo LDFLAGS="-X github.com/kaito-project/aikit/pkg/version.Version=${GIT_TAG}" >> $GITHUB_ENV
 
       - name: Build and push
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
         id: build-and-push
         with:
           push: true
-          tags: ghcr.io/sozercan/aikit:dev
+          tags: ghcr.io/kaito-project/aikit/aikit:dev
           cache-from: type=gha,scope=aikit
           cache-to: type=gha,scope=aikit,mode=max
           sbom: true
@@ -80,12 +80,12 @@ jobs:
       - name: Sign the images with GitHub OIDC Token
         env:
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
-        run: cosign sign --yes "ghcr.io/sozercan/aikit@${DIGEST}"
+        run: cosign sign --yes "ghcr.io/kaito-project/aikit/aikit@${DIGEST}"
 
       - name: Verify image signature
         env:
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
         run: |
-          cosign verify ghcr.io/sozercan/aikit@${DIGEST} \
+          cosign verify ghcr.io/kaito-project/aikit/aikit@${DIGEST} \
             --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-            --certificate-identity https://github.com/sozercan/aikit/.github/workflows/pre-release.yaml@refs/heads/main
+            --certificate-identity https://github.com/kaito-project/aikit/.github/workflows/pre-release.yaml@refs/heads/main

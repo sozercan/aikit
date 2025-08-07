@@ -22,7 +22,7 @@ config: # optional. list of config files
 Example:
 
 ```yaml
-#syntax=ghcr.io/sozercan/aikit:latest
+#syntax=ghcr.io/kaito-project/aikit/aikit:latest
 apiVersion: v1alpha1
 debug: true
 runtime: cuda

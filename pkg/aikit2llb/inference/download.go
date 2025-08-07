@@ -7,10 +7,10 @@ import (
 	"path"
 	"strings"
 
+	"github.com/kaito-project/aikit/pkg/utils"
 	"github.com/moby/buildkit/client/llb"
 	"github.com/opencontainers/go-digest"
 	specs "github.com/opencontainers/image-spec/specs-go/v1"
-	"github.com/sozercan/aikit/pkg/utils"
 )
 
 const orasImage = "ghcr.io/oras-project/oras:v1.2.0"
