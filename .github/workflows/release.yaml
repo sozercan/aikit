@@ -6,12 +6,14 @@ on:
       - v*
 
 permissions:
-  contents: write
-  packages: write
-  id-token: write
+  contents: read
 
 jobs:
   release:
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
