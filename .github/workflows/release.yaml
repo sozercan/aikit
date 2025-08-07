@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 360
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@6c439dc8bdf85cadbbce9ed30d1c7b959517bc49 # v2.12.2
+        uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -25,8 +25,7 @@ jobs:
             fulcio.sigstore.dev:443
             ghcr.io:443
             github.com:443
-            objects.githubusercontent.com:443
-            pkg-containers.githubusercontent.com:443
+            *.githubusercontent.com:443
             production.cloudflare.docker.com:443
             proxy.golang.org:443
             registry-1.docker.io:443
@@ -41,7 +40,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install Cosign
-        uses: sigstore/cosign-installer@398d4b0eeef1380460a10c8013a76f728fb906ac # v3.9.1
+        uses: sigstore/cosign-installer@d58896d6a1865668819e1d91763c7751a165e159 # v3.9.2
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
@@ -55,7 +54,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - id: docker_meta
-        uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804 # v5.7.0
+        uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f # v5.8.0
         with:
           images: ghcr.io/sozercan/aikit
           tags: type=semver,pattern={{raw}}
