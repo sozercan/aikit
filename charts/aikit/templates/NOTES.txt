@@ -1,15 +1,19 @@
 {{- if .Values.leaderWorkerSet.enabled }}
 AIKit deployed in distributed inference mode using LeaderWorkerSet!
 
+CRD check passed (leaderworkerset.x-k8s.io/v1 detected).
+
 - LeaderWorkerSet replicas: {{ .Values.leaderWorkerSet.replicas }}
 - Pods per replica: {{ .Values.leaderWorkerSet.leaderWorkerTemplate.size }} (1 leader + {{ sub .Values.leaderWorkerSet.leaderWorkerTemplate.size 1 }} workers)
 
 Check deployment status:
   kubectl get leaderworkerset {{ include "aikit.fullname" . }} -n {{ .Release.Namespace }}
 
+If you see an error that the resource type is not found, install the LWS CRD:
+  kubectl apply -f https://github.com/kubernetes-sigs/lws/releases/latest/download/crds.yaml
+
 {{- else }}
 AIKit deployed in standard mode!
-
 {{- end }}
 Access AIKit WebUI or API by running the following commands:
 
@@ -33,6 +37,9 @@ Monitor distributed inference:
 
   # Check worker pod logs
   kubectl logs -l app.kubernetes.io/name={{ include "aikit.name" . }},leaderworkerset.sigs.k8s.io/pod-role=worker -n {{ .Release.Namespace }}
+
+If you have not yet installed the CRD (required before enabling), apply:
+  kubectl apply -f https://github.com/kubernetes-sigs/lws/releases/latest/download/crd.yaml
 
 For more information about distributed inference, see:
   https://github.com/kubernetes-sigs/lws

@@ -1,4 +1,4 @@
-#syntax=aikit:test
+#syntax=sozercan/aikit:test
 apiVersion: v1alpha1
 debug: true
 models:

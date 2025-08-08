@@ -1,15 +1,17 @@
+{{- if .Values.leaderWorkerSet.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "aikit.fullname" . }}
+  name: {{ include "aikit.fullname" . }}-headless
   labels:
     {{- include "aikit.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
+  clusterIP: None
+  selector:
+    {{- include "aikit.selectorLabels" . | nindent 4 }}
   ports:
     - port: {{ .Values.service.port }}
       targetPort: 8080
       protocol: TCP
       name: http
-  selector:
-    {{- include "aikit.selectorLabels" . | nindent 4 }}
+{{- end }}

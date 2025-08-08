@@ -39,6 +39,9 @@ func Aikit2LLB(c *config.InferenceConfig, platform *specs.Platform) (llb.State, 
 		return state, nil, err
 	}
 
+	// Add the aikit-leader wrapper binary to the image so we can run LWS leader
+	state, merge = addAikitLeader(state, merge, *platform)
+
 	// install cuda if runtime is nvidia and architecture is amd64
 	if c.Runtime == utils.RuntimeNVIDIA && platform.Architecture == utils.PlatformAMD64 {
 		state, merge = installCuda(c, state, merge)
@@ -181,6 +184,24 @@ func addLocalAI(c *config.InferenceConfig, s llb.State, merge llb.State, platfor
 
 	diff := llb.Diff(savedState, s)
 	return s, llb.Merge([]llb.State{merge, diff}), nil
+}
+
+// addAikitLeader builds the leader wrapper from this repo and adds it to /usr/bin.
+func addAikitLeader(s llb.State, merge llb.State, _ specs.Platform) (llb.State, llb.State) {
+	// Copy a prebuilt leader binary from the local build context into the image.
+	// Ensure you run: make build-aikit-leader-binary (outputs bin/aikit-leader)
+	// Include timestamp file to force cache invalidation
+	ctx := llb.Local("context", llb.IncludePatterns([]string{"bin/aikit-leader", "bin/build-timestamp.txt"}))
+
+	saved := s
+	s = s.File(
+		llb.Copy(ctx, "bin/aikit-leader", "/usr/bin/aikit-leader"),
+		llb.WithCustomName("Copy aikit-leader to /usr/bin"),
+	)
+	s = s.Run(utils.Sh("chmod +x /usr/bin/aikit-leader"), llb.WithCustomName("Chmod aikit-leader")).Root()
+
+	diff := llb.Diff(saved, s)
+	return s, llb.Merge([]llb.State{merge, diff})
 }
 
 // cloneLocalAI clones the LocalAI repository to the image used for python backends.

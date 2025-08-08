@@ -1,30 +1,26 @@
 image:
-  repository: ghcr.io/kaito-project/aikit/llama3
-  tag: "8b"
+  repository: docker.io/sozercan/testmodel
+  tag: "test"
   pullPolicy: IfNotPresent
 
 replicaCount: 1
 
 # LeaderWorkerSet configuration for distributed inference
 leaderWorkerSet:
-  enabled: false
+  enabled: true
   replicas: 1
   leaderWorkerTemplate:
-    size: 3  # Total number of pods (1 leader + 2 workers)
+    size: 2  # Total number of pods (1 leader + 2 workers)
     restartPolicy: RecreateGroupOnPodRestart
 
   # Leader configuration
   leader:
-    # Use a wrapper image that can coordinate with LocalAI for distributed inference
-    # If empty, uses the main image (which may not support distributed coordination)
-    image:
-      repository: ""  # e.g., "ghcr.io/sozercan/aikit-leader"
-      tag: ""  # If empty, uses the main image tag
-      pullPolicy: ""  # If empty, uses the main image pullPolicy
+    # Leader uses the main image but runs aikit-leader wrapper instead of local-ai directly
+    port: 8080
     resources: {}
     securityContext: {}
     args: []
-    command: []
+    command: ["/usr/bin/aikit-leader"]
     env:
       # Standard LWS environment variables for coordination
       - name: LWS_GROUP_SIZE
@@ -38,12 +34,8 @@ leaderWorkerSet:
 
   # Worker configuration
   worker:
-    # Use a worker image that can connect to the leader for distributed compute
-    # If empty, uses the main image (which may not support worker coordination)
-    image:
-      repository: ""  # e.g., "ghcr.io/sozercan/aikit-worker"
-      tag: "latest"
-      pullPolicy: IfNotPresent
+    # Worker uses the main image and runs local-ai directly
+    port: 50051
     resources: {}
     securityContext: {}
     args: []

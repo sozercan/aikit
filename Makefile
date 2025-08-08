@@ -21,13 +21,17 @@ lint:
 
 .PHONY: build-aikit
 build-aikit:
-	docker buildx build . -t ${REGISTRY}/aikit/aikit:${TAG} --output=${OUTPUT_TYPE} \
+	docker buildx build . -t ${REGISTRY}/aikit:${TAG} --output=${OUTPUT_TYPE} \
 		--build-arg LDFLAGS=${LDFLAGS} \
 		--progress=plain
 
+.PHONY: build-aikit-leader-binary
+build-aikit-leader-binary:
+	CGO_ENABLED=0 go build -o ./bin/aikit-leader ./cmd/aikit-leader
+
 .PHONY: build-test-model
 build-test-model:
-	docker buildx build . -t ${REGISTRY}/aikit/${TEST_IMAGE_NAME}:${TAG} -f ${TEST_FILE} \
+	docker buildx build . -t ${REGISTRY}/${TEST_IMAGE_NAME}:${TAG} -f ${TEST_FILE} \
 		--progress=plain --provenance=false \
 		--output=${OUTPUT_TYPE} \
 		--build-arg runtime=${RUNTIME} \

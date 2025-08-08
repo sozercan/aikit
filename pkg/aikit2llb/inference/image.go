@@ -17,6 +17,8 @@ func NewImageConfig(c *config.InferenceConfig, platform *specs.Platform) *specs.
 		cmd = append(cmd, "--config-file=/config.yaml")
 	}
 
+	// Default entrypoint remains local-ai. If running as LWS leader, chart can override command
+	// to "/usr/bin/aikit-leader".
 	img.Config.Entrypoint = []string{"local-ai"}
 	img.Config.Cmd = cmd
 	return img

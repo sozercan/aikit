@@ -1,4 +1,4 @@
-{{- if .Values.leaderWorkerSet.enabled }}
+{{- if and .Values.leaderWorkerSet.enabled (.Capabilities.APIVersions.Has "leaderworkerset.x-k8s.io/v1") }}
 apiVersion: leaderworkerset.x-k8s.io/v1
 kind: LeaderWorkerSet
 metadata:
@@ -20,6 +20,7 @@ spec:
         {{- end }}
         labels:
           {{- include "aikit.labels" . | nindent 10 }}
+          app.kubernetes.io/component: leader
           {{- with .Values.podLabels }}
           {{- toYaml . | nindent 10 }}
           {{- end }}
@@ -42,13 +43,8 @@ spec:
                 type: RuntimeDefault
               {{- end }}
               {{- toYaml .Values.securityContext | nindent 14 }}
-            {{- if .Values.leaderWorkerSet.leader.image.repository }}
-            image: "{{ .Values.leaderWorkerSet.leader.image.repository }}:{{ .Values.leaderWorkerSet.leader.image.tag | default .Chart.AppVersion }}"
-            imagePullPolicy: {{ .Values.leaderWorkerSet.leader.image.pullPolicy | default .Values.image.pullPolicy }}
-            {{- else }}
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
             imagePullPolicy: {{ .Values.image.pullPolicy }}
-            {{- end }}
             {{- with .Values.leaderWorkerSet.leader.command }}
             command:
               {{- toYaml . | nindent 14 }}
@@ -63,7 +59,7 @@ spec:
             {{- end }}
             ports:
               - name: http
-                containerPort: 8080
+                containerPort: {{ .Values.leaderWorkerSet.leader.port | default 8080 }}
                 protocol: TCP
             livenessProbe:
               {{- toYaml .Values.livenessProbe | nindent 14 }}
@@ -88,6 +84,17 @@ spec:
           {{- toYaml . | nindent 10 }}
         {{- end }}
     workerTemplate:
+      metadata:
+        {{- with .Values.podAnnotations }}
+        annotations:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        labels:
+          {{- include "aikit.labels" . | nindent 10 }}
+          app.kubernetes.io/component: worker
+          {{- with .Values.podLabels }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
       spec:
         {{- with .Values.imagePullSecrets }}
         imagePullSecrets:
@@ -107,13 +114,8 @@ spec:
                 type: RuntimeDefault
               {{- end }}
               {{- toYaml .Values.securityContext | nindent 14 }}
-            {{- if .Values.leaderWorkerSet.worker.image.repository }}
-            image: "{{ .Values.leaderWorkerSet.worker.image.repository }}:{{ .Values.leaderWorkerSet.worker.image.tag }}"
-            imagePullPolicy: {{ .Values.leaderWorkerSet.worker.image.pullPolicy }}
-            {{- else }}
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
             imagePullPolicy: {{ .Values.image.pullPolicy }}
-            {{- end }}
             {{- with .Values.leaderWorkerSet.worker.command }}
             command:
               {{- toYaml . | nindent 14 }}
@@ -125,6 +127,12 @@ spec:
             {{- with .Values.leaderWorkerSet.worker.env }}
             env:
               {{- toYaml . | nindent 14 }}
+            {{- end }}
+            {{- if .Values.leaderWorkerSet.worker.port }}
+            ports:
+              - name: worker
+                containerPort: {{ .Values.leaderWorkerSet.worker.port }}
+                protocol: TCP
             {{- end }}
             resources:
               {{- if .Values.leaderWorkerSet.worker.resources }}
@@ -144,4 +152,6 @@ spec:
         tolerations:
           {{- toYaml . | nindent 10 }}
         {{- end }}
+{{- else if .Values.leaderWorkerSet.enabled }}
+{{ fail "leaderWorkerSet.enabled=true but CRD leaderworkerset.x-k8s.io/v1 not found in cluster" }}
 {{- end }}

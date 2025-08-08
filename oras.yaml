@@ -1,0 +1,62 @@
+# syntax=ghcr.io/azure/dalec/frontend:0.16
+args:
+  VERSION: 1.2.3
+  COMMIT: 10fb4e54ba99e8df2ec29a0f14eb12e4058bb500
+  REVISION: "1"
+
+name: oras
+version: ${VERSION}
+revision: ${REVISION}
+packager: AIKit
+vendor: AIKit
+license: Apache-2.0
+description: OCI registry client - managing content like artifacts, images, packages
+website: https://github.com/oras-project/oras
+
+sources:
+  src:
+    generate:
+      - gomod: {}
+    git:
+      url: https://github.com/oras-project/oras.git
+      commit: ${COMMIT}
+
+targets:
+  azlinux3:
+    dependencies:
+      build:
+        golang:
+      runtime:
+        jq:
+        curl:
+
+build:
+  steps:
+    - command: |
+        cd src
+        ID=$(grep '^ID=' /etc/os-release | cut -d'=' -f2)
+        VERSION=$(grep '^VERSION=' /etc/os-release | cut -d'=' -f2 | tr -d '"')
+        BUILD_TARGET=$ID.$VERSION
+        PROJECT_PKG="oras.land/oras"
+        LDFLAGS="-w -X ${PROJECT_PKG}/internal/version.BuildMetadata=${BUILD_TARGET}"
+        go build -ldflags "${LDFLAGS}" -o oras ${PROJECT_PKG}/cmd/oras
+artifacts:
+  binaries:
+    src/oras: {}
+  licenses:
+    src/LICENSE: {}
+
+image:
+  entrypoint: /usr/bin/oras
+
+tests:
+  - name: check oras binary
+    files:
+      /usr/bin/oras:
+        permissions: 0755
+  - name: run oras commands
+    steps:
+      - command: /usr/bin/oras version
+        stdout:
+          matches:
+          - "Version:    ${VERSION}*"
